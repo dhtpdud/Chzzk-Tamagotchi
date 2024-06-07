@@ -7,6 +7,8 @@ public class SpawnerAuthoring : MonoBehaviour
     public int totalCount;
     public int interval;
     public bool isRandomSize;
+    public float minSize;
+    public float maxSize;
     public class SpawnerAuthoringBaker : Baker<SpawnerAuthoring>
     {
         public override void Bake(SpawnerAuthoring authoring)
@@ -24,7 +26,13 @@ public class SpawnerAuthoring : MonoBehaviour
                 spawnPrefab = GetEntity(authoring.spawnPrefab, TransformUsageFlags.None),
                 maxCount = authoring.totalCount,
                 spawnIntervalSec = authoring.interval,
-                isRandomSize = authoring.isRandomSize
+                isRandomSize = authoring.isRandomSize,
+                minSize = authoring.minSize,
+                maxSize = authoring.maxSize
+            });
+            AddComponent(entity, new RandomDataComponent
+            {
+                Random = new Unity.Mathematics.Random((uint)Random.Range(int.MinValue, int.MaxValue))
             });
         }
     }

@@ -1,6 +1,11 @@
 using Unity.Entities;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
+public struct DragableComponent : IComponentData
+{
+
+}
 public struct PeepoComponent : IComponentData
 {
     public int totalDonation;
@@ -14,6 +19,8 @@ public struct SpawnerComponent : IComponentData
     public int spawnedCount;
     public float spawnIntervalSec;
     public bool isRandomSize;
+    public float minSize;
+    public float maxSize;
 }
 public struct MouseInfoComponent : IComponentData
 {
@@ -32,4 +39,8 @@ public struct MouseInfoComponent : IComponentData
     public float dragPower;
 
     public Entity dragingEntity;
+}
+public struct RandomDataComponent : IComponentData
+{
+    public Random Random;
 }

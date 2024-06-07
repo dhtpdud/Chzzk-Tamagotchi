@@ -1,15 +1,12 @@
 using Cysharp.Threading.Tasks;
 using OSY;
-using System;
-using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.Profiling;
-using static Unity.Entities.EntitiesJournaling;
 
 public class GameManager : Singleton<GameManager>
 {
-    public int targetFPS=0;
+    public int targetFPS = 0;
     [HideInInspector]
     public string EmptyString = "";
 

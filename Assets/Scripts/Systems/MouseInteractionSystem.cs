@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Core;
 using Unity.Entities;
@@ -95,8 +94,11 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
             var hitEntity = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
-            GameManager.Instance.dragingEntity = hitEntity;
-            GameManager.Instance.isDragging = true;
+            if(entityManager.HasComponent<DragableComponent>(hitEntity))
+            {
+                GameManager.Instance.dragingEntity = hitEntity;
+                GameManager.Instance.isDragging = true;
+            }
         }
     }
     private void OnMouseDrag()

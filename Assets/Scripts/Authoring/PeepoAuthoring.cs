@@ -19,6 +19,7 @@ public class PeepoAuthoring : MonoBehaviour
                 totalDonation = authoring.totalDonation,
                 isChatBubble = true,
             });
+            AddComponent(entity, new DragableComponent());
         }
     }
 }
