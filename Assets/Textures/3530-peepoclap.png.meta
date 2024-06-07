@@ -222,7 +222,9 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      3530-peepoclap_0: -2622470051727220965
+      3530-peepoclap_1: -7972226436830633058
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Physics;
 using Unity.Transforms;
 
+[BurstCompile, UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public partial struct Physic2DSystem : ISystem
 {
     [BurstCompile]

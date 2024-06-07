@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      2236-peepo-rifle_0: -1826306878987330436
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

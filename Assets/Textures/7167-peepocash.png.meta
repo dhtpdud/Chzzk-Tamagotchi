@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      7167-peepocash_0: 1087842376523307552
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

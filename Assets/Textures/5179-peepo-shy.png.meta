@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      5179-peepo-shy_0: 5602448617181842722
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

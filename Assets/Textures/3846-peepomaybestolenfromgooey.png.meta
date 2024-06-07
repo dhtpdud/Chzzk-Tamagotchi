@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      3846-peepomaybestolenfromgooey_0: -941369166708738924
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

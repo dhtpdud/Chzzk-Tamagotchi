@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      9053-peepo-adidas_0: -8527154206697916520
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

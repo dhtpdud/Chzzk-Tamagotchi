@@ -13,6 +13,7 @@ public struct SpawnerComponent : IComponentData
     public int maxCount;
     public int spawnedCount;
     public float spawnIntervalSec;
+    public bool isRandomSize;
 }
 public struct MouseInfoComponent : IComponentData
 {

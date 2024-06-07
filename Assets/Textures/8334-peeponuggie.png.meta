@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      8334-peeponuggie_0: 7406081762073329346
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

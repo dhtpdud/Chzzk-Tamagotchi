@@ -6,6 +6,7 @@ public class SpawnerAuthoring : MonoBehaviour
     public GameObject spawnPrefab;
     public int totalCount;
     public int interval;
+    public bool isRandomSize;
     public class SpawnerAuthoringBaker : Baker<SpawnerAuthoring>
     {
         public override void Bake(SpawnerAuthoring authoring)
@@ -22,7 +23,8 @@ public class SpawnerAuthoring : MonoBehaviour
             {
                 spawnPrefab = GetEntity(authoring.spawnPrefab, TransformUsageFlags.None),
                 maxCount = authoring.totalCount,
-                spawnIntervalSec = authoring.interval
+                spawnIntervalSec = authoring.interval,
+                isRandomSize = authoring.isRandomSize
             });
         }
     }

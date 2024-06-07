@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 4361004265060234793}
   - component: {fileID: 8036343593646345498}
   - component: {fileID: 2298591741213852009}
-  - component: {fileID: 4896046523774823206}
   - component: {fileID: 6035465228374207805}
+  - component: {fileID: 4459835897779520491}
   m_Layer: 0
-  m_Name: Peepo
+  m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,8 +30,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2836, y: 0.2836, z: 0.2836}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -79,12 +79,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3864654225977550766, guid: 9c3b3ed8a3e908448b60ef815bd9ebfb, type: 3}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -117,7 +117,23 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 56
   m_CollisionDetection: 2
---- !u!65 &4896046523774823206
+--- !u!114 &6035465228374207805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765040178466298933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76f8fd9a0bae4284d814da16e3c5706e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  userName: 
+  totalDonation: 0
+  lastChat: 
+  isChatBubble: 0
+--- !u!65 &4459835897779520491
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,21 +152,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.12, y: 1.07, z: 0.2}
+  m_Size: {x: 0.16, y: 0.16, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6035465228374207805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1765040178466298933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76f8fd9a0bae4284d814da16e3c5706e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  userName: 
-  totalDonation: 0
-  lastChat: 
-  isChatBubble: 0

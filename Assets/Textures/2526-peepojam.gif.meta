@@ -322,7 +322,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      2526-peepojam_0: -3573069790510642240
+      2526-peepojam_1: -5531867864022508962
+      2526-peepojam_2: -8729655283385911909
+      2526-peepojam_3: -3585268002832359805
+      2526-peepojam_4: 5100804740789173180
+      2526-peepojam_5: -5308291940122859059
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

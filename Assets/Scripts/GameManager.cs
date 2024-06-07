@@ -45,6 +45,7 @@ public class GameManager : Singleton<GameManager>
     public Vector2 onMouseDragedPositionCurrent;
     public Vector2 mouseVelocity;
     public float dragPower;
+    public float stabilityPower;
     public bool isDragging;
 
     public Entity dragingEntity;
@@ -52,12 +53,12 @@ public class GameManager : Singleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        Application.targetFrameRate = targetFPS;
+        var InitInstance = Instance;
         QualitySettings.vSyncCount = 0;
         QualitySettings.maxQueuedFrames = 4;
+        Application.targetFrameRate = targetFPS;
         Screen.SetResolution(ScreenWidth, ScreenHeight, false);
         ScreenRect = new Rect(0, 0, ScreenWidth, ScreenHeight);
-        var InitInstance = Instance;
         Profiler.maxUsedMemory = 2000000000;//2GB
         originTargetFramerate = Application.targetFrameRate;
         origincaptureFramerate = Time.captureFramerate;

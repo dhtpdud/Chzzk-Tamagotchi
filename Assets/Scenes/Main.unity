@@ -357,7 +357,8 @@ MonoBehaviour:
   onMouseDragedPositionLast: {x: 0, y: 0}
   onMouseDragedPositionCurrent: {x: 0, y: 0}
   mouseVelocity: {x: 0, y: 0}
-  dragPower: 20
+  dragPower: 100
+  stabilityPower: 1
   isDragging: 0
 --- !u!4 &1192278570
 Transform:
@@ -378,6 +379,6 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 519420032}
   - {fileID: 1192278570}
+  - {fileID: 519420032}
   - {fileID: 1179863448}

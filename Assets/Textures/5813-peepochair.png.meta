@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      5813-peepochair_0: 5382332884703213038
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

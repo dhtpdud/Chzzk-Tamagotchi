@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      3711-autisticderp_0: -878454813867240397
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

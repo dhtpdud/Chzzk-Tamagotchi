@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      6550-peepocowboy_0: 3855941595142552828
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      9076-peepo-giggle_0: -3249426154690487742
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

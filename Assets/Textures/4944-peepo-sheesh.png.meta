@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      4944-peepo-sheesh_0: -760380578768142832
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

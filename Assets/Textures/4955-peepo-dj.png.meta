@@ -197,7 +197,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      4955-peepo-dj_0: -1271381277756843633
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

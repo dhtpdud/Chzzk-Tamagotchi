@@ -1,3 +1,4 @@
+using OSY;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
@@ -14,7 +15,7 @@ public partial struct SpawnerSystem : ISystem
             if (spawnerComponent.ValueRO.spawnedCount >= spawnerComponent.ValueRO.maxCount) return;
             Entity spawnedEntity = entityManager.Instantiate(spawnerComponent.ValueRO.spawnPrefab);
             var sapwnedEnityTrans = entityManager.GetComponentData<LocalTransform>(spawnedEntity);
-            var initTransform = new LocalTransform { Position = spawnerTransform.ValueRO.Position, Rotation = spawnerTransform.ValueRO.Rotation, Scale = sapwnedEnityTrans.Scale };
+            var initTransform = new LocalTransform { Position = spawnerTransform.ValueRO.Position, Rotation = spawnerTransform.ValueRO.Rotation, Scale = spawnerComponent.ValueRO.isRandomSize ? Utils.GetRandom(1f, 3f) : sapwnedEnityTrans.Scale };
             entityManager.SetComponentData(spawnedEntity, initTransform);
             spawnerComponent.ValueRW.spawnedCount++;
         }
