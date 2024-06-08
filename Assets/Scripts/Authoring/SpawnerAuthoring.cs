@@ -23,7 +23,7 @@ public class SpawnerAuthoring : MonoBehaviour
             });*/
             AddComponent(entity, new SpawnerComponent
             {
-                spawnPrefab = GetEntity(authoring.spawnPrefab, TransformUsageFlags.None),
+                spawnPrefab = GetEntity(authoring.spawnPrefab, TransformUsageFlags.Dynamic),
                 maxCount = authoring.totalCount,
                 spawnIntervalSec = authoring.interval,
                 isRandomSize = authoring.isRandomSize,

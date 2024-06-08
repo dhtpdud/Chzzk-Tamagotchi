@@ -773,7 +773,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Standalone: 
+    Standalone: UNITY_PHYSICS_DISABLE_INTEGRITY_CHECKS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

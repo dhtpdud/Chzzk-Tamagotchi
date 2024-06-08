@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
@@ -6,12 +7,35 @@ public struct DragableComponent : IComponentData
 {
 
 }
+public enum PeepoState
+{
+    Ragdoll,
+    Idle,
+    Dance
+}
 public struct PeepoComponent : IComponentData
 {
+    public PeepoState state;
+
+    public float3 lastVelocity;
+    public float3 currentVelocity;
+
+    public float lastAngularVelocity;
+    public float currentAngularVelocity;
+
+
+    public float currentImpact;
+
+    public float switchTime;
+
     public int totalDonation;
     public bool isChatBubble;
 }
-
+public struct EntityStoreComponent : IComponentData
+{
+    public Entity peepo;
+    public Entity mouseRock;
+}
 public struct SpawnerComponent : IComponentData
 {
     public Entity spawnPrefab;

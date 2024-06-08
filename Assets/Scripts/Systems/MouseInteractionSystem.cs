@@ -13,36 +13,14 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
     private PhysicsWorldSingleton _physicsWorldSingleton;
     private EntityManager entityManager;
-    struct MouseRock
-    {
-        public Entity entity;
-        public float size;
-        public float dragPower;
-        public float stabilityPower;
-        public PhysicsVelocity velocity;
-        public LocalTransform localTransform;
-
-        public MouseRock(Entity entity, PhysicsVelocity velocity, LocalTransform localTransform, float size, float dragPower, float stabilityPower)
-        {
-            this.entity = entity;
-            this.velocity = velocity;
-            this.localTransform = localTransform;
-            this.size = size;
-            this.dragPower = dragPower;
-            this.stabilityPower = stabilityPower;
-        }
-    }
-    MouseRock mouseRock;
+    Entity mouseRockEntity;
     TimeData time;
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
         entityManager = state.EntityManager;
-        var MouseRockEntity = entityManager.Instantiate(SystemAPI.GetSingleton<SpawnerComponent>().spawnPrefab);
-        var MouseRockVelocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRock.entity);
-        var MouseRockLocalTransform = entityManager.GetComponentData<LocalTransform>(mouseRock.entity);
-        mouseRock = new MouseRock(MouseRockEntity, MouseRockVelocity, MouseRockLocalTransform, 1, 500, 5);
-        entityManager.SetEnabled(mouseRock.entity, false);
+        mouseRockEntity = entityManager.Instantiate(SystemAPI.GetSingleton<EntityStoreComponent>().mouseRock);
+        entityManager.SetEnabled(mouseRockEntity, false);
     }
 
 
@@ -65,18 +43,17 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
-            entityManager.SetEnabled(mouseRock.entity, true);
+            entityManager.SetEnabled(mouseRockEntity, true);
         }
         if (Input.GetKey(KeyCode.LeftAlt))
         {
-            mouseRock.velocity.Linear = Vector3.Lerp(mouseRock.velocity.Linear, Vector3.zero, 5 * time.DeltaTime);
-            mouseRock.velocity.Linear += ((float3)((Vector3)GameManager.Instance.onMouseDragingPosition) - mouseRock.localTransform.Position) * 200 * time.DeltaTime;
-
-            entityManager.SetComponentData(mouseRock.entity, mouseRock.velocity);
+            var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
+            localTransform.Position = (Vector3)GameManager.Instance.mouseCurrentPosition;
+            entityManager.SetComponentData(mouseRockEntity, localTransform);
         }
         if (Input.GetKeyUp(KeyCode.LeftAlt))
         {
-            entityManager.SetEnabled(mouseRock.entity, false);
+            entityManager.SetEnabled(mouseRockEntity, false);
         }
     }
 
@@ -94,7 +71,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
             var hitEntity = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
-            if(entityManager.HasComponent<DragableComponent>(hitEntity))
+            if (entityManager.HasComponent<DragableComponent>(hitEntity))
             {
                 GameManager.Instance.dragingEntity = hitEntity;
                 GameManager.Instance.isDragging = true;
