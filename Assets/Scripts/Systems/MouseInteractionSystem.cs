@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using Unity.Burst;
 using Unity.Core;
 using Unity.Entities;
@@ -15,6 +16,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     private EntityManager entityManager;
     Entity mouseRockEntity;
     TimeData time;
+    float2 objectPositionOnDown;
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
@@ -71,8 +73,10 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
             var hitEntity = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
-            if (entityManager.HasComponent<DragableComponent>(hitEntity))
+            if (entityManager.HasComponent<DragableTag>(hitEntity))
             {
+                var hitEntityPosition = entityManager.GetComponentData<LocalTransform>(hitEntity).Position;
+                objectPositionOnDown = new float2(hitEntityPosition.x, hitEntityPosition.y);
                 GameManager.Instance.dragingEntity = hitEntity;
                 GameManager.Instance.isDragging = true;
             }
@@ -83,11 +87,20 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (!GameManager.Instance.isDragging) return;
         var dragingEntity = GameManager.Instance.dragingEntity;
 
+        if (entityManager.HasComponent<PeepoComponent>(dragingEntity))
+        {
+            var peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntity);
+            peepoComponent.state = PeepoState.Ragdoll;
+            peepoComponent.switchTime = 0;
+            entityManager.SetComponentData(dragingEntity, peepoComponent);
+        }
+
         var velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntity);
         var localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntity);
 
         velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, GameManager.Instance.stabilityPower * time.DeltaTime);
-        velocity.Linear += ((float3)((Vector3)GameManager.Instance.onMouseDragingPosition) - localTransform.Position) * GameManager.Instance.dragPower * time.DeltaTime;
+        float2 power = objectPositionOnDown + (float2)(GameManager.Instance.onMouseDragingPosition - GameManager.Instance.onMouseDownPosition) - new float2(localTransform.Position.x, localTransform.Position.y);
+        velocity.Linear += new float3(power.x, power.y, 0) * GameManager.Instance.dragPower * time.DeltaTime;
 
         entityManager.SetComponentData(dragingEntity, velocity);
     }

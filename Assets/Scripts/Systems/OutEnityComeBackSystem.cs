@@ -34,7 +34,7 @@ partial struct OutEnityComeBackSystem : ISystem
     [BurstCompile]
     partial struct OutEnityComeBackJob : IJobEntity
     {
-        public void Execute(in DragableComponent dragable, ref LocalTransform localTransform)
+        public void Execute(in DragableTag dragable, ref LocalTransform localTransform)
         {
             if (localTransform.Position.x > 8.5f * 2)
             {

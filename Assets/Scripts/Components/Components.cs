@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
-public struct DragableComponent : IComponentData
+public struct DragableTag : IComponentData
 {
 
 }
@@ -41,7 +41,10 @@ public struct SpawnerComponent : IComponentData
     public Entity spawnPrefab;
     public int maxCount;
     public int spawnedCount;
+
     public float spawnIntervalSec;
+    public float currentSec;
+
     public bool isRandomSize;
     public float minSize;
     public float maxSize;

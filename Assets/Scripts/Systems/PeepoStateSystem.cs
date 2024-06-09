@@ -48,7 +48,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                 case PeepoState.Ragdoll:
                     //collider.Value.Value.SetCollisionFilter(onRagdollFilter);
                     collider.Value = onRagdollCollider;
-                    if (peepoComponent.currentImpact <= 0.1f)
+                    if (peepoComponent.currentImpact <= 0.2f)
                     {
                         peepoComponent.switchTime += time.DeltaTime;
                         if (peepoComponent.switchTime > 3)

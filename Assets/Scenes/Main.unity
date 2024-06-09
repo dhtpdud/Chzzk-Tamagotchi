@@ -357,8 +357,8 @@ MonoBehaviour:
   onMouseDragedPositionLast: {x: 0, y: 0}
   onMouseDragedPositionCurrent: {x: 0, y: 0}
   mouseVelocity: {x: 0, y: 0}
-  dragPower: 100
-  stabilityPower: 1
+  dragPower: 500
+  stabilityPower: 10
   isDragging: 0
 --- !u!4 &1192278570
 Transform:

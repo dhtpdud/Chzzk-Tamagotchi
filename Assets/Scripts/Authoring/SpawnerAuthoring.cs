@@ -5,7 +5,7 @@ public class SpawnerAuthoring : MonoBehaviour
 {
     public GameObject spawnPrefab;
     public int totalCount;
-    public int interval;
+    public float intervalSec;
     public bool isRandomSize;
     public float minSize;
     public float maxSize;
@@ -25,7 +25,7 @@ public class SpawnerAuthoring : MonoBehaviour
             {
                 spawnPrefab = GetEntity(authoring.spawnPrefab, TransformUsageFlags.Dynamic),
                 maxCount = authoring.totalCount,
-                spawnIntervalSec = authoring.interval,
+                spawnIntervalSec = authoring.intervalSec,
                 isRandomSize = authoring.isRandomSize,
                 minSize = authoring.minSize,
                 maxSize = authoring.maxSize
