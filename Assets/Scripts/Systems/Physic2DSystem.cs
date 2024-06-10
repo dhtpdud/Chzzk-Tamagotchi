@@ -8,11 +8,11 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct Physic2DSystem : ISystem, ISystemStartStop
 {
-    float maxVelocity;
+    GameManagerComponent gameManager;
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
-        maxVelocity = SystemAPI.GetSingleton<GameManagerComponent>().physicMaxVelocity;
+        gameManager = SystemAPI.GetSingleton<GameManagerComponent>();
     }
 
     [BurstCompile]
@@ -23,7 +23,7 @@ public partial struct Physic2DSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = this.maxVelocity }.ScheduleParallel();
+        new Physic2DJob { maxVelocity = gameManager.physicMaxVelocity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity

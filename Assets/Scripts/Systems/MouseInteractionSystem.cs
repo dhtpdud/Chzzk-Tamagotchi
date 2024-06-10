@@ -2,7 +2,6 @@ using OSY;
 using Unity.Burst;
 using Unity.Core;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
@@ -55,6 +54,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     {
         entityManager = state.EntityManager;
         mouseRockEntity = entityManager.Instantiate(SystemAPI.GetSingleton<EntityStoreComponent>().mouseRock);
+        entityManager.AddComponent<MouseRockTag>(mouseRockEntity);
         entityManager.SetEnabled(mouseRockEntity, false);
     }
 
@@ -64,18 +64,19 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         time = SystemAPI.Time;
         gameManager = SystemAPI.GetSingleton<GameManagerComponent>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        EntityCommandBuffer ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
 
         if (Input.GetMouseButtonDown(0))
         {
             OnMouseDown();
         }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            OnMouseUp();
+        }
         if (Input.GetMouseButton(0))
         {
             OnMouse();
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
-            OnMouseUp();
         }
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
@@ -89,21 +90,12 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             entityManager.SetComponentData(mouseRockEntity, velocity);
             entityManager.SetEnabled(mouseRockEntity, true);
         }
-        if (Input.GetKey(KeyCode.LeftAlt))
-        {
-            var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
-            var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
-
-            velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, 20 * time.DeltaTime);
-            float2 power = (float2)(gameManager.ScreenToWorldPointMainCam) - new float2(localTransform.Position.x, localTransform.Position.y);
-            velocity.Linear += new float3(power.x, power.y, 0) * 300 * time.DeltaTime;
-
-            entityManager.SetComponentData(mouseRockEntity, velocity);
-        }
-        if (Input.GetKeyUp(KeyCode.LeftAlt))
+        else if (Input.GetKeyUp(KeyCode.LeftAlt))
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }
+        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, parallelWriter = ecb.AsParallelWriter(), time = time }.ScheduleParallel(state.Dependency).Complete();
+        ecb.Playback(state.EntityManager);
     }
 
     private void OnMouseDown()
@@ -178,11 +170,26 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public void OnStopRunning(ref SystemState state)
     {
     }
-    public partial struct TaskJob : IJob
+    public partial struct MouseRockJob : IJobEntity
     {
-        public void Execute()
+        public EntityCommandBuffer.ParallelWriter parallelWriter;
+        public Vector2 screenToWorldPointMainCam;
+        public float maxVelocity;
+        public TimeData time;
+        public void Execute(in MouseRockTag mouseRockTag, ref PhysicsVelocity velocity, ref LocalTransform localTransform, in Entity entity)
         {
-            throw new System.NotImplementedException();
+            float2 power = (float2)(screenToWorldPointMainCam) - new float2(localTransform.Position.x, localTransform.Position.y);
+            velocity.Linear += new float3(power.x, power.y, 0) * 500 * time.DeltaTime;
+            velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, 20 * time.DeltaTime);
+            if (velocity.Linear.x > maxVelocity)
+                velocity.Linear.x = maxVelocity;
+            else if (velocity.Linear.x < -maxVelocity)
+                velocity.Linear.x = -maxVelocity;
+
+            if (velocity.Linear.y > maxVelocity)
+                velocity.Linear.y = maxVelocity;
+            else if (velocity.Linear.y < -maxVelocity)
+                velocity.Linear.y = -maxVelocity;
         }
     }
 }

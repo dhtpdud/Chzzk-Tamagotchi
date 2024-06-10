@@ -9,6 +9,10 @@ public struct DragableTag : IComponentData
 {
 
 }
+public struct MouseRockTag : IComponentData
+{
+
+}
 public enum PeepoState
 {
     Ragdoll,
