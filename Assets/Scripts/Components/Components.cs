@@ -1,7 +1,9 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
+using Ray = UnityEngine.Ray;
 
 public struct DragableTag : IComponentData
 {
@@ -49,23 +51,13 @@ public struct SpawnerComponent : IComponentData
     public float minSize;
     public float maxSize;
 }
-public struct MouseInfoComponent : IComponentData
+public struct GameManagerComponent : IComponentData
 {
-    public bool isMouseDown;
-    public bool isMouse;
-    public bool isMouseUp;
-    public bool isDragging;
+    public Ray ScreenPointToRayOfMainCam;
+    public Vector2 ScreenToWorldPointMainCam;
 
-    public Vector2 onMouseDownPosition;
-    public Vector2 mouseCurrentPosition;
-    public Vector2 onMouseDragingPosition;
-
-    public Vector2 onMouseDragedPositionLast;
-    public Vector2 onMouseDragedPositionCurrent;
-    public Vector2 mouseVelocity;
     public float dragPower;
-
-    public Entity dragingEntity;
+    public float stabilityPower;
 }
 public struct RandomDataComponent : IComponentData
 {

@@ -347,19 +347,8 @@ MonoBehaviour:
     y: 0
     width: 0
     height: 0
-  mainCam: {fileID: 519420031}
-  isMouseDown: 0
-  isMouse: 0
-  isMouseUp: 0
-  onMouseDownPosition: {x: 0, y: 0}
-  mouseCurrentPosition: {x: 0, y: 0}
-  onMouseDragingPosition: {x: 0, y: 0}
-  onMouseDragedPositionLast: {x: 0, y: 0}
-  onMouseDragedPositionCurrent: {x: 0, y: 0}
-  mouseVelocity: {x: 0, y: 0}
   dragPower: 500
   stabilityPower: 10
-  isDragging: 0
 --- !u!4 &1192278570
 Transform:
   m_ObjectHideFlags: 0
@@ -379,6 +368,6 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1192278570}
   - {fileID: 519420032}
+  - {fileID: 1192278570}
   - {fileID: 1179863448}

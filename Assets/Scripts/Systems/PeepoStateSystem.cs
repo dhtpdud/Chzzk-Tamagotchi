@@ -11,6 +11,11 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
 {
     BlobAssetReference<Collider> onRagdollCollider;
     BlobAssetReference<Collider> onIdleCollider;
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<PeepoComponent>();
+    }
 
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)

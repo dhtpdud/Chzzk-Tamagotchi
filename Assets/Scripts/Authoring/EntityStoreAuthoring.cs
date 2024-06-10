@@ -13,7 +13,7 @@ public class EntityStoreAuthoring : MonoBehaviour
             AddComponent(entity, new EntityStoreComponent
             {
                 peepo = GetEntity(authoring.peepo, TransformUsageFlags.Dynamic),
-                mouseRock = GetEntity(authoring.mouseRock, TransformUsageFlags.None)
+                mouseRock = GetEntity(authoring.mouseRock, TransformUsageFlags.Dynamic)
             });
         }
     }
