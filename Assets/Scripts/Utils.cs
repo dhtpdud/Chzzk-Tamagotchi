@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Unity.Collections;
+using Unity.Physics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -344,6 +345,30 @@ namespace OSY
         {
             float radians = degrees * Mathf.Deg2Rad;
             return new Vector3(magnitude * Mathf.Cos(radians), magnitude * Mathf.Sin(radians), 0);
+        }
+        public static Unity.Physics.Material GetMaterial(RigidBody rigidBody, ColliderKey colliderKey)
+        {
+            Unity.Physics.Material material;
+            unsafe
+            {
+                Unity.Physics.Collider* colliderPointer = (Unity.Physics.Collider*)rigidBody.Collider.GetUnsafePtr();
+                ChildCollider childCollider;
+                colliderPointer->GetLeaf(colliderKey, out childCollider);
+                ConvexCollider* childColliderPointer = (ConvexCollider*)childCollider.Collider;
+                material = childColliderPointer->Material;
+            }
+            return material;
+        }
+        public static void SetMaterial(RigidBody rigidBody, Unity.Physics.Material material, ColliderKey colliderKey)
+        {
+            unsafe
+            {
+                Unity.Physics.Collider* colliderPointer = (Unity.Physics.Collider*)rigidBody.Collider.GetUnsafePtr();
+                ChildCollider childCollider;
+                colliderPointer->GetLeaf(colliderKey, out childCollider);
+                ConvexCollider* childColliderPointer = (ConvexCollider*)childCollider.Collider;
+                childColliderPointer->Material = material;
+            }
         }
     }
 }

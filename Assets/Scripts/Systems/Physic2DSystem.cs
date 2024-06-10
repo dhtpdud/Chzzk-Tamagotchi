@@ -6,16 +6,29 @@ using Unity.Transforms;
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [BurstCompile]
-public partial struct Physic2DSystem : ISystem
+public partial struct Physic2DSystem : ISystem, ISystemStartStop
 {
+    float maxVelocity;
+    [BurstCompile]
+    public void OnStartRunning(ref SystemState state)
+    {
+        maxVelocity = SystemAPI.GetSingleton<GameManagerComponent>().physicMaxVelocity;
+    }
+
+    [BurstCompile]
+    public void OnStopRunning(ref SystemState state)
+    {
+    }
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob().ScheduleParallel();
+        new Physic2DJob { maxVelocity = this.maxVelocity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity
     {
+        public float maxVelocity;
         public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform)
         {
             localTransform.Position.z = 0;
@@ -25,6 +38,16 @@ public partial struct Physic2DSystem : ISystem
             velocity.Linear.z = 0;
             velocity.Angular.x = 0;
             velocity.Angular.y = 0;
+
+            if (velocity.Linear.x > maxVelocity)
+                velocity.Linear.x = maxVelocity;
+            else if (velocity.Linear.x < -maxVelocity)
+                velocity.Linear.x = -maxVelocity;
+
+            if (velocity.Linear.y > maxVelocity)
+                velocity.Linear.y = maxVelocity;
+            else if (velocity.Linear.y < -maxVelocity)
+                velocity.Linear.y = -maxVelocity;
         }
     }
 }

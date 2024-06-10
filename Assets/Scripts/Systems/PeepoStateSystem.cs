@@ -11,6 +11,8 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
 {
     BlobAssetReference<Collider> onRagdollCollider;
     BlobAssetReference<Collider> onIdleCollider;
+    BlobAssetReference<Collider> onDragingCollider;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
@@ -24,6 +26,8 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         var onIdleFilter = new CollisionFilter { BelongsTo = 2u, CollidesWith = ~2u, GroupIndex = 0 };
         onRagdollCollider = SystemAPI.GetComponent<PhysicsCollider>(SystemAPI.GetSingleton<EntityStoreComponent>().peepo).Value.Value.Clone();
         onIdleCollider = onRagdollCollider.Value.Clone();
+        onDragingCollider = onRagdollCollider.Value.Clone();
+        onDragingCollider.Value.SetRestitution(0);
         onIdleCollider.Value.SetCollisionFilter(onIdleFilter);
     }
 
@@ -34,7 +38,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new PeepoJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider }.ScheduleParallel();
+        new PeepoJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct PeepoJob : IJobEntity
@@ -42,6 +46,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         public TimeData time;
         public BlobAssetReference<Collider> onRagdollCollider;
         public BlobAssetReference<Collider> onIdleCollider;
+        public BlobAssetReference<Collider> onDragingCollider;
 
         public unsafe void Execute(ref PeepoComponent peepoComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
         {
@@ -51,7 +56,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
             switch (peepoComponent.state)
             {
                 case PeepoState.Ragdoll:
-                    //collider.Value.Value.SetCollisionFilter(onRagdollFilter);
                     collider.Value = onRagdollCollider;
                     if (peepoComponent.currentImpact <= 0.2f)
                     {
@@ -69,7 +73,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     break;
 
                 case PeepoState.Idle:
-                    //collider.Value.Value.SetCollisionFilter(onIdleFilter);
                     collider.Value = onIdleCollider;
                     if (peepoComponent.currentImpact > 0.05f)
                     {
@@ -86,7 +89,9 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     }
                     localTransform.Rotation = Quaternion.Lerp(localTransform.Rotation, Quaternion.identity, 10 * time.DeltaTime);
                     break;
-
+                case PeepoState.Draging:
+                    collider.Value = onDragingCollider;
+                    break;
                 case PeepoState.Dance:
                     break;
             }

@@ -13,6 +13,7 @@ public enum PeepoState
 {
     Ragdoll,
     Idle,
+    Draging,
     Dance
 }
 public struct PeepoComponent : IComponentData
@@ -58,6 +59,8 @@ public struct GameManagerComponent : IComponentData
 
     public float dragPower;
     public float stabilityPower;
+
+    public float physicMaxVelocity;
 }
 public struct RandomDataComponent : IComponentData
 {

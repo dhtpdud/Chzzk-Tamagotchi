@@ -1,56 +1,43 @@
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Transforms;
 
-[BurstCompile, UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[BurstCompile]
 partial struct OutEnityComeBackSystem : ISystem
 {
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        /*foreach (var (dragable, localTransform) in SystemAPI.Query<RefRO<DragableComponent>, RefRW<LocalTransform>>())
-        {
-            LocalTransform localTransformRO = localTransform.ValueRO;
-            if (localTransformRO.Position.x > 8.5f)
-            {
-                localTransform.ValueRW.Position.x = 7.5f;
-            }
-            else if (localTransformRO.Position.x < -8.5f)
-            {
-                localTransform.ValueRW.Position.x = -7.5f;
-            }
-            if (localTransformRO.Position.y > 5f)
-            {
-                localTransform.ValueRW.Position.y = 4f;
-            }
-            else if (localTransformRO.Position.y < -5f)
-            {
-                localTransform.ValueRW.Position.y = -4f;
-            }
-        }*/
         new OutEnityComeBackJob().ScheduleParallel();
     }
 
     [BurstCompile]
     partial struct OutEnityComeBackJob : IJobEntity
     {
-        public void Execute(in DragableTag dragable, ref LocalTransform localTransform)
+        public void Execute(in DragableTag dragable, ref LocalTransform localTransform, ref PhysicsVelocity velocity)
         {
             if (localTransform.Position.x > 8.5f * 2)
             {
                 localTransform.Position.x = 7.5f * 2;
+                velocity.Linear.x /= 2;
             }
             else if (localTransform.Position.x < -8.5f * 2)
             {
                 localTransform.Position.x = -7.5f * 2;
+                velocity.Linear.x /= 2;
             }
             if (localTransform.Position.y > 5f * 2)
             {
                 localTransform.Position.y = 4f * 2;
+                velocity.Linear.y /= 2;
             }
             else if (localTransform.Position.y < -5f * 2)
             {
                 localTransform.Position.y = -4f * 2;
+                velocity.Linear.y /= 2;
             }
         }
     }

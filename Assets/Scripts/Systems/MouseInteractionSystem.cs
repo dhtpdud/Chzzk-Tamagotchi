@@ -1,3 +1,4 @@
+using OSY;
 using Unity.Burst;
 using Unity.Core;
 using Unity.Entities;
@@ -6,35 +7,13 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using Material = Unity.Physics.Material;
 using RaycastHit = Unity.Physics.RaycastHit;
 
 [BurstCompile]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
-    [UpdateBefore(typeof(MouseInteractionSystem))]
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
-    public sealed partial class UpdateCameraInfoSystem : SystemBase
-    {
-        public Camera mainCam;
-        protected override void OnStartRunning()
-        {
-            base.OnStartRunning();
-            mainCam = Camera.main;
-            if (!SystemAPI.HasSingleton<GameManagerComponent>())
-                EntityManager.CreateSingleton<GameManagerComponent>(nameof(MouseInteractionSystem));
-            ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerComponent>().ValueRW;
-            gameManagerRW.stabilityPower = GameManager.Instance.stabilityPower;
-            gameManagerRW.dragPower = GameManager.Instance.dragPower;
-        }
-        protected override void OnUpdate()
-        {
-            ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerComponent>().ValueRW;
-            gameManagerRW.ScreenPointToRayOfMainCam = mainCam.ScreenPointToRay(Input.mousePosition);
-            gameManagerRW.ScreenToWorldPointMainCam = mainCam.ScreenToWorldPoint(Input.mousePosition);
-        }
-    }
-
     private PhysicsWorldSingleton _physicsWorldSingleton;
     private GameManagerComponent gameManager;
     private EntityManager entityManager;
@@ -43,7 +22,22 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     float2 objectPositionOnDown;
 
     public bool isDraging;
-    public Entity dragingEntity;
+    struct DragingEntityInfo
+    {
+        readonly public Entity entity;
+        readonly public RigidBody rigidbody;
+        readonly public ColliderKey colliderKey;
+        readonly public Material material;
+
+        public DragingEntityInfo(Entity entity, RigidBody rigidbody, ColliderKey colliderKey, Material material)
+        {
+            this.entity = entity;
+            this.rigidbody = rigidbody;
+            this.colliderKey = colliderKey;
+            this.material = material;
+        }
+    }
+    DragingEntityInfo dragingEntityInfo;
 
     public Vector2 mouseLastPosition;
     public Vector2 mouseVelocity;
@@ -85,13 +79,26 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         }
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
+            var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
+            var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
+
+            velocity.Linear *= 0;
+            localTransform.Position = (Vector3)gameManager.ScreenToWorldPointMainCam;
+
+            entityManager.SetComponentData(mouseRockEntity, localTransform);
+            entityManager.SetComponentData(mouseRockEntity, velocity);
             entityManager.SetEnabled(mouseRockEntity, true);
         }
         if (Input.GetKey(KeyCode.LeftAlt))
         {
+            var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
             var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
-            localTransform.Position = (Vector3)gameManager.ScreenToWorldPointMainCam;
-            entityManager.SetComponentData(mouseRockEntity, localTransform);
+
+            velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, 20 * time.DeltaTime);
+            float2 power = (float2)(gameManager.ScreenToWorldPointMainCam) - new float2(localTransform.Position.x, localTransform.Position.y);
+            velocity.Linear += new float3(power.x, power.y, 0) * 300 * time.DeltaTime;
+
+            entityManager.SetComponentData(mouseRockEntity, velocity);
         }
         if (Input.GetKeyUp(KeyCode.LeftAlt))
         {
@@ -107,13 +114,25 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 
         if (Raycast(rayStart, rayEnd, out var raycastHit))
         {
-            var hitEntity = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex].Entity;
+            var hitRigidBody = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex];
+            var hitEntity = hitRigidBody.Entity;
             if (entityManager.HasComponent<DragableTag>(hitEntity))
             {
                 var hitEntityPosition = entityManager.GetComponentData<LocalTransform>(hitEntity).Position;
                 objectPositionOnDown = new float2(hitEntityPosition.x, hitEntityPosition.y);
-                dragingEntity = hitEntity;
                 isDraging = true;
+
+                Material material = Utils.GetMaterial(hitRigidBody, raycastHit.ColliderKey);
+                dragingEntityInfo = new DragingEntityInfo(hitEntity, hitRigidBody, raycastHit.ColliderKey, material);
+
+                material.RestitutionCombinePolicy = Material.CombinePolicy.Minimum;
+                Utils.SetMaterial(dragingEntityInfo.rigidbody, material, raycastHit.ColliderKey);
+            }
+            if (entityManager.HasComponent<PeepoComponent>(hitEntity))
+            {
+                var peepoComponent = entityManager.GetComponentData<PeepoComponent>(hitEntity);
+                peepoComponent.state = PeepoState.Draging;
+                entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
             }
         }
     }
@@ -122,27 +141,27 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (!isDraging) return;
         onMouseDragingPosition = gameManager.ScreenToWorldPointMainCam;
 
-        if (entityManager.HasComponent<PeepoComponent>(dragingEntity))
-        {
-            var peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntity);
-            peepoComponent.state = PeepoState.Ragdoll;
-            peepoComponent.switchTime = 0;
-            entityManager.SetComponentData(dragingEntity, peepoComponent);
-        }
-
-        var velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntity);
-        var localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntity);
+        var velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntityInfo.entity);
+        var localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntityInfo.entity);
 
         velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, gameManager.stabilityPower * time.DeltaTime);
         float2 power = objectPositionOnDown + (float2)(onMouseDragingPosition - onMouseDownPosition) - new float2(localTransform.Position.x, localTransform.Position.y);
         velocity.Linear += new float3(power.x, power.y, 0) * gameManager.dragPower * time.DeltaTime;
 
-        entityManager.SetComponentData(dragingEntity, velocity);
+        entityManager.SetComponentData(dragingEntityInfo.entity, velocity);
     }
     private void OnMouseUp()
     {
         if (!isDraging) return;
         isDraging = false;
+        if (entityManager.HasComponent<PeepoComponent>(dragingEntityInfo.entity))
+        {
+            var peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntityInfo.entity);
+            peepoComponent.state = PeepoState.Ragdoll;
+            peepoComponent.switchTime = 0;
+            Utils.SetMaterial(dragingEntityInfo.rigidbody, dragingEntityInfo.material, dragingEntityInfo.colliderKey);
+            entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
+        }
     }
     private bool Raycast(float3 rayStart, float3 rayEnd, out RaycastHit raycastHit)
     {

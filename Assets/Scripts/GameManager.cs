@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
 
     public float dragPower;
     public float stabilityPower;
+    public float physicMaxVelocity;
 
     protected void Awake()
     {

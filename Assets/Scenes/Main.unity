@@ -339,8 +339,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetFPS: 0
   EmptyString: 
-  ScreenWidth: 0
-  ScreenHeight: 0
+  ScreenWidth: 1920
+  ScreenHeight: 1080
   ScreenRect:
     serializedVersion: 2
     x: 0
@@ -349,6 +349,7 @@ MonoBehaviour:
     height: 0
   dragPower: 500
   stabilityPower: 10
+  physicMaxVelocity: 400
 --- !u!4 &1192278570
 Transform:
   m_ObjectHideFlags: 0
