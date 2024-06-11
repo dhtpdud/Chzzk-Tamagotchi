@@ -150,7 +150,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f8fd9a0bae4284d814da16e3c5706e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  userName: 
   totalDonation: 0
-  lastChat: 
   isMute: 0

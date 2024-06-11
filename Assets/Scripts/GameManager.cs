@@ -1,10 +1,10 @@
+using OSY;
+using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance;
-
     public int targetFPS = 0;
     [HideInInspector]
     public string EmptyString = "";
@@ -30,10 +30,25 @@ public class GameManager : MonoBehaviour
     public float stabilityPower;
     public float physicMaxVelocity;
 
-    protected void Awake()
+    [Serializable]
+    public class PeepoConfig
     {
+        public float switchTimeImpact;
+
+        public float moveSpeedMin;
+        public float moveSpeedMax;
+        public float movingTimeMin;
+        public float movingTimeMax;
+        public float IdlingTimeMin;
+        public float IdlingTimeMax;
+    }
+    public PeepoConfig peepoConfig;
+
+    protected override void Awake()
+    {
+        base.Awake();
         var initToken = destroyCancellationToken;
-        var InitInstance = Instance = this;
+        var InitInstance = Instance;
         QualitySettings.vSyncCount = 0;
         QualitySettings.maxQueuedFrames = 4;
         Application.targetFrameRate = targetFPS;

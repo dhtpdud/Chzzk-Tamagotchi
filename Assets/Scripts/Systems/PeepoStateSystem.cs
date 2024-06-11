@@ -40,62 +40,112 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new PeepoJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider }.ScheduleParallel();
+        new StateJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider }.ScheduleParallel();
     }
     [BurstCompile]
-    partial struct PeepoJob : IJobEntity
+    partial struct StateJob : IJobEntity
     {
         [ReadOnly] public TimeData time;
         [ReadOnly] public BlobAssetReference<Collider> onRagdollCollider;
         [ReadOnly] public BlobAssetReference<Collider> onIdleCollider;
         [ReadOnly] public BlobAssetReference<Collider> onDragingCollider;
 
-        public void Execute(ref PeepoComponent peepoComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
         {
             float2 currentVelocity = velocity.Linear.ToFloat2();
             float currentAngularVelocity = velocity.Angular.z;
-            /*float LinerImpact = math.lengthsq(peepoComponent.lastVelocity - currentVelocity);
-            float AngularImpact = math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity);*/
+            //float LinerImpact = math.lengthsq(peepoComponent.lastVelocity - currentVelocity);
+            float angularImpact = math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity);
             //Debug.Log(LinerImpact + "+" + AngularImpact);
-            peepoComponent.currentImpact = (math.lengthsq(peepoComponent.lastVelocity - currentVelocity) + math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity)) * time.DeltaTime;
-            switch (peepoComponent.state)
+            peepoComponent.currentImpact = (math.lengthsq(peepoComponent.lastVelocity - currentVelocity) + angularImpact) * time.DeltaTime;
+            switch (peepoComponent.currentState)
             {
-                case PeepoState.Ragdoll:
-                    collider.Value = onRagdollCollider;
-                    if (peepoComponent.currentImpact <= 0.2f)
-                    {
-                        peepoComponent.switchTime += time.DeltaTime;
-                        if (peepoComponent.switchTime > 3)
-                        {
-                            peepoComponent.switchTime = 0;
-                            peepoComponent.state = PeepoState.Idle;
-                        }
-                    }
-                    else
-                    {
-                        peepoComponent.switchTime = 0;
-                    }
+                case PeepoState.Born:
+                    peepoComponent.lastState = PeepoState.Born;
+                    peepoComponent.currentState = PeepoState.Ragdoll;
                     break;
 
                 case PeepoState.Idle:
-                    collider.Value = onIdleCollider;
-                    if (peepoComponent.currentImpact > 0.05f)
+                    //init
+                    if (peepoComponent.lastState != PeepoState.Idle)
                     {
-                        peepoComponent.switchTime += time.DeltaTime;
-                        if (peepoComponent.currentImpact > 10f || peepoComponent.switchTime > 1)
+                        randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue)+ chunkIndex));
+                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.IdlingTimeMin, peepoComponent.config.Value.IdlingTimeMax);
+                        peepoComponent.switchTimerImpact = 0;
+                        peepoComponent.switchTimerMove = 0;
+                        collider.Value = onIdleCollider;
+                        peepoComponent.lastState = PeepoState.Idle;
+                    }
+                    //update
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, quaternion.identity, 10 * time.DeltaTime);
+                    if (peepoComponent.currentImpact > 0.05f)   //일정 충격량 이상
+                    {
+                        peepoComponent.switchTimerImpact += time.DeltaTime;
+                        if (peepoComponent.currentImpact > 10f || peepoComponent.switchTimerImpact > peepoComponent.config.Value.switchTimeImpact)
                         {
-                            peepoComponent.switchTime = 0;
-                            peepoComponent.state = PeepoState.Ragdoll;
+                            peepoComponent.currentState = PeepoState.Ragdoll;
+                        }
+                    }
+                    else                                        //고요할 때
+                    {
+                        peepoComponent.switchTimerImpact = 0;
+                        if (peepoComponent.switchTimerMove > peepoComponent.switchTimeMove)
+                        {
+                            peepoComponent.currentState = PeepoState.Move;
+                            break;
+                        }
+                        peepoComponent.switchTimerMove += time.DeltaTime;
+                    }
+                    break;
+                case PeepoState.Ragdoll:
+                    //init
+                    if (peepoComponent.lastState != PeepoState.Ragdoll)
+                    {
+                        peepoComponent.switchTimerImpact = 0;
+                        collider.Value = onRagdollCollider;
+                        peepoComponent.lastState = PeepoState.Ragdoll;
+                    }
+                    //update
+                    if (peepoComponent.currentImpact <= 0.2f)
+                    {
+                        peepoComponent.switchTimerImpact += time.DeltaTime;
+                        if (peepoComponent.switchTimerImpact > 3)
+                        {
+                            peepoComponent.currentState = PeepoState.Idle;
                         }
                     }
                     else
                     {
-                        peepoComponent.switchTime = 0;
+                        peepoComponent.switchTimerImpact = 0;
                     }
-                    localTransform.Rotation = math.nlerp(localTransform.Rotation, quaternion.identity, 10 * time.DeltaTime);
                     break;
-                case PeepoState.Draging:
-                    collider.Value = onDragingCollider;
+                case PeepoState.Move:
+                    //init
+                    if (peepoComponent.lastState != PeepoState.Move)
+                    {
+                        peepoComponent.switchTimerMove = 0;
+                        randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue) + chunkIndex));
+                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.movingTimeMin, peepoComponent.config.Value.movingTimeMax);
+                        peepoComponent.moveVelocity = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.moveSpeedMin, peepoComponent.config.Value.moveSpeedMax);
+                        peepoComponent.lastState = PeepoState.Move;
+                    }
+                    //update
+                    if (peepoComponent.switchTimerMove > peepoComponent.switchTimeMove)
+                    {
+                        peepoComponent.currentState = PeepoState.Idle;
+                        break;
+                    }
+                    peepoComponent.switchTimerMove += time.DeltaTime;
+                    if (angularImpact < 1)
+                        localTransform.Position.x += peepoComponent.moveVelocity * time.DeltaTime;
+                    break;
+                case PeepoState.Draged:
+                    //Init
+                    if (peepoComponent.lastState != PeepoState.Draged)
+                    {
+                        peepoComponent.lastState = PeepoState.Draged;
+                        collider.Value = onDragingCollider;
+                    }
                     break;
                 case PeepoState.Dance:
                     break;

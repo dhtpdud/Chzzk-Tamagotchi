@@ -350,6 +350,14 @@ MonoBehaviour:
   dragPower: 500
   stabilityPower: 10
   physicMaxVelocity: 400
+  peepoConfig:
+    switchTimeImpact: 1
+    moveSpeedMin: -3
+    moveSpeedMax: 3
+    movingTimeMin: 1
+    movingTimeMax: 4
+    IdlingTimeMin: 3
+    IdlingTimeMax: 7
 --- !u!4 &1192278570
 Transform:
   m_ObjectHideFlags: 0

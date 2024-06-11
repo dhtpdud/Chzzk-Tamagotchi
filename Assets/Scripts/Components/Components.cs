@@ -14,23 +14,42 @@ public struct MouseRockTag : IComponentData
 }
 public enum PeepoState
 {
-    Ragdoll,
+    Born,
     Idle,
-    Draging,
+    Ragdoll,
+    Move,
+    Draged,
     Dance
 }
 public struct PeepoComponent : IComponentData
 {
-    public PeepoState state;
+    public PeepoState lastState;
+    public PeepoState currentState;
 
     public float2 lastVelocity;
     public float lastAngularVelocity;
 
     public float currentImpact;
-    public float switchTime;
+    public float switchTimerImpact;
+
+    public BlobAssetReference<PeepoConfig> config;
+    public float switchTimeMove;
+    public float moveVelocity;
+    public float switchTimerMove;
 
     public int totalDonation;
     public bool isMute;
+}
+public struct PeepoConfig
+{
+    public float switchTimeImpact;
+
+    public float moveSpeedMin;
+    public float moveSpeedMax;
+    public float movingTimeMin;
+    public float movingTimeMax;
+    public float IdlingTimeMin;
+    public float IdlingTimeMax;
 }
 public struct EntityStoreComponent : IComponentData
 {

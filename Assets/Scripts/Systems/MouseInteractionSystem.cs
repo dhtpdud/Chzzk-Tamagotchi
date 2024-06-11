@@ -123,7 +123,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             if (entityManager.HasComponent<PeepoComponent>(hitEntity))
             {
                 PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(hitEntity);
-                peepoComponent.state = PeepoState.Draging;
+                peepoComponent.currentState = PeepoState.Draged;
                 entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
             }
         }
@@ -148,8 +148,8 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         if (entityManager.HasComponent<PeepoComponent>(dragingEntityInfo.entity))
         {
             PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntityInfo.entity);
-            peepoComponent.state = PeepoState.Ragdoll;
-            peepoComponent.switchTime = 0;
+            peepoComponent.currentState = PeepoState.Ragdoll;
+            peepoComponent.switchTimerImpact = 0;
             Utils.SetMaterial(dragingEntityInfo.rigidbody, dragingEntityInfo.material, dragingEntityInfo.colliderKey);
             entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
         }
