@@ -397,5 +397,26 @@ namespace OSY
         {
             return math.float2(target.x, target.y);
         }
+
+        public static unsafe float3* ToFloat3Unsafe(this float2 target)
+        {
+            float3 result = math.float3(target.x, target.y, 0);
+            return &result;
+        }
+        public static unsafe float2* ToFloat2Unsafe(this float3 target)
+        {
+            float2 result = math.float2(target.x, target.y);
+            return &result;
+        }
+        public static unsafe float3* ToFloat3Unsafe(this Vector2 target)
+        {
+            float3 result = math.float3(target.x, target.y, 0);
+            return &result;
+        }
+        public static unsafe float2* ToFloat2Unsafe(this Vector3 target)
+        {
+            float2 result = math.float2(target.x, target.y);
+            return &result;
+        }
     }
 }
