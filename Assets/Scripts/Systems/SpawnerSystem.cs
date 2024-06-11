@@ -5,21 +5,17 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-[UpdateAfter(typeof(TransformSystemGroup))]
 [BurstCompile]
 public partial struct SpawnerSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        // The system make use of an EntityCommandBuffer, therefore, it needs the system handling the entity command buffer to be initialized to run 
-        state.RequireForUpdate<BeginInitializationEntityCommandBufferSystem.Singleton>();
     }
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        EntityCommandBuffer ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
-        //EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+        EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
         /*foreach (var (spawnerComponent, randomDataComponent, spawnerTransformComponent) in SystemAPI.Query<RefRW<SpawnerComponent>, RefRW<RandomDataComponent>, RefRO<LocalTransform>>().WithAll<SpawnerComponent>())
         {
             SpawnerComponent spawnerComponentRO = spawnerComponent.ValueRO;
@@ -32,17 +28,18 @@ public partial struct SpawnerSystem : ISystem
             spawnerComponent.ValueRW.spawnedCount++;
         }*/
         SpawnweJob job = new SpawnweJob { parallelWriter = ecb.AsParallelWriter() };
-        var handle = job.ScheduleParallel(state.Dependency);
+        job.ScheduleParallel();
+        /*var handle = job.ScheduleParallel(state.Dependency);
 
         handle.Complete(); //차후 최적화
-        ecb.Playback(state.EntityManager);
+        ecb.Playback(state.EntityManager);*/
     }
     [BurstCompile]
     partial struct SpawnweJob : IJobEntity
     {
         [ReadOnly] public TimeData time;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
-        public void Execute(ref SpawnerComponent spawnerComponent, ref RandomDataComponent randomDataComponent, in LocalTransform spawnerTransformComponent)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, ref SpawnerComponent spawnerComponent, ref RandomDataComponent randomDataComponent, in LocalTransform spawnerTransformComponent)
         {
             if (spawnerComponent.spawnedCount >= spawnerComponent.maxCount) return;
             if (spawnerComponent.currentSec < spawnerComponent.spawnIntervalSec)
@@ -51,9 +48,9 @@ public partial struct SpawnerSystem : ISystem
                 return;
             }
             randomDataComponent.Random = new Random((uint)randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue));
-            Entity spawnedEntity = parallelWriter.Instantiate(0, spawnerComponent.spawnPrefab);
+            Entity spawnedEntity = parallelWriter.Instantiate(chunkIndex, spawnerComponent.spawnPrefab);
             var initTransform = new LocalTransform { Position = spawnerTransformComponent.Position, Rotation = spawnerTransformComponent.Rotation, Scale = spawnerComponent.isRandomSize ? randomDataComponent.Random.NextFloat(spawnerComponent.minSize, spawnerComponent.maxSize) : 1 };
-            parallelWriter.SetComponent(0, spawnedEntity, initTransform);
+            parallelWriter.SetComponent(chunkIndex, spawnedEntity, initTransform);
             spawnerComponent.spawnedCount++;
             spawnerComponent.currentSec = 0;
         }

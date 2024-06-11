@@ -6,7 +6,7 @@ public class PeepoAuthoring : MonoBehaviour
     public string userName;
     public int totalDonation;
     public string lastChat;
-    public bool isChatBubble;
+    public bool isMute;
 
     public class PeepoBaker : Baker<PeepoAuthoring>
     {
@@ -17,7 +17,7 @@ public class PeepoAuthoring : MonoBehaviour
             AddComponent(entity, new PeepoComponent
             {
                 totalDonation = authoring.totalDonation,
-                isChatBubble = true,
+                isMute = authoring.isMute,
             });
             AddComponent(entity, new DragableTag());
         }

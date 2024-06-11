@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
@@ -29,7 +30,7 @@ public struct PeepoComponent : IComponentData
     public float switchTime;
 
     public int totalDonation;
-    public bool isChatBubble;
+    public bool isMute;
 }
 public struct EntityStoreComponent : IComponentData
 {
@@ -58,6 +59,7 @@ public struct GameManagerSingleton : IComponentData
     public float stabilityPower;
 
     public float physicMaxVelocity;
+    public NativeList<SpawnerComponent> spawnerInfos;
 }
 public struct RandomDataComponent : IComponentData
 {

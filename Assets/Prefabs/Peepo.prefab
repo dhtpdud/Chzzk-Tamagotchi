@@ -153,4 +153,4 @@ MonoBehaviour:
   userName: 
   totalDonation: 0
   lastChat: 
-  isChatBubble: 0
+  isMute: 0
