@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Core;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -39,7 +40,7 @@ public partial struct SpawnerSystem : ISystem
     [BurstCompile]
     partial struct SpawnweJob : IJobEntity
     {
-        public TimeData time;
+        [ReadOnly] public TimeData time;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
         public void Execute(ref SpawnerComponent spawnerComponent, ref RandomDataComponent randomDataComponent, in LocalTransform spawnerTransformComponent)
         {

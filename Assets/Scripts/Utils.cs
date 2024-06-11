@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Unity.Collections;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -74,7 +75,7 @@ namespace OSY
             var tokenCreate = destroyCancellationToken;
         }
     }
-    public class Utils
+    public static class Utils
     {
 
         public static async UniTask WaitUntilRecord(Stopwatch stopwatch, NativeArray<float> lastRecordTIme, string taskName, Func<bool> waitCondition, CancellationToken token, bool isDebug = false)
@@ -369,6 +370,32 @@ namespace OSY
                 ConvexCollider* childColliderPointer = (ConvexCollider*)childCollider.Collider;
                 childColliderPointer->Material = material;
             }
+        }
+        public static void ToFloat3(this float2 target, ref float3 convert)
+        {
+            convert.x = target.x;
+            convert.y = target.y;
+        }
+        public static void ToFloat2(this float3 target, ref float2 convert)
+        {
+            convert.x = target.x;
+            convert.y = target.y;
+        }
+        public static float3 ToFloat3(this float2 target)
+        {
+            return math.float3(target.x, target.y, 0);
+        }
+        public static float2 ToFloat2(this float3 target)
+        {
+            return math.float2(target.x, target.y);
+        }
+        public static float3 ToFloat3(this Vector2 target)
+        {
+            return math.float3(target.x, target.y, 0);
+        }
+        public static float2 ToFloat2(this Vector3 target)
+        {
+            return math.float2(target.x, target.y);
         }
     }
 }

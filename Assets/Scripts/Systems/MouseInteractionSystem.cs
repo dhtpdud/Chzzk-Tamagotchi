@@ -1,5 +1,6 @@
 using OSY;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Core;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -14,7 +15,7 @@ using RaycastHit = Unity.Physics.RaycastHit;
 public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
     private PhysicsWorldSingleton _physicsWorldSingleton;
-    private GameManagerComponent gameManager;
+    private GameManagerSingleton gameManager;
     private EntityManager entityManager;
     Entity mouseRockEntity;
     TimeData time;
@@ -38,10 +39,9 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     }
     DragingEntityInfo dragingEntityInfo;
 
-    public Vector2 mouseLastPosition;
-    public Vector2 mouseVelocity;
-    public Vector2 onMouseDragingPosition;
-    public Vector2 onMouseDownPosition;
+    public float2 mouseLastPosition;
+    public float2 mouseVelocity;
+    public float2 onMouseDownPosition;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -62,7 +62,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public void OnUpdate(ref SystemState state)
     {
         time = SystemAPI.Time;
-        gameManager = SystemAPI.GetSingleton<GameManagerComponent>();
+        gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         EntityCommandBuffer ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
 
@@ -84,7 +84,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
 
             velocity.Linear *= 0;
-            localTransform.Position = (Vector3)gameManager.ScreenToWorldPointMainCam;
+            localTransform.Position = gameManager.ScreenToWorldPointMainCam.ToFloat3();
 
             entityManager.SetComponentData(mouseRockEntity, localTransform);
             entityManager.SetComponentData(mouseRockEntity, velocity);
@@ -94,7 +94,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }
-        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, parallelWriter = ecb.AsParallelWriter(), time = time }.ScheduleParallel(state.Dependency).Complete();
+        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, time = time }.ScheduleParallel(state.Dependency).Complete();
         ecb.Playback(state.EntityManager);
     }
 
@@ -104,14 +104,14 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         float3 rayStart = gameManager.ScreenPointToRayOfMainCam.origin;
         float3 rayEnd = gameManager.ScreenPointToRayOfMainCam.GetPoint(1000f);
 
-        if (Raycast(rayStart, rayEnd, out var raycastHit))
+        if (Raycast(rayStart, rayEnd, out RaycastHit raycastHit))
         {
-            var hitRigidBody = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex];
-            var hitEntity = hitRigidBody.Entity;
+            RigidBody hitRigidBody = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex];
+            Entity hitEntity = hitRigidBody.Entity;
             if (entityManager.HasComponent<DragableTag>(hitEntity))
             {
-                var hitEntityPosition = entityManager.GetComponentData<LocalTransform>(hitEntity).Position;
-                objectPositionOnDown = new float2(hitEntityPosition.x, hitEntityPosition.y);
+                float3 hitEntityPosition = entityManager.GetComponentData<LocalTransform>(hitEntity).Position;
+                objectPositionOnDown = hitEntityPosition.ToFloat2();
                 isDraging = true;
 
                 Material material = Utils.GetMaterial(hitRigidBody, raycastHit.ColliderKey);
@@ -122,7 +122,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             }
             if (entityManager.HasComponent<PeepoComponent>(hitEntity))
             {
-                var peepoComponent = entityManager.GetComponentData<PeepoComponent>(hitEntity);
+                PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(hitEntity);
                 peepoComponent.state = PeepoState.Draging;
                 entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
             }
@@ -131,14 +131,13 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     private void OnMouse()
     {
         if (!isDraging) return;
-        onMouseDragingPosition = gameManager.ScreenToWorldPointMainCam;
 
-        var velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntityInfo.entity);
-        var localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntityInfo.entity);
+        PhysicsVelocity velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntityInfo.entity);
+        LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntityInfo.entity);
 
-        velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, gameManager.stabilityPower * time.DeltaTime);
-        float2 power = objectPositionOnDown + (float2)(onMouseDragingPosition - onMouseDownPosition) - new float2(localTransform.Position.x, localTransform.Position.y);
-        velocity.Linear += new float3(power.x, power.y, 0) * gameManager.dragPower * time.DeltaTime;
+        velocity.Linear = math.lerp(velocity.Linear, float3.zero, gameManager.stabilityPower * time.DeltaTime);
+        float2 distance = objectPositionOnDown + (gameManager.ScreenToWorldPointMainCam - onMouseDownPosition) - localTransform.Position.ToFloat2();
+        velocity.Linear += distance.ToFloat3() * gameManager.dragPower * time.DeltaTime;
 
         entityManager.SetComponentData(dragingEntityInfo.entity, velocity);
     }
@@ -148,7 +147,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         isDraging = false;
         if (entityManager.HasComponent<PeepoComponent>(dragingEntityInfo.entity))
         {
-            var peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntityInfo.entity);
+            PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntityInfo.entity);
             peepoComponent.state = PeepoState.Ragdoll;
             peepoComponent.switchTime = 0;
             Utils.SetMaterial(dragingEntityInfo.rigidbody, dragingEntityInfo.material, dragingEntityInfo.colliderKey);
@@ -170,17 +169,17 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public void OnStopRunning(ref SystemState state)
     {
     }
+    [BurstCompile]
     public partial struct MouseRockJob : IJobEntity
     {
-        public EntityCommandBuffer.ParallelWriter parallelWriter;
-        public Vector2 screenToWorldPointMainCam;
-        public float maxVelocity;
-        public TimeData time;
-        public void Execute(in MouseRockTag mouseRockTag, ref PhysicsVelocity velocity, ref LocalTransform localTransform, in Entity entity)
+        [ReadOnly] public float2 screenToWorldPointMainCam;
+        [ReadOnly] public float maxVelocity;
+        [ReadOnly] public TimeData time;
+        public void Execute(in MouseRockTag mouseRockTag, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
         {
-            float2 power = (float2)(screenToWorldPointMainCam) - new float2(localTransform.Position.x, localTransform.Position.y);
-            velocity.Linear += new float3(power.x, power.y, 0) * 500 * time.DeltaTime;
-            velocity.Linear = Vector3.Lerp(velocity.Linear, Vector3.zero, 20 * time.DeltaTime);
+            float2 distance = screenToWorldPointMainCam - localTransform.Position.ToFloat2();
+            velocity.Linear += distance.ToFloat3() * 500 * time.DeltaTime;
+            velocity.Linear = math.lerp(velocity.Linear, float3.zero, 20 * time.DeltaTime);
             if (velocity.Linear.x > maxVelocity)
                 velocity.Linear.x = maxVelocity;
             else if (velocity.Linear.x < -maxVelocity)

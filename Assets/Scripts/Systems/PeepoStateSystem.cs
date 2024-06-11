@@ -1,9 +1,11 @@
+using OSY;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Core;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
 using Collider = Unity.Physics.Collider;
 
 [BurstCompile]
@@ -43,16 +45,19 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     partial struct PeepoJob : IJobEntity
     {
-        public TimeData time;
-        public BlobAssetReference<Collider> onRagdollCollider;
-        public BlobAssetReference<Collider> onIdleCollider;
-        public BlobAssetReference<Collider> onDragingCollider;
+        [ReadOnly] public TimeData time;
+        [ReadOnly] public BlobAssetReference<Collider> onRagdollCollider;
+        [ReadOnly] public BlobAssetReference<Collider> onIdleCollider;
+        [ReadOnly] public BlobAssetReference<Collider> onDragingCollider;
 
-        public unsafe void Execute(ref PeepoComponent peepoComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
+        public void Execute(ref PeepoComponent peepoComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
         {
-            peepoComponent.currentVelocity = velocity.Linear;
-            peepoComponent.currentAngularVelocity = velocity.Angular.z;
-            peepoComponent.currentImpact = (((Vector3)(peepoComponent.lastVelocity - peepoComponent.currentVelocity)).sqrMagnitude + Mathf.Abs(peepoComponent.lastAngularVelocity - peepoComponent.currentAngularVelocity)) * time.DeltaTime;
+            float2 currentVelocity = velocity.Linear.ToFloat2();
+            float currentAngularVelocity = velocity.Angular.z;
+            /*float LinerImpact = math.lengthsq(peepoComponent.lastVelocity - currentVelocity);
+            float AngularImpact = math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity);*/
+            //Debug.Log(LinerImpact + "+" + AngularImpact);
+            peepoComponent.currentImpact = (math.lengthsq(peepoComponent.lastVelocity - currentVelocity) + math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity)) * time.DeltaTime;
             switch (peepoComponent.state)
             {
                 case PeepoState.Ragdoll:
@@ -87,7 +92,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     {
                         peepoComponent.switchTime = 0;
                     }
-                    localTransform.Rotation = Quaternion.Lerp(localTransform.Rotation, Quaternion.identity, 10 * time.DeltaTime);
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, quaternion.identity, 10 * time.DeltaTime);
                     break;
                 case PeepoState.Draging:
                     collider.Value = onDragingCollider;
@@ -95,8 +100,9 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                 case PeepoState.Dance:
                     break;
             }
-            peepoComponent.lastVelocity = peepoComponent.currentVelocity;
-            peepoComponent.lastAngularVelocity = peepoComponent.currentAngularVelocity;
+
+            peepoComponent.lastVelocity = currentVelocity;
+            peepoComponent.lastAngularVelocity = currentAngularVelocity;
         }
     }
 }

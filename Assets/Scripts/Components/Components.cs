@@ -1,7 +1,5 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Physics;
-using UnityEngine;
 using Random = Unity.Mathematics.Random;
 using Ray = UnityEngine.Ray;
 
@@ -24,15 +22,10 @@ public struct PeepoComponent : IComponentData
 {
     public PeepoState state;
 
-    public float3 lastVelocity;
-    public float3 currentVelocity;
-
+    public float2 lastVelocity;
     public float lastAngularVelocity;
-    public float currentAngularVelocity;
-
 
     public float currentImpact;
-
     public float switchTime;
 
     public int totalDonation;
@@ -56,10 +49,10 @@ public struct SpawnerComponent : IComponentData
     public float minSize;
     public float maxSize;
 }
-public struct GameManagerComponent : IComponentData
+public struct GameManagerSingleton : IComponentData
 {
     public Ray ScreenPointToRayOfMainCam;
-    public Vector2 ScreenToWorldPointMainCam;
+    public float2 ScreenToWorldPointMainCam;
 
     public float dragPower;
     public float stabilityPower;

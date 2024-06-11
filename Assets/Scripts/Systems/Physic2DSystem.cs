@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
 using Unity.Transforms;
@@ -8,11 +9,11 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct Physic2DSystem : ISystem, ISystemStartStop
 {
-    GameManagerComponent gameManager;
+    GameManagerSingleton gameManager;
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
-        gameManager = SystemAPI.GetSingleton<GameManagerComponent>();
+        gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
     }
 
     [BurstCompile]
@@ -28,7 +29,7 @@ public partial struct Physic2DSystem : ISystem, ISystemStartStop
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity
     {
-        public float maxVelocity;
+        [ReadOnly] public float maxVelocity;
         public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform)
         {
             localTransform.Position.z = 0;
