@@ -94,8 +94,8 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }
-        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, time = time }.ScheduleParallel(state.Dependency).Complete();
-        ecb.Playback(state.EntityManager);
+        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, time = time }.ScheduleParallel();
+        //ecb.Playback(state.EntityManager);
     }
 
     private void OnMouseDown()

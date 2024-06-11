@@ -32,7 +32,6 @@ public struct PeepoComponent : IComponentData
     public float currentImpact;
     public float switchTimerImpact;
 
-    public BlobAssetReference<PeepoConfig> config;
     public float switchTimeMove;
     public float moveVelocity;
     public float switchTimerMove;
@@ -78,7 +77,7 @@ public struct GameManagerSingleton : IComponentData
     public float stabilityPower;
 
     public float physicMaxVelocity;
-    public NativeList<SpawnerComponent> spawnerInfos;
+    public BlobAssetReference<PeepoConfig> peepoConfig;
 }
 public struct RandomDataComponent : IComponentData
 {

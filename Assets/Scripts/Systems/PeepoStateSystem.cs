@@ -14,6 +14,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     BlobAssetReference<Collider> onRagdollCollider;
     BlobAssetReference<Collider> onIdleCollider;
     BlobAssetReference<Collider> onDragingCollider;
+    BlobAssetReference<PeepoConfig> peepoConfig;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -31,6 +32,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         onDragingCollider = onRagdollCollider.Value.Clone();
         onDragingCollider.Value.SetRestitution(0);
         onIdleCollider.Value.SetCollisionFilter(onIdleFilter);
+        peepoConfig = SystemAPI.GetSingleton<GameManagerSingleton>().peepoConfig;
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -40,7 +42,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new StateJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider }.ScheduleParallel();
+        new StateJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider, peepoConfig = peepoConfig }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct StateJob : IJobEntity
@@ -49,6 +51,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         [ReadOnly] public BlobAssetReference<Collider> onRagdollCollider;
         [ReadOnly] public BlobAssetReference<Collider> onIdleCollider;
         [ReadOnly] public BlobAssetReference<Collider> onDragingCollider;
+        [ReadOnly] public BlobAssetReference<PeepoConfig> peepoConfig;
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
         {
@@ -70,7 +73,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     if (peepoComponent.lastState != PeepoState.Idle)
                     {
                         randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue)+ chunkIndex));
-                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.IdlingTimeMin, peepoComponent.config.Value.IdlingTimeMax);
+                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoConfig.Value.IdlingTimeMin, peepoConfig.Value.IdlingTimeMax);
                         peepoComponent.switchTimerImpact = 0;
                         peepoComponent.switchTimerMove = 0;
                         collider.Value = onIdleCollider;
@@ -81,7 +84,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     if (peepoComponent.currentImpact > 0.05f)   //일정 충격량 이상
                     {
                         peepoComponent.switchTimerImpact += time.DeltaTime;
-                        if (peepoComponent.currentImpact > 10f || peepoComponent.switchTimerImpact > peepoComponent.config.Value.switchTimeImpact)
+                        if (peepoComponent.currentImpact > 10f || peepoComponent.switchTimerImpact > peepoConfig.Value.switchTimeImpact)
                         {
                             peepoComponent.currentState = PeepoState.Ragdoll;
                         }
@@ -125,8 +128,8 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     {
                         peepoComponent.switchTimerMove = 0;
                         randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue) + chunkIndex));
-                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.movingTimeMin, peepoComponent.config.Value.movingTimeMax);
-                        peepoComponent.moveVelocity = randomDataComponent.Random.NextFloat(peepoComponent.config.Value.moveSpeedMin, peepoComponent.config.Value.moveSpeedMax);
+                        peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoConfig.Value.movingTimeMin, peepoConfig.Value.movingTimeMax);
+                        peepoComponent.moveVelocity = randomDataComponent.Random.NextFloat(peepoConfig.Value.moveSpeedMin, peepoConfig.Value.moveSpeedMax);
                         peepoComponent.lastState = PeepoState.Move;
                     }
                     //update
