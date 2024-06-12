@@ -83,3 +83,11 @@ public struct RandomDataComponent : IComponentData
 {
     public Random Random;
 }
+public struct AnimationSettings : IComponentData
+{
+    public int IdleHash;
+    public int IdleSub1Hash;
+    public int IdleSub2Hash;
+    public int MoveHash;
+    public int RagdollHash;
+}
