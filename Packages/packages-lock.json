@@ -1,5 +1,22 @@
 {
   "dependencies": {
+    "com.tonymax.nsprites": {
+      "version": "https://github.com/Antoshidza/NSprites.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.entities": "1.0.0-pre.65"
+      },
+      "hash": "184502dcc42c2fc6a8bd7d26b35aa62e26c6315a"
+    },
+    "com.tonymax.nsprites.foundation": {
+      "version": "file:com.tonymax.nsprites.foundation",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.entities": "1.0.0-pre.65"
+      }
+    },
     "com.unity.2d.animation": {
       "version": "10.1.1",
       "depth": 1,

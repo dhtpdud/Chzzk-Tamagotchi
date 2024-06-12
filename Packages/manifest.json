@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.entities": "1.2.3",
     "com.unity.entities.graphics": "1.2.3",
