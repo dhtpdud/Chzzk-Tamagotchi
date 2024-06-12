@@ -19,7 +19,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     private EntityManager entityManager;
     Entity mouseRockEntity;
     TimeData time;
-    float2 objectPositionOnDown;
+    float2 entityPositionOnDown;
 
     public bool isDraging;
     struct DragingEntityInfo
@@ -42,6 +42,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public float2 mouseLastPosition;
     public float2 mouseVelocity;
     public float2 onMouseDownPosition;
+    public float lastEntityRotation;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -110,8 +111,9 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             Entity hitEntity = hitRigidBody.Entity;
             if (entityManager.HasComponent<DragableTag>(hitEntity))
             {
-                float3 hitEntityPosition = entityManager.GetComponentData<LocalTransform>(hitEntity).Position;
-                objectPositionOnDown = hitEntityPosition.ToFloat2();
+                LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(hitEntity);
+                lastEntityRotation = localTransform.Rotation.value.z;
+                entityPositionOnDown = localTransform.Position.ToFloat2();
                 isDraging = true;
 
                 Material material = Utils.GetMaterial(hitRigidBody, raycastHit.ColliderKey);
@@ -135,11 +137,21 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         PhysicsVelocity velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntityInfo.entity);
         LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntityInfo.entity);
 
+        float2 entityPosition = localTransform.Position.ToFloat2();
+        float2 entityPositionFromGrabingPoint = entityPosition - entityPositionOnDown;
+        float2 mousePositionFromGrabingPoint = gameManager.ScreenToWorldPointMainCam - onMouseDownPosition;
+        float2 entitiyToMouse = mousePositionFromGrabingPoint - entityPositionFromGrabingPoint;
+        /*float2 mouseToEntity = entityPositionFromGrabingPoint - mousePositionFromGrabingPoint;
+
+        float angularForce = lastEntityRotation - Vector2.Angle(Vector2.up, mouseToEntity);
+        velocity.Angular += angularForce * time.DeltaTime;*/
+
         velocity.Linear = math.lerp(velocity.Linear, float3.zero, gameManager.stabilityPower * time.DeltaTime);
-        float2 distance = objectPositionOnDown + (gameManager.ScreenToWorldPointMainCam - onMouseDownPosition) - localTransform.Position.ToFloat2();
-        velocity.Linear += distance.ToFloat3() * gameManager.dragPower * time.DeltaTime;
+        velocity.Linear += (entitiyToMouse * gameManager.dragPower * time.DeltaTime).ToFloat3();
 
         entityManager.SetComponentData(dragingEntityInfo.entity, velocity);
+
+        lastEntityRotation = localTransform.Rotation.value.z;
     }
     private void OnMouseUp()
     {
