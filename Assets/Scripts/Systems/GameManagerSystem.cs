@@ -25,6 +25,7 @@ public sealed partial class UpdateCameraInfoSystem : SystemBase
         var builder = new BlobBuilder(Allocator.Temp);
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
+        peepoConfig.switchIdleAnimationTime = GameManager.Instance.peepoConfig.switchIdleAnimationTime;
         peepoConfig.switchTimeImpact = GameManager.Instance.peepoConfig.switchTimeImpact;
         peepoConfig.moveSpeedMin = GameManager.Instance.peepoConfig.moveSpeedMin;
         peepoConfig.moveSpeedMax = GameManager.Instance.peepoConfig.moveSpeedMax;

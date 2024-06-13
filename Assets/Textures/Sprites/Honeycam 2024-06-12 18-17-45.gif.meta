@@ -222,7 +222,9 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Honeycam 2024-06-12 18-17-45_0: -5060809590284068995
+      Honeycam 2024-06-12 18-17-45_1: 8397111666904146022
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

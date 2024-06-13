@@ -34,6 +34,7 @@ public class GameManager : Singleton<GameManager>
     public class PeepoConfig
     {
         public float switchTimeImpact;
+        public float switchIdleAnimationTime;
 
         public float moveSpeedMin;
         public float moveSpeedMax;

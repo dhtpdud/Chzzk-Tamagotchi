@@ -1,3 +1,4 @@
+using NSprites;
 using OSY;
 using Unity.Burst;
 using Unity.Collections;
@@ -53,7 +54,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         [ReadOnly] public BlobAssetReference<Collider> onDragingCollider;
         [ReadOnly] public BlobAssetReference<PeepoConfig> peepoConfig;
 
-        public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform, ref Flip flip)
         {
             float2 currentVelocity = velocity.Linear.ToFloat2();
             float currentAngularVelocity = velocity.Angular.z;
@@ -72,7 +73,8 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     //init
                     if (peepoComponent.lastState != PeepoState.Idle)
                     {
-                        randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue)+ chunkIndex));
+                        peepoComponent.IdleAnimationIndex = 0;
+                        randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue) + chunkIndex));
                         peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoConfig.Value.IdlingTimeMin, peepoConfig.Value.IdlingTimeMax);
                         peepoComponent.switchTimerImpact = 0;
                         peepoComponent.switchTimerMove = 0;
@@ -96,6 +98,16 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         {
                             peepoComponent.currentState = PeepoState.Move;
                             break;
+                        }
+                        if (peepoComponent.switchTimerMove > peepoConfig.Value.switchIdleAnimationTime && peepoComponent.IdleAnimationIndex.Equals(0))
+                        {
+                            if (randomDataComponent.Random.NextInt(0, 3) < 1)
+                            {
+                                peepoComponent.switchTimerMove = 0;
+                                peepoComponent.IdleAnimationIndex = randomDataComponent.Random.NextInt(1, 3);
+                            }
+                            else
+                                peepoComponent.IdleAnimationIndex = 2;
                         }
                         peepoComponent.switchTimerMove += time.DeltaTime;
                     }
@@ -130,6 +142,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         randomDataComponent.Random = new Random((uint)(randomDataComponent.Random.NextInt(int.MinValue, int.MaxValue) + chunkIndex));
                         peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoConfig.Value.movingTimeMin, peepoConfig.Value.movingTimeMax);
                         peepoComponent.moveVelocity = randomDataComponent.Random.NextFloat(peepoConfig.Value.moveSpeedMin, peepoConfig.Value.moveSpeedMax);
+                        flip.Value.x = peepoComponent.moveVelocity > 0 ? 0 : -1;
                         peepoComponent.lastState = PeepoState.Move;
                     }
                     //update
@@ -149,8 +162,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         peepoComponent.lastState = PeepoState.Draged;
                         collider.Value = onDragingCollider;
                     }
-                    break;
-                case PeepoState.Dance:
                     break;
             }
 

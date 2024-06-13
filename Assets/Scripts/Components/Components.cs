@@ -23,6 +23,7 @@ public enum PeepoState
 }
 public struct PeepoComponent : IComponentData
 {
+    public int IdleAnimationIndex;
     public PeepoState lastState;
     public PeepoState currentState;
 
@@ -42,6 +43,7 @@ public struct PeepoComponent : IComponentData
 public struct PeepoConfig
 {
     public float switchTimeImpact;
+    public float switchIdleAnimationTime;
 
     public float moveSpeedMin;
     public float moveSpeedMax;
