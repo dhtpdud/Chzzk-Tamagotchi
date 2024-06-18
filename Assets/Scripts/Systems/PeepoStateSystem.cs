@@ -58,12 +58,12 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform, ref Flip flip)
         {
+
             float2 currentVelocity = velocity.Linear.ToFloat2();
-            float currentAngularVelocity = velocity.Angular.z;
+            float currentAngularVelocity = math.abs(velocity.Angular.z);
             //float LinerImpact = math.lengthsq(peepoComponent.lastVelocity - currentVelocity);
-            float angularImpact = math.abs(peepoComponent.lastAngularVelocity - currentAngularVelocity);
             //Debug.Log(LinerImpact + "+" + AngularImpact);
-            peepoComponent.currentImpact = (math.lengthsq(peepoComponent.lastVelocity - currentVelocity) + angularImpact) * time.DeltaTime;
+            peepoComponent.currentImpact = (math.lengthsq(peepoComponent.lastVelocity - currentVelocity) * 2 + currentAngularVelocity * 10) * time.DeltaTime;
             switch (peepoComponent.currentState)
             {
                 case PeepoState.Born:
@@ -85,10 +85,10 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     }
                     //update
                     localTransform.Rotation = math.nlerp(localTransform.Rotation, quaternion.identity, 10 * time.DeltaTime);
-                    if (peepoComponent.currentImpact > 0.05f)   //일정 충격량 이상
+                    if (peepoComponent.currentImpact > 0.5f)   //일정 충격량 이상
                     {
                         peepoComponent.switchTimerImpact += time.DeltaTime;
-                        if (peepoComponent.currentImpact > 10f || peepoComponent.switchTimerImpact > peepoConfig.Value.switchTimeImpact)
+                        if (peepoComponent.currentImpact > 20f || peepoComponent.switchTimerImpact > peepoConfig.Value.switchTimeImpact)
                         {
                             peepoComponent.currentState = PeepoState.Ragdoll;
                         }
@@ -123,7 +123,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         peepoComponent.lastState = PeepoState.Ragdoll;
                     }
                     //update
-                    if (peepoComponent.currentImpact <= 0.2f)
+                    if (peepoComponent.currentImpact <= 1f)
                     {
                         peepoComponent.switchTimerImpact += time.DeltaTime;
                         if (peepoComponent.switchTimerImpact > 3)
@@ -154,7 +154,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         break;
                     }
                     peepoComponent.switchTimerMove += time.DeltaTime;
-                    if (angularImpact < 1)
+                    if (currentAngularVelocity < 120)
                         localTransform.Position.x += peepoComponent.moveVelocity * time.DeltaTime;
                     break;
                 case PeepoState.Draged:
@@ -168,7 +168,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
             }
 
             peepoComponent.lastVelocity = currentVelocity;
-            peepoComponent.lastAngularVelocity = currentAngularVelocity;
         }
     }
 }
