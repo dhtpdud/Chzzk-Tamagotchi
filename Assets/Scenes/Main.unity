@@ -268,7 +268,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 8ce246a7b2b23f644b77d08754f0c029, type: 3}
@@ -461,7 +461,6 @@ MonoBehaviour:
     movingTimeMax: 4
     IdlingTimeMin: 3
     IdlingTimeMax: 7
-  subScene: {fileID: 1179863447}
 --- !u!4 &1192278570
 Transform:
   m_ObjectHideFlags: 0
