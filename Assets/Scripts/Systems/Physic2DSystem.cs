@@ -4,27 +4,20 @@ using Unity.Entities;
 using Unity.Physics;
 using Unity.Transforms;
 
+[BurstCompile]
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-[BurstCompile]
-public partial struct Physic2DSystem : ISystem, ISystemStartStop
+public partial struct Physic2DSystem : ISystem
 {
-    GameManagerSingleton gameManager;
     [BurstCompile]
-    public void OnStartRunning(ref SystemState state)
+    public void OnCreate(ref SystemState state)
     {
-        gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
+        state.RequireForUpdate<GameManagerSingleton>();
     }
-
-    [BurstCompile]
-    public void OnStopRunning(ref SystemState state)
-    {
-    }
-
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = gameManager.physicMaxVelocity }.ScheduleParallel();
+        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingleton>().physicMaxVelocity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity

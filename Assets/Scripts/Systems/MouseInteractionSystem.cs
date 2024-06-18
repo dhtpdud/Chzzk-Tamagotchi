@@ -43,17 +43,18 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public float2 mouseVelocity;
     public float2 onMouseDownPosition;
     public float lastEntityRotation;
-
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<GameManagerSingleton>();
         state.RequireForUpdate<EntityStoreComponent>();
+        entityManager = state.EntityManager;
     }
+
 
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
-        entityManager = state.EntityManager;
         mouseRockEntity = entityManager.Instantiate(SystemAPI.GetSingleton<EntityStoreComponent>().mouseRock);
         entityManager.AddComponent<MouseRockTag>(mouseRockEntity);
         entityManager.SetEnabled(mouseRockEntity, false);
@@ -65,7 +66,9 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         time = SystemAPI.Time;
         gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-        EntityCommandBuffer ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
+
+        var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
+        var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -81,8 +84,6 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         }
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
-            var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
-            var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
 
             velocity.Linear *= 0;
             localTransform.Position = gameManager.ScreenToWorldPointMainCam.ToFloat3();
@@ -95,8 +96,14 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }
-        new MouseRockJob { screenToWorldPointMainCam = gameManager.ScreenToWorldPointMainCam, maxVelocity = gameManager.physicMaxVelocity, time = time }.ScheduleParallel();
-        //ecb.Playback(state.EntityManager);
+        if(Input.GetKey(KeyCode.LeftAlt))
+        {
+            float3 rockToMouse = gameManager.ScreenToWorldPointMainCam.ToFloat3() - localTransform.Position;
+            velocity.Linear += rockToMouse * 500 * time.DeltaTime;
+            velocity.Linear = math.lerp(velocity.Linear, float3.zero, 20 * time.DeltaTime);
+            entityManager.SetComponentData(mouseRockEntity, velocity);
+            //왜인지 job을 쓰면 튕겨버림(버그로 추정됨)
+        }
     }
 
     private void OnMouseDown()
@@ -180,27 +187,5 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnStopRunning(ref SystemState state)
     {
-    }
-    [BurstCompile]
-    public partial struct MouseRockJob : IJobEntity
-    {
-        [ReadOnly] public float2 screenToWorldPointMainCam;
-        [ReadOnly] public float maxVelocity;
-        [ReadOnly] public TimeData time;
-        public void Execute(in MouseRockTag mouseRockTag, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
-        {
-            float2 distance = screenToWorldPointMainCam - localTransform.Position.ToFloat2();
-            velocity.Linear += distance.ToFloat3() * 500 * time.DeltaTime;
-            velocity.Linear = math.lerp(velocity.Linear, float3.zero, 20 * time.DeltaTime);
-            if (velocity.Linear.x > maxVelocity)
-                velocity.Linear.x = maxVelocity;
-            else if (velocity.Linear.x < -maxVelocity)
-                velocity.Linear.x = -maxVelocity;
-
-            if (velocity.Linear.y > maxVelocity)
-                velocity.Linear.y = maxVelocity;
-            else if (velocity.Linear.y < -maxVelocity)
-                velocity.Linear.y = -maxVelocity;
-        }
     }
 }

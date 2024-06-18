@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using Collider = Unity.Physics.Collider;
+using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
 partial struct PeepoStateSystem : ISystem, ISystemStartStop
@@ -20,13 +21,14 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<GameManagerSingleton>();
         state.RequireForUpdate<PeepoComponent>();
+        state.RequireForUpdate<EntityStoreComponent>();
     }
 
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
-        //var onRagdollFilter = new CollisionFilter { BelongsTo = 1u, CollidesWith = uint.MaxValue, GroupIndex = 0 };
         var onIdleFilter = new CollisionFilter { BelongsTo = 2u, CollidesWith = ~2u, GroupIndex = 0 };
         onRagdollCollider = SystemAPI.GetComponent<PhysicsCollider>(SystemAPI.GetSingleton<EntityStoreComponent>().peepo).Value.Value.Clone();
         onIdleCollider = onRagdollCollider.Value.Clone();

@@ -3,10 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-[UpdateBefore(typeof(MouseInteractionSystem))]
-[UpdateBefore(typeof(Physic2DSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
-public sealed partial class UpdateCameraInfoSystem : SystemBase
+public sealed partial class UpdateGameManagerInfoSystem : SystemBase
 {
     public Camera mainCam;
     public BlobAssetReference<PeepoConfig> peepoConfigRef;
@@ -15,14 +13,15 @@ public sealed partial class UpdateCameraInfoSystem : SystemBase
         base.OnStartRunning();
         mainCam = Camera.main;
         if (!SystemAPI.HasSingleton<GameManagerSingleton>())
-            EntityManager.CreateSingleton<GameManagerSingleton>(nameof(MouseInteractionSystem));
+            EntityManager.CreateSingleton<GameManagerSingleton>();
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingleton>().ValueRW;
         gameManagerRW.stabilityPower = GameManager.Instance.stabilityPower;
         gameManagerRW.dragPower = GameManager.Instance.dragPower;
         gameManagerRW.physicMaxVelocity = GameManager.Instance.physicMaxVelocity;
+        Debug.Log("¼Óµµ´Â?: " + GameManager.Instance.physicMaxVelocity + "/" + gameManagerRW.physicMaxVelocity);
 
 
-        var builder = new BlobBuilder(Allocator.Temp);
+        var builder = new BlobBuilder(Allocator.TempJob);
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
         peepoConfig.switchIdleAnimationTime = GameManager.Instance.peepoConfig.switchIdleAnimationTime;

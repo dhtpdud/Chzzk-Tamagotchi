@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
@@ -54,8 +53,14 @@ public struct PeepoConfig
 }
 public struct EntityStoreComponent : IComponentData
 {
-    public Entity peepo;
-    public Entity mouseRock;
+    public readonly Entity peepo;
+    public readonly Entity mouseRock;
+
+    public EntityStoreComponent(Entity peepo, Entity mouseRock)
+    {
+        this.peepo = peepo;
+        this.mouseRock = mouseRock;
+    }
 }
 public struct SpawnerComponent : IComponentData
 {
