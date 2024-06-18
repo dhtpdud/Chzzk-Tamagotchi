@@ -1,6 +1,5 @@
 using OSY;
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Core;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -67,9 +66,6 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
 
-        var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
-        var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
-
         if (Input.GetMouseButtonDown(0))
         {
             OnMouseDown();
@@ -82,6 +78,9 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             OnMouse();
         }
+
+        var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
+        var velocity = entityManager.GetComponentData<PhysicsVelocity>(mouseRockEntity);
         if (Input.GetKeyDown(KeyCode.LeftAlt))
         {
 
@@ -96,7 +95,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }
-        if(Input.GetKey(KeyCode.LeftAlt))
+        if (Input.GetKey(KeyCode.LeftAlt))
         {
             float3 rockToMouse = gameManager.ScreenToWorldPointMainCam.ToFloat3() - localTransform.Position;
             velocity.Linear += rockToMouse * 500 * time.DeltaTime;
