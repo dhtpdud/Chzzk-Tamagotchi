@@ -1,5 +1,6 @@
 using OSY;
 using System;
+using System.Collections.Generic;
 using Unity.Scenes;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -45,6 +46,7 @@ public class GameManager : Singleton<GameManager>
         public float IdlingTimeMax;
     }
     public PeepoConfig peepoConfig;
+    public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
     protected override void Awake()
     {

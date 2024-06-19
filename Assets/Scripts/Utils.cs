@@ -77,7 +77,37 @@ namespace OSY
     }
     public static class Utils
     {
-
+        public static async UniTask CachingTextureTask(string url)
+        {
+            if (url == null || url == GameManager.Instance.EmptyString || url == "\r\n")
+                return;
+            int urlHash = Animator.StringToHash(url);
+            if (GameManager.Instance.thumbnailsCacheDic.ContainsKey(urlHash))
+                return;
+            string protocol = url.Substring(0, 4);
+            if (!protocol.Equals("http") && !protocol.Equals("blob"))
+                url = $"file:///{url}";
+            //url = url.Replace("http://", "https://");
+            //Debug.LogWarning(url);
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+            {
+                try
+                {
+                    await request.SendWebRequest();
+                    if (request.result == UnityWebRequest.Result.ConnectionError)
+                    {
+                        //Debug.Log(request.error);
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    //Debug.LogWarning(e);
+                    return;
+                }
+                GameManager.Instance.thumbnailsCacheDic.TryAdd(urlHash, ((DownloadHandlerTexture)request.downloadHandler).texture);
+            }
+        }
         public static async UniTask WaitUntilRecord(Stopwatch stopwatch, NativeArray<float> lastRecordTIme, string taskName, Func<bool> waitCondition, CancellationToken token, bool isDebug = false)
         {
             if (isDebug)

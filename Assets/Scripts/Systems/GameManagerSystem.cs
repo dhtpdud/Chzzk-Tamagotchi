@@ -18,7 +18,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
         gameManagerRW.stabilityPower = GameManager.Instance.stabilityPower;
         gameManagerRW.dragPower = GameManager.Instance.dragPower;
         gameManagerRW.physicMaxVelocity = GameManager.Instance.physicMaxVelocity;
-        Debug.Log("속도는?: " + GameManager.Instance.physicMaxVelocity + "/" + gameManagerRW.physicMaxVelocity);
+        //Debug.Log("최대 속도는?: " + GameManager.Instance.physicMaxVelocity + "/" + gameManagerRW.physicMaxVelocity);
 
 
         var builder = new BlobBuilder(Allocator.TempJob);

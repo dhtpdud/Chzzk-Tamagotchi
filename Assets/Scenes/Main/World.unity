@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1547,7 +1546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   peepo: {fileID: 1765040178466298933, guid: e46d68c82253a174fb13a321a501fba9, type: 3}
-  mouseRock: {fileID: 1765040178466298933, guid: 3a6a5ea45ac592b4cbdaba3779cffa5b, type: 3}
+  mouseRock: {fileID: 1765040178466298933, guid: fa99e895bb7d1c04295c81586d51ad4b, type: 3}
 --- !u!4 &830159385
 Transform:
   m_ObjectHideFlags: 0
