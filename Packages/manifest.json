@@ -2,6 +2,7 @@
   "dependencies": {
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.needle.upm-in-unitypackage": "https://github.com/needle-tools/upm-in-unitypackage.git",
+    "com.sator-imaging.app-window-utility": "https://github.com/sator-imaging/AppWindowUtility.git",
     "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",
     "com.tonymax.nsprites.foundation": "https://github.com/Antoshidza/NSprites-Foundation.git",
     "com.unity.2d.sprite": "1.0.0",

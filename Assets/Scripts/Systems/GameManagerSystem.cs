@@ -11,6 +11,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
+        if (GameManager.Instance == null) return;
         mainCam = Camera.main;
         if (!SystemAPI.HasSingleton<GameManagerSingleton>())
             EntityManager.CreateSingleton<GameManagerSingleton>();
@@ -41,6 +42,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
     }
     protected override void OnUpdate()
     {
+        if (GameManager.Instance == null) return;
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingleton>().ValueRW;
         gameManagerRW.ScreenPointToRayOfMainCam = mainCam.ScreenPointToRay(Input.mousePosition);
         gameManagerRW.ScreenToWorldPointMainCam = mainCam.ScreenToWorldPoint(Input.mousePosition).ToFloat2();

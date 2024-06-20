@@ -2482,7 +2482,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1765040178466298933, guid: e46d68c82253a174fb13a321a501fba9, type: 3}
       propertyPath: m_Name
-      value: Peepo
+      value: PeepoBig
       objectReference: {fileID: 0}
     - target: {fileID: 1765040178466298933, guid: e46d68c82253a174fb13a321a501fba9, type: 3}
       propertyPath: m_IsActive

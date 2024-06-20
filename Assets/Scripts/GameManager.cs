@@ -54,9 +54,9 @@ public class GameManager : Singleton<GameManager>
         var initToken = destroyCancellationToken;
         var InitInstance = Instance;
         QualitySettings.vSyncCount = 0;
-        QualitySettings.maxQueuedFrames = 4;
+        //QualitySettings.maxQueuedFrames = 4;
         Application.targetFrameRate = targetFPS;
-        Screen.SetResolution(ScreenWidth, ScreenHeight, false);
+        //Screen.SetResolution(ScreenWidth, ScreenHeight, false);
         ScreenRect = new Rect(0, 0, ScreenWidth, ScreenHeight);
         Profiler.maxUsedMemory = 2000000000;//2GB
         originTargetFramerate = Application.targetFrameRate;

@@ -14,6 +14,13 @@
       "dependencies": {},
       "hash": "a2b01ee8ea1f02b7e9e3339fe13dabf5e0519b15"
     },
+    "com.sator-imaging.app-window-utility": {
+      "version": "https://github.com/sator-imaging/AppWindowUtility.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "92110b8c9515c3ec9056c924c113e1721b9a5bbc"
+    },
     "com.tonymax.nsprites": {
       "version": "https://github.com/Antoshidza/NSprites.git",
       "depth": 0,
