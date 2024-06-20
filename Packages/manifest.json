@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.needle.upm-in-unitypackage": "https://github.com/needle-tools/upm-in-unitypackage.git",
     "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",
     "com.tonymax.nsprites.foundation": "https://github.com/Antoshidza/NSprites-Foundation.git",
