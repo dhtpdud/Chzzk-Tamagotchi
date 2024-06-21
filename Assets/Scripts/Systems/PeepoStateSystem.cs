@@ -38,6 +38,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingleton>().peepoConfig;
     }
 
+    [BurstCompile]
     public void OnStopRunning(ref SystemState state)
     {
     }

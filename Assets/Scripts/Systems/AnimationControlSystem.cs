@@ -7,6 +7,7 @@ using Unity.Entities;
 [UpdateBefore(typeof(SpriteUVAnimationSystem))]
 public partial struct AnimationControlSystem : ISystem
 {
+    [BurstCompile]
     private struct SystemData : IComponentData
     {
         public EntityQuery MovableQuery;
@@ -41,7 +42,7 @@ public partial struct AnimationControlSystem : ISystem
             AnimationSettings = animationSettings,
             Time = time
         };
-        state.Dependency = animationSwitchJob.ScheduleParallelByRef(systemData.MovableQuery, state.Dependency);
+        animationSwitchJob.ScheduleParallelByRef(systemData.MovableQuery);
     }
 
     [BurstCompile]
