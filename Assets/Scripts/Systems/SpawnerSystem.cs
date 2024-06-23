@@ -12,10 +12,10 @@ public partial struct SpawnerSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
-        new SpawnweJob { time = SystemAPI.Time, parallelWriter = ecb.AsParallelWriter() }.ScheduleParallel();
+        new SpawnerJob { time = SystemAPI.Time, parallelWriter = ecb.AsParallelWriter() }.ScheduleParallel();
     }
     [BurstCompile]
-    partial struct SpawnweJob : IJobEntity
+    partial struct SpawnerJob : IJobEntity
     {
         [ReadOnly] public TimeData time;
         public EntityCommandBuffer.ParallelWriter parallelWriter;

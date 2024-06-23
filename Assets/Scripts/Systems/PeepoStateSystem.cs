@@ -7,6 +7,9 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using UnityEngine;
+using static GameManager;
+using static UpdateGameManagerInfoSystem;
 using Collider = Unity.Physics.Collider;
 using Random = Unity.Mathematics.Random;
 
@@ -46,18 +49,26 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new StateJob { time = SystemAPI.Time, onIdleCollider = onIdleCollider, onRagdollCollider = onRagdollCollider, onDragingCollider = onDragingCollider, peepoConfig = peepoConfig }.ScheduleParallel();
+        new StateJob { 
+            time = SystemAPI.Time, 
+            onIdleCollider = onIdleCollider, 
+            onRagdollCollider = onRagdollCollider, 
+            onDragingCollider = onDragingCollider, 
+            peepoConfig = peepoConfig
+        }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct StateJob : IJobEntity
     {
         [ReadOnly] public TimeData time;
+        //[ReadOnly] public SpawnOrder spawnOrder;
+
         [ReadOnly] public BlobAssetReference<Collider> onRagdollCollider;
         [ReadOnly] public BlobAssetReference<Collider> onIdleCollider;
         [ReadOnly] public BlobAssetReference<Collider> onDragingCollider;
         [ReadOnly] public BlobAssetReference<PeepoConfig> peepoConfig;
 
-        public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, in PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform, ref Flip flip)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, ref PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform, ref Flip flip)
         {
 
             float2 currentVelocity = velocity.Linear.ToFloat2();
@@ -70,6 +81,20 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                 case PeepoState.Born:
                     peepoComponent.lastState = PeepoState.Born;
                     peepoComponent.currentState = PeepoState.Ragdoll;
+
+                    Debug.Log("초기화 중");
+                    if (peepoComponent.hashID != 0) return;
+                    Debug.Log("초기화 시작");
+                    [BurstDiscard]
+                    void BurstDiscard(ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
+                    {
+                        var spawnOrder = GameManager.Instance.spawnOrderQueue.Dequeue();
+                        peepoComponent.hashID = spawnOrder.hash;
+                        velocity.Linear = spawnOrder.initForce;
+                        localTransform.Position = new float3(spawnOrder.spawnPosx, 9, 0);
+                        localTransform.Scale = spawnOrder.size;
+                    }
+                    BurstDiscard(ref peepoComponent, ref velocity, ref localTransform);
                     break;
 
                 case PeepoState.Idle:

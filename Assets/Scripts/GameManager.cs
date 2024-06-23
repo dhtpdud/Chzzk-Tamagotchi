@@ -1,12 +1,16 @@
+using Cysharp.Threading.Tasks;
 using OSY;
 using System;
 using System.Collections.Generic;
-using Unity.Scenes;
+using TMPro;
+using Unity.Entities.CodeGeneratedJobForEach;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Profiling;
 
 public class GameManager : Singleton<GameManager>
 {
+    public Camera mainCam;
     public int targetFPS = 0;
     [HideInInspector]
     public string EmptyString = "";
@@ -48,9 +52,74 @@ public class GameManager : Singleton<GameManager>
     public PeepoConfig peepoConfig;
     public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
+    public Transform canvasTransform;
+
+    [Header("GameObject Caches")]
+    public GameObject peepo;
+    public Transform subscene;
+    public GameObject chatBubble;
+
+    public class ChatInfo
+    {
+        public string id;
+        public GameObject bubbleObject;
+        public DateTime dateTime;
+        public string text;
+        public ChatInfo(string text, GameObject bubbleObject)
+        {
+            id = Utils.GetRandomHexNumber(10);
+            dateTime = DateTime.Now;
+            this.text = text;
+            this.bubbleObject = bubbleObject;
+            var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
+            UniTask.RunOnThreadPool(async () =>
+            {
+                await UniTask.SwitchToMainThread();
+                var tmp = bubbleObject.GetComponentInChildren<TMP_Text>();
+                tmp.text = text;
+                await bubbleObject.transform.DoScaleAsync(Vector3.one, 0.5f, Utils.YieldCaches.UniTaskYield);
+                /*await UniTask.Delay(TimeSpan.FromSeconds(3));
+                var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
+                invisible.a = 0;
+                await tmp.DoColorAsync(invisible, 1, Utils.YieldCaches.UniTaskYield);
+                Destroy(bubbleObject);*/
+            }, true, bubbleCTD).Forget();
+        }
+    }
+    public class ViewerInfo
+    {
+        public string nickName;
+        public List<ChatInfo> chatInfos;
+        public ViewerInfo(string nickName)
+        {
+            this.nickName = nickName;
+            chatInfos = new List<ChatInfo>();
+        }
+    }
+    //캐싱 변수
+    public Dictionary<int, ViewerInfo> viewerInfos = new Dictionary<int, ViewerInfo>();
+
+    public struct SpawnOrder
+    {
+        public int hash;
+        public float spawnPosx;
+        public float3 initForce;
+        public float size;
+
+        public SpawnOrder(int hash, float3 initForce, float spawnPosx = 0, float size = 1)
+        {
+            this.hash = hash;
+            this.spawnPosx = spawnPosx;
+            this.initForce = initForce;
+            this.size = size;
+        }
+    }
+    public Queue<SpawnOrder> spawnOrderQueue = new Queue<SpawnOrder>();
+
     protected override void Awake()
     {
         base.Awake();
+        mainCam ??= Camera.main;
         var initToken = destroyCancellationToken;
         var InitInstance = Instance;
         QualitySettings.vSyncCount = 0;

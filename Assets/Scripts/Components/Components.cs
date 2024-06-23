@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using Random = Unity.Mathematics.Random;
 using Ray = UnityEngine.Ray;
 
@@ -22,6 +23,7 @@ public enum PeepoState
 }
 public struct PeepoComponent : IComponentData
 {
+    public int hashID;
     public int IdleAnimationIndex;
     public PeepoState lastState;
     public PeepoState currentState;
