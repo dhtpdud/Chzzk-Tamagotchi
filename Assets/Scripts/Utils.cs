@@ -49,7 +49,7 @@ namespace OSY
         }
         public float GetValue() => minValue >= maxValue ? minValue : Utils.GetRandom(minValue, maxValue);
     }
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    /*public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 
@@ -75,15 +75,15 @@ namespace OSY
         {
             var tokenCreate = destroyCancellationToken;
         }
-    }
+    }*/
     public static class Utils
     {
         public static async UniTask CachingTextureTask(string url)
         {
-            if (url == null || url == GameManager.Instance.EmptyString || url == "\r\n")
+            if (url == null || url == GameManager.instance.EmptyString || url == "\r\n")
                 return;
             int urlHash = Animator.StringToHash(url);
-            if (GameManager.Instance.thumbnailsCacheDic.ContainsKey(urlHash))
+            if (GameManager.instance.thumbnailsCacheDic.ContainsKey(urlHash))
                 return;
             string protocol = url.Substring(0, 4);
             if (!protocol.Equals("http") && !protocol.Equals("blob"))
@@ -106,7 +106,7 @@ namespace OSY
                     //Debug.LogWarning(e);
                     return;
                 }
-                GameManager.Instance.thumbnailsCacheDic.TryAdd(urlHash, ((DownloadHandlerTexture)request.downloadHandler).texture);
+                GameManager.instance.thumbnailsCacheDic.TryAdd(urlHash, ((DownloadHandlerTexture)request.downloadHandler).texture);
             }
         }
         public static async UniTask WaitUntilRecord(Stopwatch stopwatch, NativeArray<float> lastRecordTIme, string taskName, Func<bool> waitCondition, CancellationToken token, bool isDebug = false)
@@ -127,7 +127,7 @@ namespace OSY
         }
         public static async UniTask<bool> WaitUntil(TimeSpan timeout, Func<bool> func, YieldAwaitable yield, bool ignoreTimeScale = false, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             bool isTimeout = false;
             UniTask.RunOnThreadPool(async () =>
             {
@@ -142,7 +142,7 @@ namespace OSY
         }
         public static async UniTask WaitWhile(TimeSpan timeout, Func<bool> func, YieldAwaitable yield, bool ignoreTimeScale = false, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             bool isTimeout = false;
             UniTask.RunOnThreadPool(async () =>
             {
@@ -156,7 +156,7 @@ namespace OSY
         }
         public static async UniTask WaitUntil(Func<bool> func, YieldAwaitable yield, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             while (!token.IsCancellationRequested && !func.Invoke())
             {
                 await yield;
@@ -165,7 +165,7 @@ namespace OSY
         }
         public static async UniTask WaitWhile(Func<bool> func, YieldAwaitable yield, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             while (func.Invoke() && !token.IsCancellationRequested)
             {
                 await yield;
@@ -173,7 +173,7 @@ namespace OSY
         }
         public static async UniTask WaitUntil(Func<bool> func, Func<UniTask> waitDelay, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             while (!func.Invoke() && !token.IsCancellationRequested)
             {
                 await waitDelay();
@@ -181,7 +181,7 @@ namespace OSY
         }
         public static async UniTask WaitWhile(Func<bool> func, UniTask waitDelay, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             while (func.Invoke() && !token.IsCancellationRequested)
             {
                 await waitDelay;
@@ -250,7 +250,7 @@ namespace OSY
 
         public static async UniTask<AudioClip> GetAudioFile(string url, AudioType audioType)
         {
-            if (url.Equals(null) || url.Equals(GameManager.Instance.EmptyString)) return null;
+            if (url.Equals(null) || url.Equals(GameManager.instance.EmptyString)) return null;
             if (!url.Substring(0, 4).Equals("http"))
                 url = $"file://{url}";
             using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
@@ -369,7 +369,7 @@ namespace OSY
         }
         public static async UniTask DelayCall(float sec, Action action, bool ignoreTimeScale, CancellationToken token = default)
         {
-            token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+            token = token == default ? GameManager.instance.destroyCancellationToken : token;
             await UniTask.WaitForSeconds(sec, ignoreTimeScale, PlayerLoopTiming.Update, token);
             action.Invoke();
         }

@@ -383,6 +383,8 @@ MonoBehaviour:
   peepo: {fileID: 1765040178466298933, guid: e46d68c82253a174fb13a321a501fba9, type: 3}
   subscene: {fileID: 1179863448}
   chatBubble: {fileID: 1567855170057777600, guid: bc3d893e0302f98429ccd7821b4053c4, type: 3}
+  nameTag: {fileID: 1567855170057777600, guid: e2d242c86543cd7498a059d0aa56beb3, type: 3}
+  spawnTrigger: 0
 --- !u!4 &1192278570
 Transform:
   m_ObjectHideFlags: 0
@@ -506,7 +508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a531646a1aa61b94591501b12a8ac199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  channelID: 0947e9a9cbc8a2bfdc61b83ccbd2b490
+  channelID: 3497a9a7221cc3ee5d3f95991d9f95e9
 --- !u!1 &1237660994
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,7 +638,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893371135}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 

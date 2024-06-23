@@ -4,14 +4,9 @@ using Newtonsoft.Json.Linq;
 using OSY;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Jobs;
 using UnityEngine.Networking;
 using WebSocketSharp;
 using MessageEventArgs = WebSocketSharp.MessageEventArgs;
@@ -51,37 +46,23 @@ public class ChzzkUnity : MonoBehaviour
         onChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
-            int hash = Animator.StringToHash(profile.userIdHash);
-            bool isInit = GameManager.Instance.viewerInfos.TryAdd(hash, new GameManager.ViewerInfo(profile.nickname));
-            GameObject bubbleObject = Instantiate(GameManager.Instance.chatBubble, GameManager.Instance.canvasTransform);
-            Transform bubbleTransform = bubbleObject.transform;
-            var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
-            if (GameManager.Instance.viewerInfos[hash].chatInfos.Count <= 0)
-                GameManager.Instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(hash.ToString(), bubbleObject));
-            else
-                GameManager.Instance.viewerInfos[hash].chatInfos[0].text += ", \n"+hash.ToString();
+            int hash = Animator.StringToHash(profile.nickname);
+            bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
 
             if (isInit)
             {
-                GameManager.Instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
+                var nickNameColor = Color.white;
+                Debug.Log(nickNameColor.ToHexString());
+                GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
+                GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
                 initForce: new float3(Utils.GetRandom(-10, 10), Utils.GetRandom(-10, 0), 0),
                 spawnPosx: Utils.GetRandom(-16, 16),
                 size: Utils.GetRandom(0.2f, 1.5f)));
+                GameManager.instance.spawnTrigger = true;
             }
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
         };
     }
-    [BurstCompile]
-    public partial struct TransformJob : IJobParallelForTransform
-    {
-        [ReadOnly] public float3 targetPosition;
-
-        public void Execute(int index, TransformAccess transform)
-        {
-            transform.position = GameManager.Instance.mainCam.WorldToScreenPoint(targetPosition, Camera.MonoOrStereoscopicEye.Mono);
-        }
-    }
-
-
     public void removeAllOnMessageListener()
     {
         onChat = (profile, str) => { };
@@ -371,7 +352,6 @@ public class ChzzkUnity : MonoBehaviour
         [Serializable]
         public class StreamingProperty
         {
-
         }
     }
 

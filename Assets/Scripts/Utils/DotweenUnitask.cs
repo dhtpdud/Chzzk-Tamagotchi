@@ -131,10 +131,10 @@ public static class DotweenUnitask
             target.color = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         var applyValue = target.color;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -160,10 +160,10 @@ public static class DotweenUnitask
             target.anchoredPosition = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector2 applyValue = target.anchoredPosition;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -189,10 +189,10 @@ public static class DotweenUnitask
             target.position = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector3 applyValue = target.position;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -218,10 +218,10 @@ public static class DotweenUnitask
             target.localScale = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector3 applyValue = target.localScale;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -248,10 +248,10 @@ public static class DotweenUnitask
             target.localScale = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector3 applyValue = target.localScale;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -277,10 +277,10 @@ public static class DotweenUnitask
             target.sizeDelta = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector3 applyValue = target.sizeDelta;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -306,10 +306,10 @@ public static class DotweenUnitask
             target.Rotate(byValue, Space.World);
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         Vector3 applyValue = target.eulerAngles;
         var originVal = applyValue;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -336,8 +336,8 @@ public static class DotweenUnitask
             return;
         }
         var originVal = target.alpha;
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;
@@ -357,9 +357,9 @@ public static class DotweenUnitask
             target[0] = byValue;
             return;
         }
-        token = token == default ? GameManager.Instance.destroyCancellationToken : token;
+        token = token == default ? GameManager.instance.destroyCancellationToken : token;
         var originVal = target[0];
-        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.Instance.deltaTime)
+        for (float time = 0; !token.IsCancellationRequested && time < second; time += GameManager.instance.deltaTime)
         {
             //await TelecastUtils.WaitUntil(() => GameManager.Instance.deltaTime != 0 && GameManager.Instance.timeScale != 0, TelecastUtils.YieldCaches.UniTaskYield);
             float progressVal = time / second;

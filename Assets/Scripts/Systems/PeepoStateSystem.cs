@@ -7,9 +7,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
-using static GameManager;
-using static UpdateGameManagerInfoSystem;
 using Collider = Unity.Physics.Collider;
 using Random = Unity.Mathematics.Random;
 
@@ -49,11 +46,12 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new StateJob { 
-            time = SystemAPI.Time, 
-            onIdleCollider = onIdleCollider, 
-            onRagdollCollider = onRagdollCollider, 
-            onDragingCollider = onDragingCollider, 
+        new StateJob
+        {
+            time = SystemAPI.Time,
+            onIdleCollider = onIdleCollider,
+            onRagdollCollider = onRagdollCollider,
+            onDragingCollider = onDragingCollider,
             peepoConfig = peepoConfig
         }.ScheduleParallel();
     }
@@ -61,7 +59,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     partial struct StateJob : IJobEntity
     {
         [ReadOnly] public TimeData time;
-        //[ReadOnly] public SpawnOrder spawnOrder;
 
         [ReadOnly] public BlobAssetReference<Collider> onRagdollCollider;
         [ReadOnly] public BlobAssetReference<Collider> onIdleCollider;
@@ -80,21 +77,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
             {
                 case PeepoState.Born:
                     peepoComponent.lastState = PeepoState.Born;
-                    peepoComponent.currentState = PeepoState.Ragdoll;
-
-                    Debug.Log("초기화 중");
-                    if (peepoComponent.hashID != 0) return;
-                    Debug.Log("초기화 시작");
-                    [BurstDiscard]
-                    void BurstDiscard(ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
-                    {
-                        var spawnOrder = GameManager.Instance.spawnOrderQueue.Dequeue();
-                        peepoComponent.hashID = spawnOrder.hash;
-                        velocity.Linear = spawnOrder.initForce;
-                        localTransform.Position = new float3(spawnOrder.spawnPosx, 9, 0);
-                        localTransform.Scale = spawnOrder.size;
-                    }
-                    BurstDiscard(ref peepoComponent, ref velocity, ref localTransform);
                     break;
 
                 case PeepoState.Idle:

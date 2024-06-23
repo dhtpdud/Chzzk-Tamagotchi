@@ -3,13 +3,13 @@ using OSY;
 using System;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Entities.CodeGeneratedJobForEach;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
     public Camera mainCam;
     public int targetFPS = 0;
     [HideInInspector]
@@ -58,6 +58,7 @@ public class GameManager : Singleton<GameManager>
     public GameObject peepo;
     public Transform subscene;
     public GameObject chatBubble;
+    public GameObject nameTag;
 
     public class ChatInfo
     {
@@ -65,24 +66,24 @@ public class GameManager : Singleton<GameManager>
         public GameObject bubbleObject;
         public DateTime dateTime;
         public string text;
-        public ChatInfo(string text, GameObject bubbleObject)
+        public ChatInfo(string text)
         {
             id = Utils.GetRandomHexNumber(10);
             dateTime = DateTime.Now;
             this.text = text;
-            this.bubbleObject = bubbleObject;
+            this.bubbleObject = Instantiate(instance.chatBubble, instance.canvasTransform);
             var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
             UniTask.RunOnThreadPool(async () =>
             {
                 await UniTask.SwitchToMainThread();
                 var tmp = bubbleObject.GetComponentInChildren<TMP_Text>();
                 tmp.text = text;
-                await bubbleObject.transform.DoScaleAsync(Vector3.one, 0.5f, Utils.YieldCaches.UniTaskYield);
-                /*await UniTask.Delay(TimeSpan.FromSeconds(3));
+                await bubbleObject.transform.DoScaleAsync(Vector3.zero, Vector3.one, 0.5f, Utils.YieldCaches.UniTaskYield);
+                await UniTask.Delay(TimeSpan.FromSeconds(3));
                 var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
                 invisible.a = 0;
                 await tmp.DoColorAsync(invisible, 1, Utils.YieldCaches.UniTaskYield);
-                Destroy(bubbleObject);*/
+                Destroy(bubbleObject);
             }, true, bubbleCTD).Forget();
         }
     }
@@ -90,10 +91,16 @@ public class GameManager : Singleton<GameManager>
     {
         public string nickName;
         public List<ChatInfo> chatInfos;
-        public ViewerInfo(string nickName)
+        public GameObject nameTagObject;
+        public ViewerInfo(string nickName, Color nicknameColor)
         {
             this.nickName = nickName;
             chatInfos = new List<ChatInfo>();
+            this.nameTagObject = Instantiate(instance.nameTag, instance.canvasTransform);
+            var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
+            tmp.text = nickName;
+            //Debug.Log(nicknameColor.ToHexString());
+            tmp.color = nicknameColor;
         }
     }
     //캐싱 변수
@@ -115,13 +122,14 @@ public class GameManager : Singleton<GameManager>
         }
     }
     public Queue<SpawnOrder> spawnOrderQueue = new Queue<SpawnOrder>();
+    public bool spawnTrigger;
 
-    protected override void Awake()
+    protected void Awake()
     {
-        base.Awake();
+        instance = this;
         mainCam ??= Camera.main;
         var initToken = destroyCancellationToken;
-        var InitInstance = Instance;
+        var InitInstance = instance;
         QualitySettings.vSyncCount = 0;
         //QualitySettings.maxQueuedFrames = 4;
         Application.targetFrameRate = targetFPS;
