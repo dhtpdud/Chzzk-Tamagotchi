@@ -98,7 +98,7 @@ public class TransparentWindow : MonoBehaviour
         DwmExtendFrameIntoClientArea(hWnd, ref margins);
 
         SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
-        SetLayeredWindowAttributes(hWnd, 0, 0, LWA_COLORKEY);
+        SetLayeredWindowAttributes(hWnd, 0, 0, LWA_COLORKEY);//이부분 문제
 
         SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 #endif
