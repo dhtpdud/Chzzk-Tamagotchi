@@ -1,66 +1,28 @@
-using System;
-using System.Runtime.InteropServices;
+ï»¿///
+/// Copyright (c) 2019 wakagomo
+///
+/// This source code is released under the MIT License.
+/// http://opensource.org/licenses/mit-license.php
+///
+
 using UnityEngine;
 
+using System;
+using System.Runtime.InteropServices;
+using System.Collections;
+
+/// <summary>
+/// Make the window transparent.
+/// </summary>
 public class TransparentWindow : MonoBehaviour
 {
-    const int SWP_HIDEWINDOW = 0x80;
-    const int SWP_SHOWWINDOW = 0x40;
-    const int SWP_NOMOVE = 0x0002;
-    const int SWP_NOSIZE = 0x0001;
-    const uint WS_SIZEBOX = 0x00040000;
-    const int GWL_STYLE = -16;
-    const int WS_MINIMIZE = 0x20000000;
-    const int WS_MAXMIZE = 0x01000000;
-    const int WS_BORDER = 0x00800000;
-    const int WS_DLGFRAME = 0x00400000;
-    const int WS_CAPTION = WS_BORDER | WS_DLGFRAME;
-    const int WS_SYSMENU = 0x00080000;
-    const int WS_MAXIMIZEBOX = 0x00010000;
-    const int WS_MINIMIZEBOX = 0x00020000;
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetActiveWindow();
-
-    [DllImport("user32.dll")]
-    static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-
+    #region WINDOWS API
     /// <summary>
-    /// window Å©±â¿Í À§Ä¡º¯°æ
+    /// Returned by the GetThemeMargins function to define the margins of windows that have visual styles applied.
     /// </summary>
-    /// <param name="hWnd">º¯°æÇÒ window handle</param>
-    /// <param name="hWndInsertAfter"> Z¼ø¼­»ó º¯°æÇÒ handle ¾Õ¿¡ ¿Ã handle</param>
-    /// HWND_BOTTOM : Z¼ø¼­ÀÇ ¸Ç ¾Æ·¡¿¡ À§µµ¿ì¸¦ ³õ´Â´Ù.
-    /// HWND_NOTOPMOST : ¸Ç À§¿¡ÀÖ´Â ¸ğµç À©µµ¿ì µÚ¿¡ À©µµ¿ì¸¦ ³õ´Â´Ù.
-    /// HWND_TOP : Z¼ø¼­»ó ¸Ç À§¿¡ À©µµ¿ì¸¦ ³õ´Â´Ù.
-    /// HWND_TOPMOST : ÃÖ»óÀ§ À§Ä¡¸¦ À¯Áö(ºñÈ°¼º¿Í µÇ¾îµµ)
-    /// <param name="X"></param>
-    /// <param name="Y"></param>
-    /// <param name="cx">³ĞÀÌ</param>
-    /// <param name="cy">³ôÀÌ</param>
-    /// <param name="uFlags">ÇÃ·¡±×</param>
-    /// SWP_SHOWWINDOW : À©µµ¿ì Ç¥½Ã(ÀÌµ¿ Å©±âº¯°æ ¹«½Ã)
-    /// SWP_HIDEWINDOW : À©µµ¿ì¸¦ ¼û±è(ÀÌµ¿ Å©±âº¯°æ ¹«½Ã)
-    /// SWP_DRAWFRAME : À©µµ¿ì ÁÖº¯¿¡ ÇÁ·¹ÀÓÀ» ±×¸²
-    /// SWP_NOACTIVATE : Å©±â º¯°æ ÈÄ À©µµ¿ì¸¦ È°¼ºÈ­ ½ÃÅ°Áö ¾ÊÀ½
-    /// SWP_NOMOVE : ÇöÀçÀ§Ä¡ À¯Áö
-    /// SWP_NOSIZE : ÇöÀçÅ©±â À¯Áö
-    /// SWP_NOZORDER : ÇöÀç Z¼ø¼­¸¦ ±×´ë·Î À¯Áö
-    /// <returns></returns>
-    [DllImport("user32.dll")]
-    static extern bool SetWindowPos(
-        System.IntPtr hWnd, //window handle
-        System.IntPtr hWndInsertAfter, // window ¹èÄ¡ ¼ø¼­
-        short X, // x position
-        short Y, // y position
-        short cx, // window width
-        short cy, // window height
-        uint uFlags // window flags.
-    );
-
-    [DllImport("user32.dll")]
-    static extern IntPtr SetLayeredWindowAttributes(IntPtr hWnd, int crKey, byte bAlpha, uint dwFlags);
-
+    /// https://docs.microsoft.com/en-us/windows/desktop/api/uxtheme/ns-uxtheme-_margins
     private struct MARGINS
     {
         public int cxLeftWidth;
@@ -69,41 +31,221 @@ public class TransparentWindow : MonoBehaviour
         public int cyBottomHeight;
     }
 
-
+    /// <summary>
+    /// Retrieves the window handle to the active window attached to the calling thread's message queue.
+    /// </summary>
+    /// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getactivewindow
+    [DllImport("User32.dll")]
+    private static extern IntPtr GetActiveWindow();
+    /// <summary>
+    /// Changes an attribute of the specified window. The function also sets the 32-bit (long) value at the specified offset into the extra window memory.
+    /// </summary>
+    /// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setwindowlonga
+    [DllImport("User32.dll")]
+    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+    /// <summary>
+    /// Changes the size, position, and Z order of a child, pop-up, or top-level window. These windows are ordered according to their appearance on the screen. The topmost window receives the highest rank and is the first window in the Z order.
+    /// </summary>
+    /// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setwindowpos
+    [DllImport("User32.dll")]
+    private static extern int SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    /// <summary>
+    /// Extends the window frame into the client area.
+    /// </summary>
+    /// https://docs.microsoft.com/en-us/windows/desktop/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea
     [DllImport("Dwmapi.dll")]
-    private static extern uint DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS margins);
+    private static extern uint DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+    #endregion
 
-    const int GWL_EXSTYLE = -20;
+    /// <summary>
+    /// Should operation be transparene?
+    /// </summary>
+    private bool isClickThrough = false;
 
-    const uint WS_EX_LAYERED = 0x00080000;
-    const uint WS_EX_TRANSPARENT = 0x00000020;
-    const uint LWA_COLORKEY = 0x00000001;
+    /// <summary>
+    /// Is the mouse pointer on an opaque pixel?
+    /// </summary>
+    private bool isOnOpaquePixel = true;
 
-    static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+    /// <summary>
+    /// The cut off threshold of alpha value.
+    /// </summary>
+    private float opaqueThreshold = 0.1f;
 
+    /// <summary>
+    /// An instance of current camera.
+    /// </summary>
+    private Camera currentCamera;
+
+    /// <summary>
+    /// 1x1 texture
+    /// </summary>
+    private Texture2D colorPickerTexture = null;
+
+    /// <summary>
+    /// Window handle
+    /// </summary>
+    private IntPtr windowHandle;
+
+    private void Awake()
+    {
+        windowHandle = GetActiveWindow();
+
+        { // SetWindowLong
+            const int GWL_STYLE = -16;
+            const uint WS_POPUP = 0x80000000;
+
+            SetWindowLong(windowHandle, GWL_STYLE, WS_POPUP);
+        }
+
+        { // Set extended window style
+            SetClickThrough(true);
+        }
+
+        { // SetWindowPos
+            IntPtr HWND_TOPMOST = new IntPtr(-1);
+            const uint SWP_NOSIZE = 0x0001;
+            const uint SWP_NOMOVE = 0x0002;
+            const uint SWP_NOACTIVE = 0x0010;
+            const uint SWP_SHOWWINDOW = 0x0040;
+
+            SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVE | SWP_SHOWWINDOW);
+        }
+
+        { // DwmExtendFrameIntoClientArea
+            MARGINS margins = new MARGINS()
+            {
+                cxLeftWidth = -1
+            };
+
+            DwmExtendFrameIntoClientArea(windowHandle, ref margins);
+        }
+    }
+
+    /// <summary>
+    /// Set my window is click-through or not
+    /// </summary>
+    /// <param name="through"></param>
+    private void SetClickThrough(bool through)
+    {
+        const int GWL_EXSTYLE = -20;
+        const uint WS_EX_LAYERD = 0x080000;
+        const uint WS_EX_TRANSPARENT = 0x00000020;
+        const uint WS_EX_LEFT = 0x00000000;
+
+        if (through)
+        {
+            SetWindowLong(windowHandle, GWL_EXSTYLE, WS_EX_LAYERD | WS_EX_TRANSPARENT);
+        }
+        else
+        {
+            SetWindowLong(windowHandle, GWL_EXSTYLE, WS_EX_LEFT);
+        }
+    }
 
     void Start()
     {
-        /*AppWindowUtility.FullScreen = true;
-        AppWindowUtility.Transparent = true;
-        AppWindowUtility.AlwaysOnTop = true;*/
+        if (!currentCamera)
+        {
+            // ã‚«ãƒ¡ãƒ©æŒ‡å®šãŒãªã‘ã‚Œã°ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ã‚’æ¢ã™
+            currentCamera = Camera.main;
 
-        Camera.main.clearFlags = CameraClearFlags.SolidColor;
-        Camera.main.backgroundColor = new Color(0, 0, 0, 0);
+            // ã‚‚ã—ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ãŒè¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã°ã€Findã§æ¢ã™
+            if (!currentCamera)
+            {
+                currentCamera = FindObjectOfType<Camera>();
+            }
+        }
 
-#if !UNITY_EDITOR
-        IntPtr hWnd = GetActiveWindow();
-        MARGINS margins = new MARGINS { cxLeftWidth = -1 };
+        // ãƒã‚¦ã‚¹ä¸‹æç”»è‰²æŠ½å‡ºç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’æº–å‚™
+        colorPickerTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
 
-        DwmExtendFrameIntoClientArea(hWnd, ref margins);
-
-        SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
-        SetLayeredWindowAttributes(hWnd, 0, 0, LWA_COLORKEY);//ÀÌºÎºĞ ¹®Á¦
-
-        SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-#endif
-
-        Screen.fullScreen = true;
-        //AppWindowUtility.AlwaysOnTop = true;
+        // ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ç›´ä¸‹ã®è‰²ã‚’æ¤œæŸ»ã™ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’é–‹å§‹
+        StartCoroutine(PickColorCoroutine());
     }
+
+    void Update()
+    {
+        // æ“ä½œé€éï¼ä¸é€éã‚’æ›´æ–°
+        UpdateClickThrough();
+    }
+
+    /// <summary>
+    /// ç”»ç´ ã®è‰²ã‚’åŸºã«æ“ä½œé€éçŠ¶æ…‹ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+    /// </summary>
+    void UpdateClickThrough()
+    {
+        if (isClickThrough)
+        {
+            // ç¾åœ¨ãŒæ“ä½œé€éçŠ¶æ…‹ã§ã€ã‹ã¤ä¸é€æ˜ç”»ç´ ä¸Šã«ãƒã‚¦ã‚¹ãŒæ¥ãŸã‚‰ã€æ“ä½œé€éã‚’ã‚„ã‚ã‚‹
+            if (isOnOpaquePixel)
+            {
+                SetClickThrough(false);
+                isClickThrough = false;
+            }
+        }
+        else
+        {
+            // ç¾åœ¨ãŒæ“ä½œå—ä»˜ä¸­ã§ã€ã‹ã¤é€æ˜ç”»ç´ ä¸Šã«ãƒã‚¦ã‚¹ãŒæ¥ãŸã‚‰ã€æ“ä½œé€éã«åˆ‡ã‚Šæ›¿ãˆã‚‹
+            if (!isOnOpaquePixel)
+            {
+                SetClickThrough(true);
+                isClickThrough = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// WaitForEndOfFrame()ã‚’ç”¨ã„ãŸã‚³ãƒ«ãƒ¼ãƒãƒ³ã§ã€æç”»å®Œäº†å¾Œã®ç”»åƒã‚’ç›£è¦–
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PickColorCoroutine()
+    {
+        while (Application.isPlaying)
+        {
+            yield return new WaitForEndOfFrame();
+            ObservePixelUnderCursor(currentCamera);
+        }
+        yield return null;
+    }
+
+    /// <summary>
+    /// ãƒã‚¦ã‚¹ç›´ä¸‹ã®ç”»ç´ ãŒé€æ˜ã‹ã©ã†ã‹ã‚’åˆ¤å®š
+    /// </summary>
+    /// <param name="cam"></param>
+    void ObservePixelUnderCursor(Camera cam)
+    {
+        // ã‚«ãƒ¡ãƒ©ãŒä¸æ˜ãªã‚‰ã°ä½•ã‚‚ã—ãªã„
+        if (!cam) return;
+
+        Vector2 mousePos = Input.mousePosition;
+        Rect camRect = cam.pixelRect;
+
+        // ãƒã‚¦ã‚¹ãŒæç”»ç¯„å›²å†…ãªã‚‰ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+        if (camRect.Contains(mousePos))
+        {
+            try
+            {
+                // ãƒã‚¦ã‚¹ç›´ä¸‹ã®ç”»ç´ ã®ã¿ReadPixelã™ã‚‹
+                // å‚è€ƒ http://tsubakit1.hateblo.jp/entry/20131203/1386000440
+                colorPickerTexture.ReadPixels(new Rect(mousePos, Vector2.one), 0, 0);
+                Color color = colorPickerTexture.GetPixel(0, 0);
+
+                // ã‚¢ãƒ«ãƒ•ã‚¡å€¤ãŒã—ãã„å€¤ä»¥ä¸Šãªã‚‰ã°ã€ä¸é€éã¨ã™ã‚‹
+                isOnOpaquePixel = (color.a >= opaqueThreshold);
+            }
+            catch (System.Exception ex)
+            {
+                // ç¨€ã«ç¯„å›²å¤–ã«ãªã£ã¦ã—ã¾ã†ï¼Ÿ
+                Debug.LogError(ex.Message);
+                isOnOpaquePixel = false;
+            }
+        }
+        else
+        {
+            isOnOpaquePixel = false;
+        }
+    }
+
+#endif // !UNITY_EDITOR && UNITY_STANDALONE_WIN
 }
