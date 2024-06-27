@@ -18,11 +18,10 @@ public partial struct UITransformUpdateSystem : ISystem
         public void Execute(in PeepoComponent peepo, in LocalTransform localTransform)
         {
             if (GameManager.instance.viewerInfos != null)
-                lock (GameManager.instance.viewerInfos)
-                    if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
-                    {
-                        UnitaskExecute(peepo, localTransform);
-                    }
+                if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
+                {
+                    UnitaskExecute(peepo, localTransform);
+                }
         }
         public void UnitaskExecute(PeepoComponent peepo, LocalTransform localTransform)
         {
@@ -45,11 +44,10 @@ public partial struct UITransformUpdateSystem : ISystem
         public void Execute(in PeepoComponent peepo, in LocalTransform localTransform)
         {
             if (GameManager.instance.viewerInfos != null)
-                lock (GameManager.instance.viewerInfos)
-                    if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
-                    {
-                        UnitaskExecute(peepo, localTransform);
-                    }
+                if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
+                {
+                    UnitaskExecute(peepo, localTransform);
+                }
         }
         public void UnitaskExecute(PeepoComponent peepo, LocalTransform localTransform)
         {

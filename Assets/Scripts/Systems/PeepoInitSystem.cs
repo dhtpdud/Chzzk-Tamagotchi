@@ -16,8 +16,8 @@ public partial struct PeepoInitSystem : ISystem
         }
         if (GameManager.instance.spawnOrderQueue.Count > 0)
             new PeepoInitJob { spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue() }.ScheduleParallel();
-        else
-            new PeepoDefaultJob().ScheduleParallel();
+        /*else
+            new PeepoDefaultJob().ScheduleParallel();*/
     }
 
 

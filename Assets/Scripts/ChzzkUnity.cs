@@ -52,7 +52,7 @@ public class ChzzkUnity : MonoBehaviour
             if (isInit)
             {
                 var nickNameColor = Color.white;
-                Debug.Log(nickNameColor.ToHexString());
+                //Debug.Log(nickNameColor.ToHexString());
                 GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
                 initForce: new float3(Utils.GetRandom(-10, 10), Utils.GetRandom(-10, 0), 0),
