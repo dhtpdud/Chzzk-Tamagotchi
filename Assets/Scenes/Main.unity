@@ -252,10 +252,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 519420032}
-  - component: {fileID: 519420033}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -390,11 +390,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb7394fd7dec1de4382f8e1db56c1864, type: 3}
+  m_Script: {fileID: 11500000, guid: eb951500192d2430eb3e306480cc2f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  mainCamera: {fileID: 0}
+  _isTransparent: 1
+  _alphaValue: 1
+  _isTopmost: 1
+  _isBottommost: 0
+  _isZoomed: 0
+  _shouldFitMonitor: 0
+  _allowDropFiles: 0
+  isHitTestEnabled: 1
+  hitTestType: 1
+  opacityThreshold: 0.1
+  autoSwitchCameraBackground: 1
+  forceWindowed: 0
+  currentCamera: {fileID: 519420031}
+  transparentType: 1
+  keyColor:
+    serializedVersion: 2
+    rgba: 65537
+  onObject: 1
+  pickedColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1179863446
 GameObject:
   m_ObjectHideFlags: 0
