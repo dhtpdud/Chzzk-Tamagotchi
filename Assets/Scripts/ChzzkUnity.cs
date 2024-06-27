@@ -4,9 +4,9 @@ using Newtonsoft.Json.Linq;
 using OSY;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using TMPro;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 using WebSocketSharp;
@@ -15,7 +15,8 @@ using WebSocket = WebSocketSharp.WebSocket;
 
 public class ChzzkUnity : MonoBehaviour
 {
-
+    public CancellationTokenSource LiveCTS;
+    LiveStatus liveStatus;
     //WSS(WS 말고 WSS) 쓰려면 필요함.
     private enum SslProtocolsHack
     {
@@ -44,6 +45,33 @@ public class ChzzkUnity : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UniTask.RunOnThreadPool(async () =>
+        {
+            await UniTask.SwitchToMainThread();
+            bool isOnSettingUI = GameManager.instance.settingUI.activeInHierarchy;
+            bool isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
+            while (!destroyCancellationToken.IsCancellationRequested)
+            {
+                if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift))
+                {
+                    GameManager.instance.settingUI.SetActive(!isOnSettingUI);
+                }
+                else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
+                {
+                    isOnSettingUI = GameManager.instance.settingUI.activeInHierarchy;
+                }
+
+                if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.RightShift))
+                {
+                    GameManager.instance.channelInfoUI.SetActive(!isOnChannelInfoUI);
+                }
+                else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightShift))
+                {
+                    isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
+                }
+                await Utils.YieldCaches.UniTaskYield;
+            }
+        }, true, destroyCancellationToken).Forget();
         onChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
@@ -66,7 +94,20 @@ public class ChzzkUnity : MonoBehaviour
     }
     public void StartLive()
     {
-        UniTask.RunOnThreadPool(Connect, true, destroyCancellationToken).Forget();
+        UniTask.RunOnThreadPool(async ()=> 
+        {
+            await Connect();
+            UniTask.RunOnThreadPool(async () =>
+            {
+                await UniTask.SwitchToMainThread();
+                while (!LiveCTS.IsCancellationRequested)
+                {
+                    liveStatus = await GetLiveStatus(inputChannelID.text);
+                    GameManager.instance.channelViewerCount.text = $"시청자 수: {liveStatus.content.concurrentUserCount}";
+                    await UniTask.Delay(TimeSpan.FromSeconds(2), false, PlayerLoopTiming.FixedUpdate, LiveCTS.Token, true);
+                }
+            }, true, LiveCTS.Token).Forget();
+        }, true, destroyCancellationToken).Forget();
     }
     public void StopLive()
     {
@@ -129,7 +170,6 @@ public class ChzzkUnity : MonoBehaviour
             //Cid 획득
             liveStatus = JsonUtility.FromJson<LiveStatus>(request.downloadHandler.text);
         }
-        await UniTask.SwitchToThreadPool();
         return liveStatus;
     }
 
@@ -146,19 +186,20 @@ public class ChzzkUnity : MonoBehaviour
             accessTokenResult = JsonUtility.FromJson<AccessTokenResult>(request.downloadHandler.text);
         }
 
-        await UniTask.SwitchToThreadPool();
         return accessTokenResult;
     }
 
-    public async UniTaskVoid Connect()
+    public async UniTask Connect()
     {
         if (socket != null && socket.IsAlive)
         {
+            LiveCTS?.Cancel();
             socket.Close();
             socket = null;
         }
+        LiveCTS = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
 
-        LiveStatus liveStatus = await GetLiveStatus(inputChannelID.text);
+        liveStatus = await GetLiveStatus(inputChannelID.text);
         cid = liveStatus.content.chatChannelId;
         AccessTokenResult accessTokenResult = await GetAccessToken(cid);
         token = accessTokenResult.content.accessToken;
@@ -281,6 +322,7 @@ public class ChzzkUnity : MonoBehaviour
     {
         removeAllOnDonationListener();
         removeAllOnMessageListener();
+        LiveCTS?.Cancel();
         if (socket != null && socket.IsAlive)
         {
             socket.Close();

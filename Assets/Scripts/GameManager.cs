@@ -49,6 +49,11 @@ public class GameManager : MonoBehaviour
 
     public Transform canvasTransform;
 
+    [Header("UI")]
+    public GameObject settingUI;
+    public GameObject channelInfoUI;
+    public TMP_Text channelViewerCount;
+
     [Header("GameObject Caches")]
     public GameObject peepo;
     public Transform subscene;
@@ -123,15 +128,16 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         mainCam ??= Camera.main;
-        var initToken = destroyCancellationToken;
-        var InitInstance = instance;
-        QualitySettings.vSyncCount = 0;
-        QualitySettings.maxQueuedFrames = 4;
-        Application.targetFrameRate = targetFPS;
-        Profiler.maxUsedMemory = 2000000000;//2GB
         originTargetFramerate = Application.targetFrameRate;
         origincaptureFramerate = Time.captureFramerate;
         originVSyncCount = QualitySettings.vSyncCount;
+    }
+    private void Start()
+    {
+        QualitySettings.maxQueuedFrames = 4;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = targetFPS;
+        Profiler.maxUsedMemory = 2000000000;//2GB
     }
     private void Update()
     {
