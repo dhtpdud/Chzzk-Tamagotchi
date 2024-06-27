@@ -1,5 +1,4 @@
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -14,8 +13,7 @@ public partial struct PeepoInitSystem : ISystem
             new SpawnJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel();
             GameManager.instance.spawnTrigger = false;
         }
-        if (GameManager.instance.spawnOrderQueue.Count > 0)
-            new PeepoInitJob { spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue() }.ScheduleParallel();
+        new PeepoInitJob().ScheduleParallel();
         /*else
             new PeepoDefaultJob().ScheduleParallel();*/
     }
@@ -33,13 +31,12 @@ public partial struct PeepoInitSystem : ISystem
         }
     }
 
-    [BurstCompile]
     partial struct PeepoInitJob : IJobEntity
     {
-        [ReadOnly] public GameManager.SpawnOrder spawnOrder;
         public void Execute(ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
         {
-            if (peepoComponent.currentState != PeepoState.Born) return;
+            if (peepoComponent.currentState != PeepoState.Born || GameManager.instance.spawnOrderQueue.Count <= 0) return;
+            var spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
             peepoComponent.hashID = spawnOrder.hash;
             velocity.Linear = spawnOrder.initForce;
             localTransform.Position = new float3(spawnOrder.spawnPosx, 9, 0);

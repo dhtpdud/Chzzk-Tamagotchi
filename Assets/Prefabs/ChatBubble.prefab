@@ -38,7 +38,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 999999}
   m_SizeDelta: {x: 155.41, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1055824036580276731
@@ -140,7 +140,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8373910994975165087}
-  - component: {fileID: 5262457397132156738}
   - component: {fileID: 3781102560187268924}
   - component: {fileID: 1672909742575950703}
   - component: {fileID: 7725069610580695124}
@@ -170,14 +169,6 @@ RectTransform:
   m_AnchoredPosition: {x: 77.705, y: -21.725}
   m_SizeDelta: {x: 155.41, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &5262457397132156738
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2888978004236652322}
-  m_CullTransparentMesh: 1
 --- !u!114 &3781102560187268924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,8 +195,8 @@ MeshRenderer:
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_MotionVectors: 2
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0

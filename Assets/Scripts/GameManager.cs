@@ -15,11 +15,6 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public string EmptyString = "";
 
-    public int ScreenWidth;
-    public int ScreenHeight;
-    [HideInInspector]
-    public Rect ScreenRect;
-
     //캐싱용 변수
     public float deltaTime { get; private set; }
     public float captureDeltaTime { get; private set; }
@@ -131,10 +126,8 @@ public class GameManager : MonoBehaviour
         var initToken = destroyCancellationToken;
         var InitInstance = instance;
         QualitySettings.vSyncCount = 0;
-        //QualitySettings.maxQueuedFrames = 4;
+        QualitySettings.maxQueuedFrames = 4;
         Application.targetFrameRate = targetFPS;
-        //Screen.SetResolution(ScreenWidth, ScreenHeight, false);
-        ScreenRect = new Rect(0, 0, ScreenWidth, ScreenHeight);
         Profiler.maxUsedMemory = 2000000000;//2GB
         originTargetFramerate = Application.targetFrameRate;
         origincaptureFramerate = Time.captureFramerate;

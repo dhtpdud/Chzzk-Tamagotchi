@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using OSY;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -25,7 +26,8 @@ public class ChzzkUnity : MonoBehaviour
 
     string cid;
     string token;
-    public string channelID;
+    //public string channelID;
+    public TMP_InputField inputChannelID;
 
     WebSocket socket = null;
     string wsURL = "wss://kr-ss3.chat.naver.com/chat";
@@ -42,7 +44,6 @@ public class ChzzkUnity : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        UniTask.RunOnThreadPool(Connect, true, destroyCancellationToken).Forget();
         onChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
@@ -62,6 +63,18 @@ public class ChzzkUnity : MonoBehaviour
             }
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
         };
+    }
+    public void StartLive()
+    {
+        UniTask.RunOnThreadPool(Connect, true, destroyCancellationToken).Forget();
+    }
+    public void StopLive()
+    {
+        if (socket != null && socket.IsAlive)
+        {
+            socket.Close();
+            socket = null;
+        }
     }
     public void removeAllOnMessageListener()
     {
@@ -145,7 +158,7 @@ public class ChzzkUnity : MonoBehaviour
             socket = null;
         }
 
-        LiveStatus liveStatus = await GetLiveStatus(channelID);
+        LiveStatus liveStatus = await GetLiveStatus(inputChannelID.text);
         cid = liveStatus.content.chatChannelId;
         AccessTokenResult accessTokenResult = await GetAccessToken(cid);
         token = accessTokenResult.content.accessToken;
@@ -166,7 +179,7 @@ public class ChzzkUnity : MonoBehaviour
 
     public void Connect(string channelId)
     {
-        channelID = channelId;
+        inputChannelID.text = channelId;
         UniTask.RunOnThreadPool(Connect, true, destroyCancellationToken).Forget();
     }
 
