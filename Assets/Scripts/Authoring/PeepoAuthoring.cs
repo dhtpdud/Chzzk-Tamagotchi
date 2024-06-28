@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class PeepoAuthoring : MonoBehaviour
 {
-    public int totalDonation;
-    public bool isMute;
 
     public class PeepoBaker : Baker<PeepoAuthoring>
     {
@@ -12,10 +10,10 @@ public class PeepoAuthoring : MonoBehaviour
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
 
-            AddComponent(entity, new PeepoComponent
+            AddComponent(entity, new PeepoComponent());
+            AddComponent(entity, new TimeLimitedLifeComponent
             {
-                totalDonation = authoring.totalDonation,
-                isMute = authoring.isMute
+                lifeTime = 60
             });
             AddComponent(entity, new DragableTag());
             AddComponent(entity, new RandomDataComponent

@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     [Serializable]
     public class PeepoConfig
     {
+        public int MaxlifeTIme;
         public float switchTimeImpact;
         public float switchIdleAnimationTime;
 
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour
     public GameObject settingUI;
     public GameObject channelInfoUI;
     public TMP_Text channelViewerCount;
+    public TMP_Text peepoCountText;
 
     [Header("GameObject Caches")]
     public GameObject peepo;
@@ -102,6 +104,15 @@ public class GameManager : MonoBehaviour
             //Debug.Log(nicknameColor.ToHexString());
             tmp.color = nicknameColor;
         }
+        public void OnDestroy()
+        {
+            UniTask.RunOnThreadPool(async () =>
+            {
+                await UniTask.SwitchToMainThread();
+                chatInfos.Clear();
+                Destroy(nameTagObject);
+            },true,GameManager.instance.destroyCancellationToken).Forget();
+        }
     }
     //캐싱 변수
     public Dictionary<int, ViewerInfo> viewerInfos = new Dictionary<int, ViewerInfo>();
@@ -122,7 +133,6 @@ public class GameManager : MonoBehaviour
         }
     }
     public Queue<SpawnOrder> spawnOrderQueue = new Queue<SpawnOrder>();
-    public bool spawnTrigger;
 
     protected void Awake()
     {

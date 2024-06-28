@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -39,12 +40,13 @@ public class ChzzkUnity : MonoBehaviour
     string heartbeatRequest = "{\"ver\":\"2\",\"cmd\":0}";
     string heartbeatResponse = "{\"ver\":\"2\",\"cmd\":10000}";
 
-    public Action<Profile, string> onChat = (profile, str) => { };
-    public Action<Profile, string, DonationExtras> onDonation = (profile, str, extra) => { };
+    public Action<Profile, string> OnChat = (profile, str) => { };
+    public Action<Profile, string, DonationExtras> OnDonation = (profile, str, extra) => { };
 
     // Start is called before the first frame update
     void Start()
     {
+        var peepoEventSystemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PeepoEventSystem>();
         UniTask.RunOnThreadPool(async () =>
         {
             await UniTask.SwitchToMainThread();
@@ -69,10 +71,17 @@ public class ChzzkUnity : MonoBehaviour
                 {
                     isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
                 }
+
+                if(Input.GetKey(KeyCode.LeftControl))
+                {
+                    peepoEventSystemHandle.OnCalm.Invoke();
+                }
                 await Utils.YieldCaches.UniTaskYield;
             }
         }, true, destroyCancellationToken).Forget();
-        onChat += async (profile, chatText) =>
+
+
+        OnChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
@@ -87,9 +96,10 @@ public class ChzzkUnity : MonoBehaviour
                 initForce: new float3(Utils.GetRandom(-10, 10), Utils.GetRandom(-10, 0), 0),
                 spawnPosx: Utils.GetRandom(-16, 16),
                 size: Utils.GetRandom(0.2f, 1.5f)));
-                GameManager.instance.spawnTrigger = true;
+                peepoEventSystemHandle.OnSpawn.Invoke();
             }
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
+            peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.MaxlifeTIme);
         };
     }
     public void StartLive()
@@ -104,6 +114,7 @@ public class ChzzkUnity : MonoBehaviour
                 {
                     liveStatus = await GetLiveStatus(inputChannelID.text);
                     GameManager.instance.channelViewerCount.text = $"시청자 수: {liveStatus.content.concurrentUserCount}";
+                    GameManager.instance.peepoCountText.text = $"채팅 참여자 수: {GameManager.instance.viewerInfos.Count}";
                     await UniTask.Delay(TimeSpan.FromSeconds(2), false, PlayerLoopTiming.FixedUpdate, LiveCTS.Token, true);
                 }
             }, true, LiveCTS.Token).Forget();
@@ -119,12 +130,12 @@ public class ChzzkUnity : MonoBehaviour
     }
     public void removeAllOnMessageListener()
     {
-        onChat = (profile, str) => { };
+        OnChat = (profile, str) => { };
     }
 
     public void removeAllOnDonationListener()
     {
-        onDonation = (profile, str, extra) => { };
+        OnDonation = (profile, str, extra) => { };
     }
 
     //20초에 한번 HeartBeat 전송해야 함.
@@ -251,7 +262,7 @@ public class ChzzkUnity : MonoBehaviour
                     Profile profile = JsonUtility.FromJson<Profile>(profileText);
                     string chatTxt = bdyObject["msg"].ToString().Trim();
                     Debug.Log(profile.nickname + ": " + chatTxt);
-                    onChat(profile, chatTxt);
+                    OnChat(profile, chatTxt);
                     break;
                 case 93102://Donation
                     bdy = (JArray)data["bdy"];

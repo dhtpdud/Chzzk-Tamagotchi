@@ -1,6 +1,5 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 using Random = Unity.Mathematics.Random;
 using Ray = UnityEngine.Ray;
 
@@ -12,6 +11,10 @@ public struct MouseRockTag : IComponentData
 {
 
 }
+public struct DestroyMark : IComponentData
+{
+
+}
 public enum PeepoState
 {
     Born,
@@ -20,6 +23,10 @@ public enum PeepoState
     Move,
     Draged,
     Dance
+}
+public struct TimeLimitedLifeComponent : IComponentData
+{
+    public float lifeTime;
 }
 public struct PeepoComponent : IComponentData
 {
@@ -38,8 +45,8 @@ public struct PeepoComponent : IComponentData
     public float moveVelocity;
     public float switchTimerMove;
 
-    public int totalDonation;
-    public bool isMute;
+    /*public uint totalDonation;
+    public bool isMute;*/
 }
 public struct PeepoConfig
 {

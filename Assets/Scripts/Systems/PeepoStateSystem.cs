@@ -55,6 +55,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
             peepoConfig = peepoConfig
         }.ScheduleParallel();
     }
+
     [BurstCompile]
     partial struct StateJob : IJobEntity
     {
@@ -67,7 +68,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, ref PeepoComponent peepoComponent, ref RandomDataComponent randomDataComponent, ref PhysicsVelocity velocity, ref PhysicsCollider collider, ref LocalTransform localTransform, ref Flip flip)
         {
-
             float2 currentVelocity = velocity.Linear.ToFloat2();
             float currentAngularVelocity = math.abs(velocity.Angular.z);
             //float LinerImpact = math.lengthsq(peepoComponent.lastVelocity - currentVelocity);
