@@ -50,6 +50,7 @@ public struct PeepoComponent : IComponentData
 }
 public struct PeepoConfig
 {
+    public float MaxLifeTime;
     public float switchTimeImpact;
     public float switchIdleAnimationTime;
 
@@ -84,7 +85,7 @@ public struct SpawnerComponent : IComponentData
     public float minSize;
     public float maxSize;
 }
-public struct GameManagerSingleton : IComponentData
+public struct GameManagerSingletonComponent : IComponentData
 {
     public Ray ScreenPointToRayOfMainCam;
     public float2 ScreenToWorldPointMainCam;

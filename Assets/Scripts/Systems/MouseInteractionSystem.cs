@@ -14,7 +14,7 @@ using RaycastHit = Unity.Physics.RaycastHit;
 public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
     private PhysicsWorldSingleton _physicsWorldSingleton;
-    private GameManagerSingleton gameManager;
+    private GameManagerSingletonComponent gameManager;
     private EntityManager entityManager;
     Entity mouseRockEntity;
     TimeData time;
@@ -45,7 +45,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<GameManagerSingleton>();
+        state.RequireForUpdate<GameManagerSingletonComponent>();
         state.RequireForUpdate<EntityStoreComponent>();
         entityManager = state.EntityManager;
     }
@@ -63,7 +63,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public void OnUpdate(ref SystemState state)
     {
         time = SystemAPI.Time;
-        gameManager = SystemAPI.GetSingleton<GameManagerSingleton>();
+        gameManager = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         if (Input.GetMouseButtonDown(0))
         {

@@ -2,16 +2,18 @@ using Cysharp.Threading.Tasks;
 using System.Linq;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Transforms;
 using UnityEngine;
 
 public partial struct UITransformUpdateSystem : ISystem
 {
+    public JobHandle eventDepedency;
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         new UpdateChatBubbleHUDJob().ScheduleParallel();
-        new UpdateNameTagHUDJob().ScheduleParallel();
+        new UpdateNameTagHUDJob().ScheduleParallel(state.Dependency).Complete();
     }
     public partial struct UpdateChatBubbleHUDJob : IJobEntity
     {
@@ -28,13 +30,14 @@ public partial struct UITransformUpdateSystem : ISystem
             UniTask.RunOnThreadPool(async () =>
             {
                 await UniTask.SwitchToMainThread();
-                foreach (var bubbleTransform in GameManager.instance.viewerInfos[peepo.hashID].chatInfos.Where(chat => chat.bubbleObject != null).Select(chat => chat.bubbleObject.GetComponent<RectTransform>()))
-                    if (bubbleTransform != null)
-                    {
-                        var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
-                        targetPosition.y += 40;
-                        bubbleTransform.localPosition = targetPosition;
-                    }
+                if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
+                    foreach (var bubbleTransform in GameManager.instance.viewerInfos[peepo.hashID].chatInfos.Where(chat => chat.bubbleObject != null).Select(chat => chat.bubbleObject.GetComponent<RectTransform>()))
+                        if (bubbleTransform != null)
+                        {
+                            var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
+                            targetPosition.y += 60;
+                            bubbleTransform.localPosition = targetPosition;
+                        }
                 //new TransformJob { targetPosition = localTransform.Position }.Schedule(bubbleTransform);
             }, true, GameManager.instance.destroyCancellationToken).Forget();
         }
@@ -56,7 +59,8 @@ public partial struct UITransformUpdateSystem : ISystem
                 await UniTask.SwitchToMainThread();
                 var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
                 targetPosition.y -= 15;
-                GameManager.instance.viewerInfos[peepo.hashID].nameTagObject.transform.localPosition = targetPosition;
+                if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID) && GameManager.instance.viewerInfos[peepo.hashID].nameTagObject != null)
+                    GameManager.instance.viewerInfos[peepo.hashID].nameTagObject.transform.localPosition = targetPosition;
                 //new TransformJob { targetPosition = localTransform.Position }.Schedule(bubbleTransform);
             }, true, GameManager.instance.destroyCancellationToken).Forget();
         }

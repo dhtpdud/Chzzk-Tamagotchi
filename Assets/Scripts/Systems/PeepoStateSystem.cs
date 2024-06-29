@@ -21,7 +21,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<GameManagerSingleton>();
+        state.RequireForUpdate<GameManagerSingletonComponent>();
         state.RequireForUpdate<PeepoComponent>();
         state.RequireForUpdate<EntityStoreComponent>();
     }
@@ -35,7 +35,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
         onDragingCollider = onRagdollCollider.Value.Clone();
         onDragingCollider.Value.SetRestitution(0);
         onIdleCollider.Value.SetCollisionFilter(onIdleFilter);
-        peepoConfig = SystemAPI.GetSingleton<GameManagerSingleton>().peepoConfig;
+        peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
     }
 
     [BurstCompile]

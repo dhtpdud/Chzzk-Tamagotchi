@@ -2,6 +2,7 @@ using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
@@ -14,17 +15,24 @@ public partial class PeepoEventSystem : SystemBase
     public Action<int> OnDead;
 
     public Action OnCalm;
+    BlobAssetReference<PeepoConfig> peepoConfig;
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        CheckedStateRef.RequireForUpdate<GameManagerSingletonComponent>();
+    }
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
 
+        peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         OnSpawn = () =>
         {
             new OnSpawnPeepoJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
-        OnChat = (hashID, lifeTime) =>
+        OnChat = (hashID, addValue) =>
         {
-            new OnChatPeepoJob { hashID = hashID, lifeTime = lifeTime }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+            new OnChatPeepoJob { hashID = hashID, addValue = addValue, peepoConfig = peepoConfig.Value }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
         OnDead = (hashID) =>
         {
@@ -32,7 +40,7 @@ public partial class PeepoEventSystem : SystemBase
         };
         OnCalm = () =>
         {
-            new OnCalmPeepoJob().ScheduleParallel();
+            new OnCalmPeepoJob().ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
     }
 
@@ -45,7 +53,7 @@ public partial class PeepoEventSystem : SystemBase
     {
         public void Execute(ref PeepoComponent peepoComponent)
         {
-            Debug.Log("진정");
+            //Debug.Log("진정");
             peepoComponent.currentState = PeepoState.Idle;
         }
     }
@@ -57,7 +65,7 @@ public partial class PeepoEventSystem : SystemBase
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, ref SpawnerComponent spawnerComponent)
         {
-            Debug.Log("스폰");
+            //Debug.Log("스폰");
             parallelWriter.Instantiate(chunkIndex, spawnerComponent.spawnPrefab);
             spawnerComponent.spawnedCount++;
         }
@@ -67,12 +75,13 @@ public partial class PeepoEventSystem : SystemBase
     partial struct OnChatPeepoJob : IJobEntity
     {
         [ReadOnly] public int hashID;
-        [ReadOnly] public int lifeTime;
+        [ReadOnly] public int addValue;
+        [ReadOnly] public PeepoConfig peepoConfig;
         public void Execute(ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent)
         {
-            Debug.Log("채팅");
+            //Debug.Log("채팅");
             if (peepoComponent.hashID == hashID)
-                timeLimitedLifeComponent.lifeTime = lifeTime;
+                timeLimitedLifeComponent.lifeTime = math.clamp(timeLimitedLifeComponent.lifeTime + addValue, 0, peepoConfig.MaxLifeTime + peepoConfig.MaxLifeTime / 2);
         }
     }
 
@@ -86,7 +95,6 @@ public partial class PeepoEventSystem : SystemBase
         {
             if (peepoComponent.hashID == hashID)
             {
-                Debug.Log("삭제");
                 timeLimitedLifeComponent.lifeTime = 0;
             }
         }
@@ -101,7 +109,7 @@ public partial class PeepoEventSystem : SystemBase
             peepoComponent.hashID = spawnOrder.hash;
             velocity.Linear = spawnOrder.initForce;
             localTransform.Position = new float3(spawnOrder.spawnPosx, 9, 0);
-            localTransform.Scale = spawnOrder.size;
+            localTransform.Scale = 1;
             peepoComponent.currentState = PeepoState.Ragdoll;
         }
     }

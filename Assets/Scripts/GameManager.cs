@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
     [Serializable]
     public class PeepoConfig
     {
-        public int MaxlifeTIme;
+        public int MaxLifeTime;
         public float switchTimeImpact;
         public float switchIdleAnimationTime;
 
@@ -111,6 +111,8 @@ public class GameManager : MonoBehaviour
                 await UniTask.SwitchToMainThread();
                 chatInfos.Clear();
                 Destroy(nameTagObject);
+                await Utils.YieldCaches.UniTaskYield;
+                GameManager.instance.viewerInfos.Remove(Animator.StringToHash(nickName));
             },true,GameManager.instance.destroyCancellationToken).Forget();
         }
     }
@@ -122,14 +124,12 @@ public class GameManager : MonoBehaviour
         public int hash;
         public float spawnPosx;
         public float3 initForce;
-        public float size;
 
-        public SpawnOrder(int hash, float3 initForce, float spawnPosx = 0, float size = 1)
+        public SpawnOrder(int hash, float3 initForce, float spawnPosx = 0)
         {
             this.hash = hash;
             this.spawnPosx = spawnPosx;
             this.initForce = initForce;
-            this.size = size;
         }
     }
     public Queue<SpawnOrder> spawnOrderQueue = new Queue<SpawnOrder>();
@@ -137,6 +137,7 @@ public class GameManager : MonoBehaviour
     protected void Awake()
     {
         instance = this;
+        var tokenInit = destroyCancellationToken;
         mainCam ??= Camera.main;
         originTargetFramerate = Application.targetFrameRate;
         origincaptureFramerate = Time.captureFramerate;

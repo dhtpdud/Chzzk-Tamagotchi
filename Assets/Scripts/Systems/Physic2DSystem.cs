@@ -12,12 +12,12 @@ public partial struct Physic2DSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<GameManagerSingleton>();
+        state.RequireForUpdate<GameManagerSingletonComponent>();
     }
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingleton>().physicMaxVelocity }.ScheduleParallel();
+        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().physicMaxVelocity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity

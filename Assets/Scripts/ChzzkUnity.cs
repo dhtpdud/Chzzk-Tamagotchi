@@ -72,7 +72,7 @@ public class ChzzkUnity : MonoBehaviour
                     isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
                 }
 
-                if(Input.GetKey(KeyCode.LeftControl))
+                if(Input.GetKeyDown(KeyCode.RightControl))
                 {
                     peepoEventSystemHandle.OnCalm.Invoke();
                 }
@@ -93,13 +93,13 @@ public class ChzzkUnity : MonoBehaviour
                 //Debug.Log(nickNameColor.ToHexString());
                 GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                initForce: new float3(Utils.GetRandom(-10, 10), Utils.GetRandom(-10, 0), 0),
-                spawnPosx: Utils.GetRandom(-16, 16),
-                size: Utils.GetRandom(0.2f, 1.5f)));
+                    initForce: new float3(Utils.GetRandom(-20, 20), Utils.GetRandom(-7, 0), 0),
+                    spawnPosx: Utils.GetRandom(-16, 16)));
                 peepoEventSystemHandle.OnSpawn.Invoke();
             }
+            else
+                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.MaxLifeTime);
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
-            peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.MaxlifeTIme);
         };
     }
     public void StartLive()
@@ -257,11 +257,11 @@ public class ChzzkUnity : MonoBehaviour
 
                     //프로필이.... json이 아니라 string으로 들어옴.
                     string profileText = bdyObject["profile"].ToString();
-                    Debug.Log(profileText);
+                    //Debug.Log(profileText);
                     profileText = profileText.Replace("\\", "");
                     Profile profile = JsonUtility.FromJson<Profile>(profileText);
                     string chatTxt = bdyObject["msg"].ToString().Trim();
-                    Debug.Log(profile.nickname + ": " + chatTxt);
+                    //Debug.Log(profile.nickname + ": " + chatTxt);
                     OnChat(profile, chatTxt);
                     break;
                 case 93102://Donation

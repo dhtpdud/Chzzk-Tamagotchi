@@ -11,9 +11,9 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
     {
         base.OnStartRunning();
         mainCam = Camera.main;
-        if (!SystemAPI.HasSingleton<GameManagerSingleton>())
-            EntityManager.CreateSingleton<GameManagerSingleton>();
-        ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingleton>().ValueRW;
+        if (!SystemAPI.HasSingleton<GameManagerSingletonComponent>())
+            EntityManager.CreateSingleton<GameManagerSingletonComponent>();
+        ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
         gameManagerRW.stabilityPower = GameManager.instance.stabilityPower;
         gameManagerRW.dragPower = GameManager.instance.dragPower;
         gameManagerRW.physicMaxVelocity = GameManager.instance.physicMaxVelocity;
@@ -23,6 +23,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
         var builder = new BlobBuilder(Allocator.TempJob);
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
+        peepoConfig.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
         peepoConfig.switchIdleAnimationTime = GameManager.instance.peepoConfig.switchIdleAnimationTime;
         peepoConfig.switchTimeImpact = GameManager.instance.peepoConfig.switchTimeImpact;
         peepoConfig.moveSpeedMin = GameManager.instance.peepoConfig.moveSpeedMin;
@@ -40,7 +41,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
     }
     protected override void OnUpdate()
     {
-        ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingleton>().ValueRW;
+        ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
         gameManagerRW.ScreenPointToRayOfMainCam = mainCam.ScreenPointToRay(Input.mousePosition);
         gameManagerRW.ScreenToWorldPointMainCam = mainCam.ScreenToWorldPoint(Input.mousePosition).ToFloat2();
     }

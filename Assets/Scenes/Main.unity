@@ -1037,7 +1037,7 @@ MonoBehaviour:
   stabilityPower: 10
   physicMaxVelocity: 400
   peepoConfig:
-    MaxlifeTIme: 0
+    MaxLifeTime: 60
     switchTimeImpact: 1
     switchIdleAnimationTime: 3
     moveSpeedMin: -3
