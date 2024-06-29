@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PeepoAuthoring : MonoBehaviour
 {
-    public float MaxLifeTime;
     public class PeepoBaker : Baker<PeepoAuthoring>
     {
         public override void Bake(PeepoAuthoring authoring)

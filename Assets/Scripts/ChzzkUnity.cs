@@ -98,7 +98,7 @@ public class ChzzkUnity : MonoBehaviour
                 peepoEventSystemHandle.OnSpawn.Invoke();
             }
             else
-                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.MaxLifeTime);
+                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
         };
     }

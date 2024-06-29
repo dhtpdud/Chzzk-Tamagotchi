@@ -28,6 +28,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
         peepoConfig.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
+        peepoConfig.AddLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
         peepoConfig.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
         peepoConfig.MaxSize = GameManager.instance.peepoConfig.MaxSize;
         peepoConfig.MinSize = GameManager.instance.peepoConfig.MinSize;

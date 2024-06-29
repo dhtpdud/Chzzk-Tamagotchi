@@ -35,7 +35,7 @@ public partial struct UITransformUpdateSystem : ISystem
                         if (bubbleTransform != null)
                         {
                             var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
-                            targetPosition.y += 60;
+                            targetPosition.y += 80;
                             bubbleTransform.localPosition = targetPosition;
                         }
                 //new TransformJob { targetPosition = localTransform.Position }.Schedule(bubbleTransform);

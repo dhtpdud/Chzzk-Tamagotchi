@@ -14,7 +14,6 @@ public partial class PeepoEventSystem : SystemBase
     public Action<int> OnDead;
 
     public Action OnCalm;
-    BlobAssetReference<PeepoConfig> peepoConfig;
     protected override void OnCreate()
     {
         base.OnCreate();
@@ -24,7 +23,7 @@ public partial class PeepoEventSystem : SystemBase
     {
         base.OnStartRunning();
 
-        peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
+        BlobAssetReference<PeepoConfig> peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         OnSpawn = () =>
         {
             new OnSpawnPeepoJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();

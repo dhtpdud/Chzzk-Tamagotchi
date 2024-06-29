@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Random = Unity.Mathematics.Random;
 using Ray = UnityEngine.Ray;
 
@@ -51,6 +52,7 @@ public struct PeepoComponent : IComponentData
 public struct PeepoConfig
 {
     public float DefalutLifeTime;
+    public float AddLifeTime;
     public float MaxLifeTime;
     public float MinSize;
     public float MaxSize;
@@ -91,6 +93,23 @@ public struct SpawnerComponent : IComponentData
 }
 public struct GameManagerSingletonComponent : IComponentData
 {
+    public struct DragingEntityInfo
+    {
+        readonly public Entity entity;
+        readonly public RigidBody rigidbody;
+        readonly public ColliderKey colliderKey;
+        readonly public Material material;
+
+        public DragingEntityInfo(Entity entity, RigidBody rigidbody, ColliderKey colliderKey, Material material)
+        {
+            this.entity = entity;
+            this.rigidbody = rigidbody;
+            this.colliderKey = colliderKey;
+            this.material = material;
+        }
+    }
+    public DragingEntityInfo dragingEntityInfo;
+
     public Ray ScreenPointToRayOfMainCam;
     public float2 ScreenToWorldPointMainCam;
 

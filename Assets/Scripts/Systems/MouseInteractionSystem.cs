@@ -14,7 +14,6 @@ using RaycastHit = Unity.Physics.RaycastHit;
 public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
     private PhysicsWorldSingleton _physicsWorldSingleton;
-    private GameManagerSingletonComponent gameManager;
     private EntityManager entityManager;
     RaycastHit raycastHit;
     Entity mouseRockEntity;
@@ -22,22 +21,6 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     float2 entityPositionOnDown;
 
     public bool isDraging;
-    struct DragingEntityInfo
-    {
-        readonly public Entity entity;
-        readonly public RigidBody rigidbody;
-        readonly public ColliderKey colliderKey;
-        readonly public Material material;
-
-        public DragingEntityInfo(Entity entity, RigidBody rigidbody, ColliderKey colliderKey, Material material)
-        {
-            this.entity = entity;
-            this.rigidbody = rigidbody;
-            this.colliderKey = colliderKey;
-            this.material = material;
-        }
-    }
-    DragingEntityInfo dragingEntityInfo;
 
     public float2 mouseLastPosition;
     public float2 mouseVelocity;
@@ -64,20 +47,19 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     public void OnUpdate(ref SystemState state)
     {
         time = SystemAPI.Time;
-        gameManager = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-
         if (Input.GetMouseButtonDown(0))
         {
-            OnMouseDown();
+            //RefRW는 매 프레임 마다. 사용할 때 호출해서 사용해야함.
+            OnMouseDown(ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW);
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            OnMouseUp();
+            OnMouseUp(ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW);
         }
         if (Input.GetMouseButton(0))
         {
-            OnMouse();
+            OnMouse(ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW);
         }
 
         var localTransform = entityManager.GetComponentData<LocalTransform>(mouseRockEntity);
@@ -86,7 +68,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
 
             velocity.Linear *= 0;
-            localTransform.Position = gameManager.ScreenToWorldPointMainCam.ToFloat3();
+            localTransform.Position = SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRO.ScreenToWorldPointMainCam.ToFloat3();
 
             entityManager.SetComponentData(mouseRockEntity, localTransform);
             entityManager.SetComponentData(mouseRockEntity, velocity);
@@ -98,20 +80,19 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         }
         if (Input.GetKey(KeyCode.LeftAlt))
         {
-            float3 rockToMouse = gameManager.ScreenToWorldPointMainCam.ToFloat3() - localTransform.Position;
+            float3 rockToMouse = SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRO.ScreenToWorldPointMainCam.ToFloat3() - localTransform.Position;
             velocity.Linear += rockToMouse * 500 * time.DeltaTime;
             velocity.Linear = math.lerp(velocity.Linear, float3.zero, 20 * time.DeltaTime);
             entityManager.SetComponentData(mouseRockEntity, velocity);
             //왜인지 job을 쓰면 튕겨버림(버그로 추정됨)
         }
     }
-
-    private void OnMouseDown()
+    private void OnMouseDown(ref GameManagerSingletonComponent gameManagerRW)
     {
-        onMouseDownPosition = gameManager.ScreenToWorldPointMainCam;
+        onMouseDownPosition = gameManagerRW.ScreenToWorldPointMainCam;
 
-        float3 rayStart = gameManager.ScreenPointToRayOfMainCam.origin;
-        float3 rayEnd = gameManager.ScreenPointToRayOfMainCam.GetPoint(1000f);
+        float3 rayStart = gameManagerRW.ScreenPointToRayOfMainCam.origin;
+        float3 rayEnd = gameManagerRW.ScreenPointToRayOfMainCam.GetPoint(1000f);
         if (Raycast(rayStart, rayEnd, out RaycastHit raycastHit))
         {
             RigidBody hitRigidBody = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex];
@@ -124,54 +105,54 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
                 isDraging = true;
 
                 Material material = Utils.GetMaterial(hitRigidBody, raycastHit.ColliderKey);
-                dragingEntityInfo = new DragingEntityInfo(hitEntity, hitRigidBody, raycastHit.ColliderKey, material);
+                gameManagerRW.dragingEntityInfo = new GameManagerSingletonComponent.DragingEntityInfo(hitEntity, hitRigidBody, raycastHit.ColliderKey, material);
 
                 material.RestitutionCombinePolicy = Material.CombinePolicy.Minimum;
-                Utils.SetMaterial(dragingEntityInfo.rigidbody, material, raycastHit.ColliderKey);
+                Utils.SetMaterial(gameManagerRW.dragingEntityInfo.rigidbody, material, raycastHit.ColliderKey);
             }
             if (entityManager.HasComponent<PeepoComponent>(hitEntity))
             {
                 PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(hitEntity);
                 peepoComponent.currentState = PeepoState.Draged;
-                entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
+                entityManager.SetComponentData(gameManagerRW.dragingEntityInfo.entity, peepoComponent);
             }
         }
     }
-    private void OnMouse()
+    private void OnMouse(ref GameManagerSingletonComponent gameManagerRW)
     {
         if (!isDraging) return;
-
-        PhysicsVelocity velocity = entityManager.GetComponentData<PhysicsVelocity>(dragingEntityInfo.entity);
-        LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(dragingEntityInfo.entity);
+        PhysicsVelocity velocity = entityManager.GetComponentData<PhysicsVelocity>(gameManagerRW.dragingEntityInfo.entity);
+        LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(gameManagerRW.dragingEntityInfo.entity);
 
         float2 entityPosition = localTransform.Position.ToFloat2();
         float2 entityPositionFromGrabingPoint = entityPosition - entityPositionOnDown;
-        float2 mousePositionFromGrabingPoint = gameManager.ScreenToWorldPointMainCam - onMouseDownPosition;
+        float2 mousePositionFromGrabingPoint = gameManagerRW.ScreenToWorldPointMainCam - onMouseDownPosition;
         float2 entitiyToMouse = mousePositionFromGrabingPoint - entityPositionFromGrabingPoint;
         /*float2 mouseToEntity = entityPositionFromGrabingPoint - mousePositionFromGrabingPoint;
 
         float angularForce = lastEntityRotation - Vector2.Angle(Vector2.up, mouseToEntity);
         velocity.Angular += angularForce * time.DeltaTime;*/
 
-        velocity.Linear = math.lerp(velocity.Linear, float3.zero, gameManager.stabilityPower * time.DeltaTime);
-        velocity.Linear += (entitiyToMouse * gameManager.dragPower * time.DeltaTime).ToFloat3();
+        velocity.Linear = math.lerp(velocity.Linear, float3.zero, gameManagerRW.stabilityPower * time.DeltaTime);
+        velocity.Linear += (entitiyToMouse * gameManagerRW.dragPower * time.DeltaTime).ToFloat3();
 
-        entityManager.SetComponentData(dragingEntityInfo.entity, velocity);
+        entityManager.SetComponentData(gameManagerRW.dragingEntityInfo.entity, velocity);
 
         lastEntityRotation = localTransform.Rotation.value.z;
     }
-    private void OnMouseUp()
+    private void OnMouseUp(ref GameManagerSingletonComponent gameManagerRW)
     {
         if (!isDraging) return;
         isDraging = false;
-        if (entityManager.HasComponent<PeepoComponent>(dragingEntityInfo.entity))
+        if (entityManager.HasComponent<PeepoComponent>(gameManagerRW.dragingEntityInfo.entity))
         {
-            PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(dragingEntityInfo.entity);
+            PeepoComponent peepoComponent = entityManager.GetComponentData<PeepoComponent>(gameManagerRW.dragingEntityInfo.entity);
             peepoComponent.currentState = PeepoState.Ragdoll;
             peepoComponent.switchTimerImpact = 0;
-            Utils.SetMaterial(dragingEntityInfo.rigidbody, dragingEntityInfo.material, dragingEntityInfo.colliderKey);
-            entityManager.SetComponentData(dragingEntityInfo.entity, peepoComponent);
+            Utils.SetMaterial(gameManagerRW.dragingEntityInfo.rigidbody, gameManagerRW.dragingEntityInfo.material, gameManagerRW.dragingEntityInfo.colliderKey);
+            entityManager.SetComponentData(gameManagerRW.dragingEntityInfo.entity, peepoComponent);
         }
+        gameManagerRW.dragingEntityInfo = default;
     }
     private bool Raycast(float3 rayStart, float3 rayEnd, out RaycastHit raycastHit)
     {
