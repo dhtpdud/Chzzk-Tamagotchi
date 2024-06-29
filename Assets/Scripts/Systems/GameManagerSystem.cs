@@ -1,16 +1,20 @@
+using Kirurobo;
 using OSY;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
+[UpdateBefore(typeof(InitializationSystemGroup))]
 public sealed partial class UpdateGameManagerInfoSystem : SystemBase
 {
     public Camera mainCam;
+    public UniWindowController uniWindowController;
     public BlobAssetReference<PeepoConfig> peepoConfigRef;
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
         mainCam = Camera.main;
+        uniWindowController= mainCam.GetComponent<UniWindowController>();
         if (!SystemAPI.HasSingleton<GameManagerSingletonComponent>())
             EntityManager.CreateSingleton<GameManagerSingletonComponent>();
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
@@ -24,6 +28,9 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
         peepoConfig.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
+        peepoConfig.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
+        peepoConfig.MaxSize = GameManager.instance.peepoConfig.MaxSize;
+        peepoConfig.MinSize = GameManager.instance.peepoConfig.MinSize;
         peepoConfig.switchIdleAnimationTime = GameManager.instance.peepoConfig.switchIdleAnimationTime;
         peepoConfig.switchTimeImpact = GameManager.instance.peepoConfig.switchTimeImpact;
         peepoConfig.moveSpeedMin = GameManager.instance.peepoConfig.moveSpeedMin;

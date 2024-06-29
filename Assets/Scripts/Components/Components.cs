@@ -50,7 +50,11 @@ public struct PeepoComponent : IComponentData
 }
 public struct PeepoConfig
 {
+    public float DefalutLifeTime;
     public float MaxLifeTime;
+    public float MinSize;
+    public float MaxSize;
+
     public float switchTimeImpact;
     public float switchIdleAnimationTime;
 

@@ -16,6 +16,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     private PhysicsWorldSingleton _physicsWorldSingleton;
     private GameManagerSingletonComponent gameManager;
     private EntityManager entityManager;
+    RaycastHit raycastHit;
     Entity mouseRockEntity;
     TimeData time;
     float2 entityPositionOnDown;
@@ -65,6 +66,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         time = SystemAPI.Time;
         gameManager = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
         _physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+
         if (Input.GetMouseButtonDown(0))
         {
             OnMouseDown();
@@ -107,9 +109,9 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     private void OnMouseDown()
     {
         onMouseDownPosition = gameManager.ScreenToWorldPointMainCam;
+
         float3 rayStart = gameManager.ScreenPointToRayOfMainCam.origin;
         float3 rayEnd = gameManager.ScreenPointToRayOfMainCam.GetPoint(1000f);
-
         if (Raycast(rayStart, rayEnd, out RaycastHit raycastHit))
         {
             RigidBody hitRigidBody = _physicsWorldSingleton.PhysicsWorld.Bodies[raycastHit.RigidBodyIndex];

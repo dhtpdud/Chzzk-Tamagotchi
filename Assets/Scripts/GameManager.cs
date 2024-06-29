@@ -34,7 +34,11 @@ public class GameManager : MonoBehaviour
     [Serializable]
     public class PeepoConfig
     {
-        public int MaxLifeTime;
+        public float DefalutLifeTime;
+        public float MaxLifeTime;
+        public float MinSize;
+        public float MaxSize;
+
         public float switchTimeImpact;
         public float switchIdleAnimationTime;
 

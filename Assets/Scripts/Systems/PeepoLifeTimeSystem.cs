@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Core;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -19,7 +20,8 @@ public partial struct PeepoLifeTimeSystem : ISystem
         public EntityCommandBuffer.ParallelWriter parallelWriter;
         public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, ref LocalTransform localTransform)
         {
-            localTransform.Scale = Mathf.Lerp(localTransform.Scale, timeLimitedLifeComponent.lifeTime / GameManager.instance.peepoConfig.MaxLifeTime, time.DeltaTime);
+            GameManager.PeepoConfig peepoConfig = GameManager.instance.peepoConfig;
+            localTransform.Scale = math.clamp(math.lerp(localTransform.Scale, timeLimitedLifeComponent.lifeTime / peepoConfig.MaxLifeTime, time.DeltaTime), peepoConfig.MinSize, peepoConfig.MaxSize);
             timeLimitedLifeComponent.lifeTime -= time.DeltaTime;
             if (timeLimitedLifeComponent.lifeTime <= 0)
             {
