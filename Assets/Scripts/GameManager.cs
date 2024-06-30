@@ -3,6 +3,7 @@ using OSY;
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -10,6 +11,7 @@ using UnityEngine.Profiling;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public GameManagerInfoSystem gameManagerSystem;
     public Camera mainCam;
     public int targetFPS = 0;
     [HideInInspector]
@@ -27,6 +29,12 @@ public class GameManager : MonoBehaviour
     public int originTargetFramerate { get; private set; }
     public int origincaptureFramerate { get; private set; }
 
+    public float gravity;
+    public void SetGravity(string val)
+    {
+        gravity = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
     public float dragPower;
     public float stabilityPower;
     public float physicMaxVelocity;
@@ -37,6 +45,7 @@ public class GameManager : MonoBehaviour
         public float DefalutLifeTime;
         public float AddLifeTime;
         public float MaxLifeTime;
+        public float DefaultSize;
         public float MinSize;
         public float MaxSize;
 
@@ -51,11 +60,41 @@ public class GameManager : MonoBehaviour
         public float IdlingTimeMax;
     }
     public PeepoConfig peepoConfig;
+    public void SetDefalutLifeTime(string val)
+    {
+        peepoConfig.DefalutLifeTime = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetAddLifeTime(string val)
+    {
+        peepoConfig.AddLifeTime = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetMaxLifeTime(string val)
+    {
+        peepoConfig.MaxLifeTime = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetDefaultSize(string val)
+    {
+        peepoConfig.DefaultSize = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetMinSize(string val)
+    {
+        peepoConfig.MinSize = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetMaxSize(string val)
+    {
+        peepoConfig.MaxSize = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
     public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
-    public Transform canvasTransform;
-
     [Header("UI")]
+    public Transform nameTagUICanvasTransform;
+    public Transform chatBubbleUICanvasTransform;
     public GameObject settingUI;
     public GameObject channelInfoUI;
     public TMP_Text channelViewerCount;
@@ -78,7 +117,7 @@ public class GameManager : MonoBehaviour
             id = Utils.GetRandomHexNumber(10);
             dateTime = DateTime.Now;
             this.text = text;
-            this.bubbleObject = Instantiate(instance.chatBubble, instance.canvasTransform);
+            this.bubbleObject = Instantiate(instance.chatBubble, instance.chatBubbleUICanvasTransform);
             var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
             UniTask.RunOnThreadPool(async () =>
             {
@@ -90,7 +129,7 @@ public class GameManager : MonoBehaviour
                 var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
                 invisible.a = 0;
                 await tmp.DoColorAsync(invisible, 1, Utils.YieldCaches.UniTaskYield);
-                Destroy(bubbleObject);
+                DestroyImmediate(bubbleObject);
             }, true, bubbleCTD).Forget();
         }
     }
@@ -103,7 +142,7 @@ public class GameManager : MonoBehaviour
         {
             this.nickName = nickName;
             chatInfos = new List<ChatInfo>();
-            this.nameTagObject = Instantiate(instance.nameTag, instance.canvasTransform);
+            this.nameTagObject = Instantiate(instance.nameTag, instance.nameTagUICanvasTransform);
             var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
             tmp.text = nickName;
             //Debug.Log(nicknameColor.ToHexString());
@@ -150,6 +189,7 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+        gameManagerSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<GameManagerInfoSystem>();
         QualitySettings.maxQueuedFrames = 4;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFPS;

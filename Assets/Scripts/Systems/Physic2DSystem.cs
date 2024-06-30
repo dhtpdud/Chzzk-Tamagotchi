@@ -17,14 +17,16 @@ public partial struct Physic2DSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().physicMaxVelocity }.ScheduleParallel();
+        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().physicMaxVelocity, gravity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().gravity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity
     {
         [ReadOnly] public float maxVelocity;
-        public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform)
+        [ReadOnly] public float gravity;
+        public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform, ref PhysicsGravityFactor gravityFactor)
         {
+            gravityFactor.Value = gravity;
             localTransform.Position.z = 0;
 
             localTransform.Rotation = new Unity.Mathematics.quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);

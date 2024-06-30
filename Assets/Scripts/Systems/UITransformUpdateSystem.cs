@@ -9,11 +9,12 @@ using UnityEngine;
 public partial struct UITransformUpdateSystem : ISystem
 {
     public JobHandle eventDepedency;
-    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new UpdateChatBubbleHUDJob().ScheduleParallel();
-        new UpdateNameTagHUDJob().ScheduleParallel(state.Dependency).Complete();
+        if(GameManager.instance.chatBubbleUICanvasTransform.gameObject.activeInHierarchy)
+            new UpdateChatBubbleHUDJob().ScheduleParallel();
+        if (GameManager.instance.nameTagUICanvasTransform.gameObject.activeInHierarchy)
+            new UpdateNameTagHUDJob().ScheduleParallel(state.Dependency).Complete();
     }
     public partial struct UpdateChatBubbleHUDJob : IJobEntity
     {

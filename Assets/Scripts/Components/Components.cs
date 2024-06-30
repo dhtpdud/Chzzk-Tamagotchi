@@ -54,6 +54,8 @@ public struct PeepoConfig
     public float DefalutLifeTime;
     public float AddLifeTime;
     public float MaxLifeTime;
+
+    public float DefaultSize;
     public float MinSize;
     public float MaxSize;
 
@@ -112,6 +114,8 @@ public struct GameManagerSingletonComponent : IComponentData
 
     public Ray ScreenPointToRayOfMainCam;
     public float2 ScreenToWorldPointMainCam;
+
+    public float gravity;
 
     public float dragPower;
     public float stabilityPower;

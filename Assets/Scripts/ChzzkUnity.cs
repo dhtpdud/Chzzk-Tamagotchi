@@ -289,8 +289,8 @@ public class ChzzkUnity : MonoBehaviour
                     break;//Nothing to do
                 default:
                     //내가 놓친 cmd가 있나?
-                    Debug.LogError(data["cmd"]);
-                    Debug.LogError(e.Data);
+                    Debug.Log(data["cmd"]);
+                    Debug.Log(e.Data);
                     break;
             }
         }

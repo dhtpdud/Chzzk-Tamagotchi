@@ -2,6 +2,7 @@
   "dependencies": {
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.kirurobo.uniwinc": "https://github.com/kirurobo/UniWindowController.git#upm",
+    "com.kyub.emojisearch": "https://github.com/calumma-robert/com.kyub.emojisearch.git",
     "com.needle.upm-in-unitypackage": "https://github.com/needle-tools/upm-in-unitypackage.git",
     "com.sator-imaging.app-window-utility": "https://github.com/sator-imaging/AppWindowUtility.git",
     "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",

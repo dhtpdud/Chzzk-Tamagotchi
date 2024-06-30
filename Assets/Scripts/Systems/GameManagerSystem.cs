@@ -5,7 +5,7 @@ using Unity.Entities;
 using UnityEngine;
 
 [UpdateBefore(typeof(InitializationSystemGroup))]
-public sealed partial class UpdateGameManagerInfoSystem : SystemBase
+public sealed partial class GameManagerInfoSystem : SystemBase
 {
     public Camera mainCam;
     public UniWindowController uniWindowController;
@@ -14,7 +14,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
     {
         base.OnStartRunning();
         mainCam = Camera.main;
-        uniWindowController= mainCam.GetComponent<UniWindowController>();
+        uniWindowController = mainCam.GetComponent<UniWindowController>();
         if (!SystemAPI.HasSingleton<GameManagerSingletonComponent>())
             EntityManager.CreateSingleton<GameManagerSingletonComponent>();
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
@@ -27,11 +27,14 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
         var builder = new BlobBuilder(Allocator.TempJob);
 
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
+        peepoConfig.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
         peepoConfig.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
         peepoConfig.AddLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
-        peepoConfig.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
+
+        peepoConfig.DefaultSize = GameManager.instance.peepoConfig.DefaultSize;
         peepoConfig.MaxSize = GameManager.instance.peepoConfig.MaxSize;
         peepoConfig.MinSize = GameManager.instance.peepoConfig.MinSize;
+
         peepoConfig.switchIdleAnimationTime = GameManager.instance.peepoConfig.switchIdleAnimationTime;
         peepoConfig.switchTimeImpact = GameManager.instance.peepoConfig.switchTimeImpact;
         peepoConfig.moveSpeedMin = GameManager.instance.peepoConfig.moveSpeedMin;
@@ -44,6 +47,7 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
         peepoConfigRef = builder.CreateBlobAssetReference<PeepoConfig>(Allocator.Persistent);
 
         gameManagerRW.peepoConfig = peepoConfigRef;
+        UpdateSetting();
 
         builder.Dispose();
     }
@@ -52,6 +56,17 @@ public sealed partial class UpdateGameManagerInfoSystem : SystemBase
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
         gameManagerRW.ScreenPointToRayOfMainCam = mainCam.ScreenPointToRay(Input.mousePosition);
         gameManagerRW.ScreenToWorldPointMainCam = mainCam.ScreenToWorldPoint(Input.mousePosition).ToFloat2();
+    }
+    public void UpdateSetting()
+    {
+        SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW.gravity = GameManager.instance.gravity;
+        peepoConfigRef.Value.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
+        peepoConfigRef.Value.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
+        peepoConfigRef.Value.AddLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+        
+        peepoConfigRef.Value.DefaultSize = GameManager.instance.peepoConfig.DefaultSize;
+        peepoConfigRef.Value.MaxSize = GameManager.instance.peepoConfig.MaxSize;
+        peepoConfigRef.Value.MinSize = GameManager.instance.peepoConfig.MinSize;
     }
     protected override void OnDestroy()
     {

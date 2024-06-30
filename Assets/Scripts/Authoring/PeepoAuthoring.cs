@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Physics;
 using UnityEngine;
 
 public class PeepoAuthoring : MonoBehaviour
@@ -10,7 +11,7 @@ public class PeepoAuthoring : MonoBehaviour
             var entity = GetEntity(TransformUsageFlags.Dynamic);
 
             AddComponent(entity, new PeepoComponent());
-
+            AddComponent(entity, new PhysicsGravityFactor { Value = 1});
         }
     }
 }

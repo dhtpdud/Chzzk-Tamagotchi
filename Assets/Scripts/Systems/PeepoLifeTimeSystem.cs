@@ -29,11 +29,11 @@ public partial struct PeepoLifeTimeSystem : ISystem
         public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, ref LocalTransform localTransform)
         {
             PeepoConfig peepoConfig = gameManager.peepoConfig.Value;
-            localTransform.Scale = math.clamp(math.lerp(localTransform.Scale, timeLimitedLifeComponent.lifeTime / peepoConfig.DefalutLifeTime, time.DeltaTime), peepoConfig.MinSize, peepoConfig.MaxSize);
+            localTransform.Scale = math.clamp(math.lerp(localTransform.Scale, timeLimitedLifeComponent.lifeTime / peepoConfig.DefalutLifeTime * peepoConfig.DefaultSize, time.DeltaTime), peepoConfig.MinSize, peepoConfig.MaxSize);
             timeLimitedLifeComponent.lifeTime -= time.DeltaTime;
             if (timeLimitedLifeComponent.lifeTime <= 0 && (gameManager.dragingEntityInfo.entity != entity))
             {
-                Debug.Log($"삭제: {peepoComponent.hashID}");
+                //Debug.Log($"삭제: {peepoComponent.hashID}");
                 GameManager.instance.viewerInfos[peepoComponent.hashID].OnDestroy();
                 parallelWriter.AddComponent(chunkIndex, entity, new DestroyMark());
             }

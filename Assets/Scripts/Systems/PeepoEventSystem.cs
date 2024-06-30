@@ -79,7 +79,7 @@ public partial class PeepoEventSystem : SystemBase
             peepoComponent.hashID = spawnOrder.hash;
             velocity.Linear = spawnOrder.initForce;
             localTransform.Position = new float3(spawnOrder.spawnPosx, 8, 0);
-            localTransform.Scale = 1;
+            localTransform.Scale = GameManager.instance.peepoConfig.DefaultSize;
 
             parallelWriter.AddComponent(chunkIndex, entity, new TimeLimitedLifeComponent
             {
