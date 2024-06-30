@@ -262,6 +262,7 @@ public class ChzzkUnity : MonoBehaviour
         {
             IDictionary<string, object> data = JsonConvert.DeserializeObject<IDictionary<string, object>>(e.Data);
 
+            Debug.Log(e.Data);
             //Cmd에 따라서
             switch ((long)data["cmd"])
             {
@@ -272,35 +273,45 @@ public class ChzzkUnity : MonoBehaviour
                     timer = 0;
                     break;
                 case 93101://Chat
-                    JArray bdy = (JArray)data["bdy"];
-                    JObject bdyObject = (JObject)bdy[0];
-
-                    //프로필이.... json이 아니라 string으로 들어옴.
-                    string profileText = bdyObject["profile"].ToString();
-                    //Debug.Log(profileText);
-                    profileText = profileText.Replace("\\", "");
-                    Profile profile = JsonUtility.FromJson<Profile>(profileText);
-                    string chatTxt = bdyObject["msg"].ToString().Trim();
-                    //Debug.Log(profile.nickname + ": " + chatTxt);
-                    OnChat(profile, chatTxt);
+                    JArray bdies = (JArray)data["bdy"];
+                    UniTask.RunOnThreadPool(async () =>
+                    {
+                        foreach (var bdy in bdies)
+                        {
+                            JObject bdyObject = (JObject)bdy;
+                            //프로필이.... json이 아니라 string으로 들어옴.
+                            string profileText = bdyObject["profile"].ToString();
+                            //Debug.Log(profileText);
+                            profileText = profileText.Replace("\\", "");
+                            Profile profile = JsonUtility.FromJson<Profile>(profileText);
+                            string chatTxt = bdyObject["msg"].ToString().Trim();
+                            //Debug.Log(profile.nickname + ": " + chatTxt);
+                            OnChat(profile, chatTxt);
+                            await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
+                        }
+                    }, true, destroyCancellationToken).Forget();
                     break;
                 case 93102://Donation
-                    bdy = (JArray)data["bdy"];
-                    bdyObject = (JObject)bdy[0];
+                    bdies = (JArray)data["bdy"];
+                    foreach (var bdy in bdies)
+                    {
+                        UniTask.RunOnThreadPool(() =>
+                        {
+                            JObject bdyObject = (JObject)bdy;
 
-                    //프로필 스트링 변환
-                    profileText = bdyObject["profile"].ToString();
-                    profileText = profileText.Replace("\\", "");
-                    profile = JsonUtility.FromJson<Profile>(profileText);
+                            //프로필 스트링 변환
+                            string profileText = bdyObject["profile"].ToString();
+                            profileText = profileText.Replace("\\", "");
+                            Profile profile = JsonUtility.FromJson<Profile>(profileText);
 
-                    Debug.Log(bdyObject);
-                    //도네이션과 관련된 데이터는 extra
-                    /*string extraText = bdyObject["extra"].ToString();
-                    extraText = extraText.Replace("\\", "");
-                    DonationExtras extras = JsonUtility.FromJson<DonationExtras>(extraText);
-
-
-                    onDonation(profile, bdyObject["msg"].ToString(), extras);*/
+                            Debug.Log(bdyObject);
+                            //도네이션과 관련된 데이터는 extra
+                            /*string extraText = bdyObject["extra"].ToString();
+                            extraText = extraText.Replace("\\", "");
+                            DonationExtras extras = JsonUtility.FromJson<DonationExtras>(extraText);
+                            onDonation(profile, bdyObject["msg"].ToString(), extras);*/
+                        }, true, destroyCancellationToken).Forget();
+                    }
                     break;
                 case 94008://Blocked Message(CleanBot) 차단된 메세지.
                 case 94201://Member Sync 멤버 목록 동기화.
