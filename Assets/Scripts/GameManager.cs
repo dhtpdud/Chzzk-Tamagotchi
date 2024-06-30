@@ -99,6 +99,8 @@ public class GameManager : MonoBehaviour
     public GameObject channelInfoUI;
     public TMP_Text channelViewerCount;
     public TMP_Text peepoCountText;
+    public GameObject ErrorPOPUP;
+    public TMP_InputField ErrorPOPUPText;
 
     [Header("GameObject Caches")]
     public GameObject peepo;

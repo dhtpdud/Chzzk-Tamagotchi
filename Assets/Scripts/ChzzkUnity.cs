@@ -148,8 +148,8 @@ public class ChzzkUnity : MonoBehaviour
             timer += Time.unscaledDeltaTime;
             if (timer > 15)
             {
-                socket.Send(heartbeatRequest);
                 timer = 0;
+                socket.Send(heartbeatRequest);
             }
         }
     }
@@ -174,7 +174,16 @@ public class ChzzkUnity : MonoBehaviour
         string URL = $"https://api.chzzk.naver.com/polling/v2/channels/{channelId}/live-status";
         await UniTask.SwitchToMainThread();
         UnityWebRequest request = UnityWebRequest.Get(URL);
-        await request.SendWebRequest();
+        try
+        {
+            await request.SendWebRequest();
+        }
+        catch (UnityWebRequestException ex)
+        {
+            GameManager.instance.ErrorPOPUP.SetActive(true);
+            GameManager.instance.ErrorPOPUPText.text = $"따흐흑ㅠㅠ 에러!!\n\n{ex.Message}";
+            return null;
+        }
         LiveStatus liveStatus = null;
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -189,7 +198,16 @@ public class ChzzkUnity : MonoBehaviour
         string URL = $"https://comm-api.game.naver.com/nng_main/v1/chats/access-token?channelId={cid}&chatType=STREAMING";
         await UniTask.SwitchToMainThread();
         UnityWebRequest request = UnityWebRequest.Get(URL);
-        await request.SendWebRequest();
+        try
+        {
+            await request.SendWebRequest();
+        }
+        catch (UnityWebRequestException ex)
+        {
+            GameManager.instance.ErrorPOPUP.SetActive(true);
+            GameManager.instance.ErrorPOPUPText.text = $"따흐흑ㅠㅠ 에러!! (혹시 연령제한 방송인가요?)\n\n{ex.Message}";
+            return null;
+        }
         AccessTokenResult accessTokenResult = null;
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -213,6 +231,8 @@ public class ChzzkUnity : MonoBehaviour
         liveStatus = await GetLiveStatus(inputChannelID.text);
         cid = liveStatus.content.chatChannelId;
         AccessTokenResult accessTokenResult = await GetAccessToken(cid);
+        if (accessTokenResult == null)
+            return;
         token = accessTokenResult.content.accessToken;
 
         socket = new WebSocket(wsURL);
