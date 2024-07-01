@@ -35,6 +35,28 @@ public class GameManager : MonoBehaviour
         gravity = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
+    public float2 SpawnMinSpeed;
+    public float2 SpawnMaxSpeed;
+    public void SetSpawnMinXSpeed(string val)
+    {
+        SpawnMinSpeed.x = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetSpawnMinYSpeed(string val)
+    {
+        SpawnMinSpeed.y = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetSpawnMaxXSpeed(string val)
+    {
+        SpawnMaxSpeed.x = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetSpawnMaxYSpeed(string val)
+    {
+        SpawnMaxSpeed.y = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
     public float dragPower;
     public float stabilityPower;
     public float physicMaxVelocity;

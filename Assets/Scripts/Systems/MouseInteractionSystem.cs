@@ -74,7 +74,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
             entityManager.SetComponentData(mouseRockEntity, velocity);
             entityManager.SetEnabled(mouseRockEntity, true);
         }
-        else if (Input.GetKeyUp(KeyCode.LeftAlt))
+        if (!Input.GetKeyDown(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftAlt))
         {
             entityManager.SetEnabled(mouseRockEntity, false);
         }

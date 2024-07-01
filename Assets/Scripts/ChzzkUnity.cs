@@ -85,7 +85,7 @@ public class ChzzkUnity : MonoBehaviour
         OnChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
-            int hash = Animator.StringToHash(profile.nickname);
+            int hash = Animator.StringToHash(profile.userIdHash);
             bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
 
             if (isInit)
@@ -94,7 +94,7 @@ public class ChzzkUnity : MonoBehaviour
                 //Debug.Log(nickNameColor.ToHexString());
                 GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                    initForce: new float3(Utils.GetRandom(-15, 15), 0, 0)));
+                    initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
                 peepoEventSystemHandle.OnSpawn.Invoke();
             }
             else

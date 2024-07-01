@@ -116,6 +116,8 @@ public struct GameManagerSingletonComponent : IComponentData
     public float2 ScreenToWorldPointMainCam;
 
     public float gravity;
+    public float2 SpawnMinSpeed;
+    public float2 SpawnMaxSpeed;
 
     public float dragPower;
     public float stabilityPower;
