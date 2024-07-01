@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using OSY;
 using System;
 using Unity.Burst;
@@ -14,6 +15,7 @@ public partial class PeepoEventSystem : SystemBase
     public Action<int> OnDead;
 
     public Action OnCalm;
+    BlobAssetReference<PeepoConfig> peepoConfig;
     protected override void OnCreate()
     {
         base.OnCreate();
@@ -23,7 +25,7 @@ public partial class PeepoEventSystem : SystemBase
     {
         base.OnStartRunning();
 
-        BlobAssetReference<PeepoConfig> peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
+        peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         OnSpawn = () =>
         {
             new OnSpawnPeepoJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
@@ -44,7 +46,8 @@ public partial class PeepoEventSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        new PeepoInitJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel();
+        if (GameManager.instance.spawnOrderQueue.Count > 0)
+            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = GameManager.instance.mainCam.ScreenToWorldPoint(Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()) }.ScheduleParallel();
     }
     [BurstCompile]
     public partial struct OnCalmPeepoJob : IJobEntity
@@ -68,22 +71,23 @@ public partial class PeepoEventSystem : SystemBase
             spawnerComponent.spawnedCount++;
         }
     }
-
     partial struct PeepoInitJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter parallelWriter;
+        [ReadOnly] public GameManager.SpawnOrder spawnOrder;
+        [ReadOnly] public float3 spawnPosition;
+        [ReadOnly] public PeepoConfig peepoConfig;
         public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
         {
-            if (peepoComponent.currentState != PeepoState.Born || GameManager.instance.spawnOrderQueue.Count <= 0) return;
-            var spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
+            if (peepoComponent.currentState != PeepoState.Born) return;
             peepoComponent.hashID = spawnOrder.hash;
             velocity.Linear = spawnOrder.initForce;
-            localTransform.Position = new float3(spawnOrder.spawnPosx, 8, 0);
-            localTransform.Scale = GameManager.instance.peepoConfig.DefaultSize;
+            localTransform.Scale = 0;
+            localTransform.Position = spawnPosition;
 
             parallelWriter.AddComponent(chunkIndex, entity, new TimeLimitedLifeComponent
             {
-                lifeTime = GameManager.instance.peepoConfig.DefalutLifeTime
+                lifeTime = peepoConfig.DefalutLifeTime
             });
             parallelWriter.AddComponent(chunkIndex, entity, new DragableTag());
             parallelWriter.AddComponent(chunkIndex, entity, new RandomDataComponent

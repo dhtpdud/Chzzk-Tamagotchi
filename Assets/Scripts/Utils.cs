@@ -194,9 +194,13 @@ namespace OSY
             System.Random random = new System.Random();
             return (float)(random.NextDouble() * (maximum - minimum) + minimum);
         }
-        public static Vector2 GetRandomPosition(RectTransform rectTransform)
+        public static Vector2 GetRandomPosition_Vector2(RectTransform rectTransform)
         {
             return rectTransform.anchoredPosition + new Vector2(GetRandom(-rectTransform.rect.width / 2, rectTransform.rect.width / 2), GetRandom(-rectTransform.rect.height / 2, rectTransform.rect.height / 2));
+        }
+        public static float2 GetRandomPosition_Float2(RectTransform rectTransform)
+        {
+            return (float2)rectTransform.anchoredPosition + new float2(GetRandom(0, rectTransform.rect.width), GetRandom(0, rectTransform.rect.height));
         }
         public static int GetRandom(int minimum, int maximum)
         {

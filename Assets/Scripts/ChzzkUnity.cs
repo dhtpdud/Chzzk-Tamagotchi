@@ -93,8 +93,7 @@ public class ChzzkUnity : MonoBehaviour
                 //Debug.Log(nickNameColor.ToHexString());
                 GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                    initForce: new float3(Utils.GetRandom(-15, 15), 0, 0),
-                    spawnPosx: Utils.GetRandom(-16, 16)));
+                    initForce: new float3(Utils.GetRandom(-15, 15), 0, 0)));
                 peepoEventSystemHandle.OnSpawn.Invoke();
             }
             else

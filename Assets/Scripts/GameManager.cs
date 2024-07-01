@@ -101,6 +101,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text peepoCountText;
     public GameObject ErrorPOPUP;
     public TMP_InputField ErrorPOPUPText;
+    public RectTransform peepoSpawnRect;
 
     [Header("GameObject Caches")]
     public GameObject peepo;
@@ -168,13 +169,11 @@ public class GameManager : MonoBehaviour
     public struct SpawnOrder
     {
         public int hash;
-        public float spawnPosx;
         public float3 initForce;
 
-        public SpawnOrder(int hash, float3 initForce, float spawnPosx = 0)
+        public SpawnOrder(int hash, float3 initForce)
         {
             this.hash = hash;
-            this.spawnPosx = spawnPosx;
             this.initForce = initForce;
         }
     }
