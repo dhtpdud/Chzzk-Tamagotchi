@@ -57,6 +57,7 @@ public class ChzzkUnity : MonoBehaviour
                 if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift))
                 {
                     GameManager.instance.settingUI.SetActive(!isOnSettingUI);
+                    GameManager.instance.peepoSpawnRect.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
                 }
                 else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
                 {
