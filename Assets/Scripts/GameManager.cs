@@ -179,6 +179,10 @@ public class GameManager : MonoBehaviour
     }
     public Queue<SpawnOrder> spawnOrderQueue = new Queue<SpawnOrder>();
 
+    public Vector2 onMouseDownPosition;
+    public Vector2 onMouseDragPosition;
+    public GameObject dragingObject;
+
     protected void Awake()
     {
         instance = this;
@@ -204,5 +208,12 @@ public class GameManager : MonoBehaviour
         timeScale = Time.timeScale;
         unscaledDeltaTime = Time.unscaledDeltaTime;
         realTimeScale = deltaTime / unscaledDeltaTime;
+        if (mainCam != null)
+        {
+            if (Input.GetMouseButtonDown(0))
+                onMouseDownPosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+            if (Input.GetMouseButton(0))
+                onMouseDragPosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        }
     }
 }
