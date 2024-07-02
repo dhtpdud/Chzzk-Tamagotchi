@@ -85,7 +85,7 @@ public class ChzzkUnity : MonoBehaviour
         OnChat += async (profile, chatText) =>
         {
             await UniTask.SwitchToMainThread();
-            int hash = Animator.StringToHash(profile.userIdHash);
+            int hash = Animator.StringToHash(profile.nickname);
             bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
 
             if (isInit)
