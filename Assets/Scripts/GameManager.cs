@@ -112,6 +112,13 @@ public class GameManager : MonoBehaviour
         peepoConfig.MaxSize = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
+    public void SetChatBubbleSize(string val)
+    {
+        chatBubbleSize = float.Parse(val);
+    }
+    public float chatBubbleSize = 1;
+    //말풍선 겹치는 문제
+
     public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
     [Header("UI")]
@@ -128,6 +135,7 @@ public class GameManager : MonoBehaviour
     [Header("GameObject Caches")]
     public GameObject peepo;
     public Transform subscene;
+    public GameObject chatBubbles;
     public GameObject chatBubble;
     public GameObject nameTag;
 
@@ -137,19 +145,22 @@ public class GameManager : MonoBehaviour
         public GameObject bubbleObject;
         public DateTime dateTime;
         public string text;
-        public ChatInfo(string text)
+        public ChatInfo(string id, string text, Transform bubbleObjectParent)
         {
-            id = Utils.GetRandomHexNumber(10);
+            this.id = id;
             dateTime = DateTime.Now;
             this.text = text;
-            this.bubbleObject = Instantiate(instance.chatBubble, instance.chatBubbleUICanvasTransform);
+            bubbleObject = Instantiate(instance.chatBubble, bubbleObjectParent);
             var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
             UniTask.RunOnThreadPool(async () =>
             {
                 await UniTask.SwitchToMainThread();
                 var tmp = bubbleObject.GetComponentInChildren<TMP_Text>();
                 tmp.text = text;
-                await bubbleObject.transform.DoScaleAsync(Vector3.zero, Vector3.one, 0.5f, Utils.YieldCaches.UniTaskYield);
+                await bubbleObject.transform.GetChild(0).DoScaleAsync(Vector3.zero, Vector3.one, 0.5f, Utils.YieldCaches.UniTaskYield);
+                var parentOBJ = bubbleObjectParent.gameObject;
+                parentOBJ.SetActive(false);
+                parentOBJ.SetActive(true);
                 await UniTask.Delay(TimeSpan.FromSeconds(3));
                 var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
                 invisible.a = 0;
@@ -161,6 +172,7 @@ public class GameManager : MonoBehaviour
     public class ViewerInfo
     {
         public string nickName;
+        public GameObject chatBubbleObjects;
         public List<ChatInfo> chatInfos;
         public GameObject nameTagObject;
         public ViewerInfo(string nickName, Color nicknameColor)
@@ -168,6 +180,7 @@ public class GameManager : MonoBehaviour
             this.nickName = nickName;
             chatInfos = new List<ChatInfo>();
             this.nameTagObject = Instantiate(instance.nameTag, instance.nameTagUICanvasTransform);
+            this.chatBubbleObjects = Instantiate(instance.chatBubbles, instance.chatBubbleUICanvasTransform);
             var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
             tmp.text = nickName;
             //Debug.Log(nicknameColor.ToHexString());

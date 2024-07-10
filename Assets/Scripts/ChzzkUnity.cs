@@ -40,7 +40,7 @@ public class ChzzkUnity : MonoBehaviour
     string heartbeatRequest = "{\"ver\":\"2\",\"cmd\":0}";
     string heartbeatResponse = "{\"ver\":\"2\",\"cmd\":10000}";
 
-    public Action<Profile, string> OnChat = (profile, str) => { };
+    public Action<Profile, string, string> OnChat = (profile, chatID, str) => { };
     public Action<Profile, string, DonationExtras> OnDonation = (profile, str, extra) => { };
 
     // Start is called before the first frame update
@@ -82,7 +82,7 @@ public class ChzzkUnity : MonoBehaviour
         }, true, destroyCancellationToken).Forget();
 
 
-        OnChat += async (profile, chatText) =>
+        OnChat += async (profile, chatID, chatText) =>
         {
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
@@ -99,7 +99,8 @@ public class ChzzkUnity : MonoBehaviour
             }
             else
                 peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatText));
+            GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
     }
     public void StartLive()
@@ -130,7 +131,7 @@ public class ChzzkUnity : MonoBehaviour
     }
     public void removeAllOnMessageListener()
     {
-        OnChat = (profile, str) => { };
+        OnChat = (profile, chatID, str) => { };
     }
 
     public void removeAllOnDonationListener()
@@ -263,6 +264,7 @@ public class ChzzkUnity : MonoBehaviour
             IDictionary<string, object> data = JsonConvert.DeserializeObject<IDictionary<string, object>>(e.Data);
 
             Debug.Log(e.Data);
+            JArray bdy;
             //Cmd에 따라서
             switch ((long)data["cmd"])
             {
@@ -273,45 +275,46 @@ public class ChzzkUnity : MonoBehaviour
                     timer = 0;
                     break;
                 case 93101://Chat
-                    JArray bdies = (JArray)data["bdy"];
+                    bdy = (JArray)data["bdy"];
                     UniTask.RunOnThreadPool(async () =>
                     {
-                        foreach (var bdy in bdies)
+                        foreach (JObject chatInfo in bdy)
                         {
-                            JObject bdyObject = (JObject)bdy;
                             //프로필이.... json이 아니라 string으로 들어옴.
-                            string profileText = bdyObject["profile"].ToString();
-                            //Debug.Log(profileText);
+                            string profileText = chatInfo["profile"].ToString();
                             profileText = profileText.Replace("\\", "");
                             Profile profile = JsonUtility.FromJson<Profile>(profileText);
-                            string chatTxt = bdyObject["msg"].ToString().Trim();
+
+                            //Debug.Log(profileText);
+                            string chatTxt = chatInfo["msg"].ToString().Trim();
+                            string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"];
                             //Debug.Log(profile.nickname + ": " + chatTxt);
-                            OnChat(profile, chatTxt);
+                            OnChat(profile, chatID, chatTxt);
                             await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                         }
                     }, true, destroyCancellationToken).Forget();
                     break;
                 case 93102://Donation
-                    bdies = (JArray)data["bdy"];
-                    foreach (var bdy in bdies)
+                    bdy = (JArray)data["bdy"];
+                    UniTask.RunOnThreadPool(async () =>
                     {
-                        UniTask.RunOnThreadPool(() =>
+                        foreach (JObject chatInfo in bdy)
                         {
-                            JObject bdyObject = (JObject)bdy;
-
                             //프로필 스트링 변환
-                            string profileText = bdyObject["profile"].ToString();
+                            string profileText = chatInfo["profile"].ToString();
                             profileText = profileText.Replace("\\", "");
                             Profile profile = JsonUtility.FromJson<Profile>(profileText);
 
-                            Debug.Log(bdyObject);
-                            //도네이션과 관련된 데이터는 extra
-                            /*string extraText = bdyObject["extra"].ToString();
+                            Debug.Log(chatInfo);
+                            //도네이션과 관련된 데이터는 extra?
+                            string extraText = chatInfo["extra"].ToString();
+                            string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"]; // 도네이션 json요소도 똑같을까?
                             extraText = extraText.Replace("\\", "");
                             DonationExtras extras = JsonUtility.FromJson<DonationExtras>(extraText);
-                            onDonation(profile, bdyObject["msg"].ToString(), extras);*/
-                        }, true, destroyCancellationToken).Forget();
-                    }
+                            OnDonation(profile, chatInfo["msg"].ToString(), extras);
+                            await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
+                        }
+                    }, true, destroyCancellationToken).Forget();
                     break;
                 case 94008://Blocked Message(CleanBot) 차단된 메세지.
                 case 94201://Member Sync 멤버 목록 동기화.

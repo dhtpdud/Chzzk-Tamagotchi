@@ -32,13 +32,15 @@ public partial struct UITransformUpdateSystem : ISystem
             {
                 await UniTask.SwitchToMainThread();
                 if (GameManager.instance.viewerInfos.ContainsKey(peepo.hashID))
-                    foreach (var bubbleTransform in GameManager.instance.viewerInfos[peepo.hashID].chatInfos.Where(chat => chat.bubbleObject != null).Select(chat => chat.bubbleObject.GetComponent<RectTransform>()))
-                        if (bubbleTransform != null)
-                        {
-                            var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
-                            targetPosition.y += 80;
-                            bubbleTransform.localPosition = targetPosition;
-                        }
+                {
+                    Transform bubbleTransform = GameManager.instance.viewerInfos[peepo.hashID]?.chatBubbleObjects?.transform;
+                    if (bubbleTransform != null)
+                    {
+                        var targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
+                        targetPosition.y += 80;
+                        bubbleTransform.localPosition = targetPosition;
+                    }
+                }
                 //new TransformJob { targetPosition = localTransform.Position }.Schedule(bubbleTransform);
             }, true, GameManager.instance.destroyCancellationToken).Forget();
         }
