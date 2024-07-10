@@ -41,7 +41,7 @@ public class ChzzkUnity : MonoBehaviour
     string heartbeatResponse = "{\"ver\":\"2\",\"cmd\":10000}";
 
     public Action<Profile, string, string> OnChat = (profile, chatID, str) => { };
-    public Action<Profile, string, DonationExtras> OnDonation = (profile, str, extra) => { };
+    public Action<Profile, string, string, DonationExtras> OnDonation = (profile, chatID, str, extra) => { };
 
     // Start is called before the first frame update
     void Start()
@@ -82,7 +82,7 @@ public class ChzzkUnity : MonoBehaviour
         }, true, destroyCancellationToken).Forget();
 
 
-        OnChat += async (profile, chatID, chatText) =>
+        OnChat = async (profile, chatID, chatText) =>
         {
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
@@ -101,6 +101,26 @@ public class ChzzkUnity : MonoBehaviour
                 peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+        };
+        OnDonation = async (profile, chatID, chatText, extra) =>
+        {
+            await UniTask.SwitchToMainThread();
+            int hash = Animator.StringToHash(profile.nickname);
+            bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+
+            if (isInit)
+            {
+                var nickNameColor = Color.white;
+                //Debug.Log(nickNameColor.ToHexString());
+                GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
+                GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
+                    initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
+                peepoEventSystemHandle.OnSpawn.Invoke();
+            }
+            else
+                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
+            GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
     }
     public void StartLive()
@@ -136,7 +156,7 @@ public class ChzzkUnity : MonoBehaviour
 
     public void removeAllOnDonationListener()
     {
-        OnDonation = (profile, str, extra) => { };
+        OnDonation = (profile, chatID, str, extra) => { };
     }
 
     //20초에 한번 HeartBeat 전송해야 함.
@@ -306,12 +326,12 @@ public class ChzzkUnity : MonoBehaviour
                             Profile profile = JsonUtility.FromJson<Profile>(profileText);
 
                             Debug.Log(chatInfo);
-                            //도네이션과 관련된 데이터는 extra?
-                            string extraText = chatInfo["extra"].ToString();
+                            //도네이션과 관련된 데이터는 extras
+                            string extraText = chatInfo["extras"].ToString();
                             string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"]; // 도네이션 json요소도 똑같을까?
                             extraText = extraText.Replace("\\", "");
                             DonationExtras extras = JsonUtility.FromJson<DonationExtras>(extraText);
-                            OnDonation(profile, chatInfo["msg"].ToString(), extras);
+                            OnDonation(profile, chatID, chatInfo["msg"].ToString(), extras);
                             await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                         }
                     }, true, destroyCancellationToken).Forget();
