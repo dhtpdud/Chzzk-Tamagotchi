@@ -87,6 +87,7 @@ public class ChzzkUnity : MonoBehaviour
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
             bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+            float addLifeTime = 0;
 
             if (isInit)
             {
@@ -96,9 +97,12 @@ public class ChzzkUnity : MonoBehaviour
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
                     initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
                 peepoEventSystemHandle.OnSpawn.Invoke();
+                await Utils.YieldCaches.UniTaskYield;
             }
             else
-                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
+                addLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+
+            peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
@@ -107,6 +111,7 @@ public class ChzzkUnity : MonoBehaviour
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
             bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+            float addLifeTime = 0;
 
             if (isInit)
             {
@@ -116,9 +121,12 @@ public class ChzzkUnity : MonoBehaviour
                 GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
                     initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
                 peepoEventSystemHandle.OnSpawn.Invoke();
+                await Utils.YieldCaches.UniTaskYield;
             }
             else
-                peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
+                addLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+
+            peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
             peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));

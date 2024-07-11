@@ -11,7 +11,12 @@ public class PeepoAuthoring : MonoBehaviour
             var entity = GetEntity(TransformUsageFlags.Dynamic);
 
             AddComponent(entity, new PeepoComponent());
-            AddComponent(entity, new PhysicsGravityFactor { Value = 1});
+            AddComponent(entity, new PhysicsGravityFactor { Value = 1 });
+            AddComponent(entity, new RandomDataComponent
+            {
+                Random = new Unity.Mathematics.Random((uint)Random.Range(int.MinValue, int.MaxValue))
+            });
+            AddComponent(entity, new DragableTag());
         }
     }
 }

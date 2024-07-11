@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using OSY;
 using System;
 using Unity.Burst;
@@ -7,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public partial class PeepoEventSystem : SystemBase
 {
@@ -27,18 +29,29 @@ public partial class PeepoEventSystem : SystemBase
         base.OnStartRunning();
 
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
-        OnSpawn = () =>
+        OnSpawn = async () =>
         {
-            new OnSpawnPeepoJob { parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+            new OnSpawnPeepoJob
+            {
+                parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter()
+            }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+            await Utils.YieldCaches.UniTaskYield;
+            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = GameManager.instance.mainCam.ScreenToWorldPoint(Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()) }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
         OnChat = (hashID, addValueLife) =>
         {
             if (addValueLife != 0)
                 new OnChatPeepoJob { hashID = hashID, addValue = addValueLife, peepoConfig = peepoConfig.Value }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            for (int i = 0; i < 10; i++)
+            /*UniTask.RunOnThreadPool(async () =>
             {
-                new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            }
+                await UniTask.SwitchToMainThread();
+                int cheezeCount = 200;
+                for (int i = 0; i < cheezeCount; i++)
+                {
+                    new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                    await Utils.YieldCaches.UniTaskYield;
+                }
+            }, true, GameManager.instance.destroyCancellationToken).Forget();*/
         };
         OnDead = (hashID) =>
         {
@@ -51,19 +64,23 @@ public partial class PeepoEventSystem : SystemBase
         OnDonation = (hashID, payAmount) =>
         {
             new OnDonationPeepoJob { hashID = hashID, payAmount = (uint)payAmount }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            int cheezeCount = (int)payAmount / 10;
-            for (int i = 0; i < cheezeCount; i++)
+            UniTask.RunOnThreadPool(async () =>
             {
-                new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            }
+                await UniTask.SwitchToMainThread();
+                int cheezeCount = (int)payAmount / 10;
+                for (int i = 0; i < cheezeCount; i++)
+                {
+                    new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                    await Utils.YieldCaches.UniTaskYield;
+                }
+            },true,GameManager.instance.destroyCancellationToken).Forget();
         };
     }
 
     protected override void OnUpdate()
     {
-        if (GameManager.instance.spawnOrderQueue.Count > 0)
-            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = GameManager.instance.mainCam.ScreenToWorldPoint(Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()) }.ScheduleParallel();
     }
+
     [BurstCompile]
     public partial struct OnCalmPeepoJob : IJobEntity
     {
@@ -103,11 +120,6 @@ public partial class PeepoEventSystem : SystemBase
             {
                 lifeTime = peepoConfig.DefalutLifeTime
             });
-            parallelWriter.AddComponent(chunkIndex, entity, new DragableTag());
-            parallelWriter.AddComponent(chunkIndex, entity, new RandomDataComponent
-            {
-                Random = new Unity.Mathematics.Random((uint)Utils.GetRandom(uint.MinValue, uint.MaxValue))
-            });
 
             peepoComponent.currentState = PeepoState.Ragdoll;
         }
@@ -145,15 +157,20 @@ public partial class PeepoEventSystem : SystemBase
         [ReadOnly] public int hashID;
         [ReadOnly] public EntityStoreComponent store;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
-        public void Execute([ChunkIndexInQuery] int chunkIndex, in PeepoComponent peepoComponent, in LocalTransform peepoLocalTransform, in RandomDataComponent randomDataComponent)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, in PeepoComponent peepoComponent, in LocalTransform peepoLocalTransform, ref RandomDataComponent randomDataComponent)
         {
             if (peepoComponent.hashID == hashID)
             {
                 Entity spawnedCheeze = parallelWriter.Instantiate(chunkIndex, store.cheeze);
-                var initTransform = new LocalTransform { Position = peepoLocalTransform.Position, Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(0.5f, 1.2f) };
-                var initVelocity = new PhysicsVelocity { Linear = new float3(randomDataComponent.Random.NextFloat(-0.1f, 0.1f), randomDataComponent.Random.NextFloat(0.5f, 1.2f), 0) };
+                randomDataComponent.Random = new Unity.Mathematics.Random(randomDataComponent.Random.NextUInt(uint.MinValue, uint.MaxValue));
+                var initTransform = new LocalTransform { Position = peepoLocalTransform.Position, Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(0.3f, 1.2f) };
+                var initVelocity = new PhysicsVelocity { Linear = new float3(randomDataComponent.Random.NextFloat(-5f, 5f), 0, 0) };
                 parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initTransform);
                 parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initVelocity);
+                parallelWriter.AddComponent(chunkIndex, spawnedCheeze, new TimeLimitedLifeComponent
+                {
+                    lifeTime = 10
+                });
             }
         }
     }

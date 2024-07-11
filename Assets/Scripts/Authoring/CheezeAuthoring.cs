@@ -12,10 +12,6 @@ public class CheezeAuthoring : MonoBehaviour
 
             AddComponent(entity, new PhysicsGravityFactor { Value = 1 });
             AddComponent(entity, new DragableTag());
-            AddComponent(entity, new TimeLimitedLifeComponent
-            {
-                lifeTime = 5
-            });
         }
     }
 }
