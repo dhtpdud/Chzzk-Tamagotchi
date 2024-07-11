@@ -4,6 +4,7 @@ using UnityEngine;
 public class EntityStoreAuthoring : MonoBehaviour
 {
     public GameObject peepo;
+    public GameObject cheeze;
     public GameObject mouseRock;
     public class EntityStoreAuthoringBaker : Baker<EntityStoreAuthoring>
     {
@@ -12,6 +13,7 @@ public class EntityStoreAuthoring : MonoBehaviour
             var entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new EntityStoreComponent(
                 GetEntity(authoring.peepo, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.cheeze, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.mouseRock, TransformUsageFlags.Dynamic)));
         }
     }

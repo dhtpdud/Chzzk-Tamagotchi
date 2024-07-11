@@ -23,3 +23,5 @@ MonoBehaviour:
     data: {fileID: 11400000, guid: 91183f7bc43b40f40b712e91791397de, type: 2}
   - name: Ragdoll
     data: {fileID: 11400000, guid: 21a447fbb4482904c83e9a31999523dd, type: 2}
+  - name: Donation
+    data: {fileID: 11400000, guid: 2d47d59f7a188e340a96627234ab233c, type: 2}

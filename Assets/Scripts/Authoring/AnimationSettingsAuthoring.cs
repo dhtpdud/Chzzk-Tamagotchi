@@ -15,7 +15,8 @@ namespace NSprites
                     IdleSub1Hash = Animator.StringToHash("IdleSub1"),
                     IdleSub2Hash = Animator.StringToHash("IdleSub2"),
                     MoveHash = Animator.StringToHash("Move"),
-                    RagdollHash = Animator.StringToHash("Ragdoll")
+                    RagdollHash = Animator.StringToHash("Ragdoll"),
+                    DonationHash = Animator.StringToHash("Donation"),
                 });
             }
         }

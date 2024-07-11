@@ -53,6 +53,11 @@ public partial struct AnimationControlSystem : ISystem
 
         private void Execute(AnimatorAspect animator, in PeepoComponent peepoComponent)
         {
+            /*if(peepoComponent.triggerDonation)
+            {
+                animator.SetAnimation(AnimationSettings.DonationHash, Time);
+                return;
+            }*/
             switch (peepoComponent.currentState)
             {
                 case PeepoState.Idle:

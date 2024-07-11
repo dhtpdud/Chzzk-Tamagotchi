@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc460e3eaeb97f48b48aa09fa988f09, type: 3}
   m_Name: PeepoRagdoll
   m_EditorClassIdentifier: 
-  SpriteSheet: {fileID: 21300000, guid: bd3a2a73587b35e428ffd0e8e6f6e9f5, type: 3}
+  SpriteSheet: {fileID: 21300000, guid: b17780abfed56064cb40df7aa9d09423, type: 3}
   FrameCount:
     x: 30
-    y: 1
+    y: 2
   FrameRange:
     Offset: 28
     Count: 2

@@ -22,8 +22,7 @@ public enum PeepoState
     Idle,
     Ragdoll,
     Move,
-    Draged,
-    Dance
+    Draged
 }
 public struct TimeLimitedLifeComponent : IComponentData
 {
@@ -46,8 +45,14 @@ public struct PeepoComponent : IComponentData
     public float moveVelocity;
     public float switchTimerMove;
 
-    /*public uint totalDonation;
-    public bool isMute;*/
+    public bool triggerDonation;
+
+    public uint totalDonation;
+    //public bool isMute;
+}
+public struct CheezeComponent : IComponentData
+{
+    public int hashID;
 }
 public struct PeepoConfig
 {
@@ -72,11 +77,13 @@ public struct PeepoConfig
 public struct EntityStoreComponent : IComponentData
 {
     public readonly Entity peepo;
+    public readonly Entity cheeze;
     public readonly Entity mouseRock;
 
-    public EntityStoreComponent(Entity peepo, Entity mouseRock)
+    public EntityStoreComponent(Entity peepo, Entity cheeze, Entity mouseRock)
     {
         this.peepo = peepo;
+        this.cheeze = cheeze;
         this.mouseRock = mouseRock;
     }
 }
@@ -136,4 +143,5 @@ public struct AnimationSettings : IComponentData
     public int IdleSub2Hash;
     public int MoveHash;
     public int RagdollHash;
+    public int DonationHash;
 }

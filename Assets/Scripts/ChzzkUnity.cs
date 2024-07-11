@@ -119,6 +119,7 @@ public class ChzzkUnity : MonoBehaviour
             }
             else
                 peepoEventSystemHandle.OnChat.Invoke(hash, GameManager.instance.peepoConfig.AddLifeTime);
+            peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
