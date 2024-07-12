@@ -8,7 +8,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public partial class PeepoEventSystem : SystemBase
 {
@@ -42,16 +41,12 @@ public partial class PeepoEventSystem : SystemBase
         {
             if (addValueLife != 0)
                 new OnChatPeepoJob { hashID = hashID, addValue = addValueLife, peepoConfig = peepoConfig.Value }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            /*UniTask.RunOnThreadPool(async () =>
+            /*int cheezeCount = 200;
+            for (int i = 0; i < cheezeCount; i++)
             {
-                await UniTask.SwitchToMainThread();
-                int cheezeCount = 200;
-                for (int i = 0; i < cheezeCount; i++)
-                {
-                    new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-                    await Utils.YieldCaches.UniTaskYield;
-                }
-            }, true, GameManager.instance.destroyCancellationToken).Forget();*/
+                new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                await Utils.YieldCaches.UniTaskYield;
+            }*/
         };
         OnDead = (hashID) =>
         {
@@ -61,19 +56,15 @@ public partial class PeepoEventSystem : SystemBase
         {
             new OnCalmPeepoJob().ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
-        OnDonation = (hashID, payAmount) =>
+        OnDonation = async (hashID, payAmount) =>
         {
             new OnDonationPeepoJob { hashID = hashID, payAmount = (uint)payAmount }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            UniTask.RunOnThreadPool(async () =>
+            int cheezeCount = (int)payAmount / 10;
+            for (int i = 0; i < cheezeCount; i++)
             {
-                await UniTask.SwitchToMainThread();
-                int cheezeCount = (int)payAmount / 10;
-                for (int i = 0; i < cheezeCount; i++)
-                {
-                    new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-                    await Utils.YieldCaches.UniTaskYield;
-                }
-            },true,GameManager.instance.destroyCancellationToken).Forget();
+                new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                await Utils.YieldCaches.UniTaskYield;
+            }
         };
     }
 
