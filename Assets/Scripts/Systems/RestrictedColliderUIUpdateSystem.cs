@@ -1,3 +1,4 @@
+using OSY;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -6,13 +7,22 @@ using UnityEngine;
 
 public partial class RestrictedColliderUIUpdateSystem : SystemBase
 {
+    public bool isReady { get; private set; }
     public Entity top;
     public Entity bottom;
     public Entity left;
     public Entity right;
-    protected override void OnStartRunning()
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        CheckedStateRef.RequireForUpdate<GameManagerSingletonComponent>();
+    }
+    protected async override void OnStartRunning()
     {
         base.OnStartRunning();
+        EntityStoreComponent entityStore;
+        await Utils.WaitUntil(() => SystemAPI.TryGetSingleton<EntityStoreComponent>(out entityStore) && EntityManager != null && EntityManager.Exists(entityStore.boxCollider), Utils.YieldCaches.UniTaskYield, GameManager.instance.destroyCancellationToken);
+        isReady = true;
         UpdateResolution();
     }
     public void UpdateResolution()

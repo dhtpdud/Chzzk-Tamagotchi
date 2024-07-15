@@ -6,20 +6,19 @@ using UnityEngine;
 public class RestrictedColliderUI : MonoBehaviour
 {
     public Entity colliderEntity;
-    private async void Start()
+    private void Start()
     {
         colliderEntity = default;
-        await Utils.WaitUntil(() => World.DefaultGameObjectInjectionWorld.IsCreated && World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>() != null, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
-        await Utils.YieldCaches.UniTaskYield;
-        UpdateColliderEntity();
-        await Utils.YieldCaches.UniTaskYield;
         UpdateColliderEntity();
     }
-    public void UpdateColliderEntity()
+    public async void UpdateColliderEntity()
     {
         float size = GameManager.instance.rootCanvas.transform.localScale.x;
         Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta * size;
-        World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>().UpdateColliderEntity(ref colliderEntity, new float3(transform.position.x, transform.position.y, 0), new float3(sizeDelta.x, sizeDelta.y, 10));
+        RestrictedColliderUIUpdateSystem ColliderUpdateSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>();
+        await Utils.WaitUntil(() => ColliderUpdateSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
+        if (!destroyCancellationToken.IsCancellationRequested)
+            ColliderUpdateSystem.UpdateColliderEntity(ref colliderEntity, new float3(transform.position.x, transform.position.y, 0), new float3(sizeDelta.x, sizeDelta.y, 10));
     }
     public void DestroySelf()
     {
