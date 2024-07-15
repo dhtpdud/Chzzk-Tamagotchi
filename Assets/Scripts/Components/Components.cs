@@ -16,6 +16,10 @@ public struct DestroyMark : IComponentData
 {
 
 }
+public struct HashIDComponent : IComponentData
+{
+    public int ID;
+}
 public enum PeepoState
 {
     Born,
@@ -30,7 +34,6 @@ public struct TimeLimitedLifeComponent : IComponentData
 }
 public struct PeepoComponent : IComponentData
 {
-    public int hashID;
     public int IdleAnimationIndex;
     public PeepoState lastState;
     public PeepoState currentState;
@@ -79,12 +82,14 @@ public struct EntityStoreComponent : IComponentData
     public readonly Entity peepo;
     public readonly Entity cheeze;
     public readonly Entity mouseRock;
+    public readonly Entity boxCollider;
 
-    public EntityStoreComponent(Entity peepo, Entity cheeze, Entity mouseRock)
+    public EntityStoreComponent(Entity peepo, Entity cheeze, Entity mouseRock, Entity boxCollider)
     {
         this.peepo = peepo;
         this.cheeze = cheeze;
         this.mouseRock = mouseRock;
+        this.boxCollider = boxCollider;
     }
 }
 public struct SpawnerComponent : IComponentData

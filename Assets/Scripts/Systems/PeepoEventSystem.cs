@@ -99,10 +99,10 @@ public partial class PeepoEventSystem : SystemBase
         [ReadOnly] public GameManager.SpawnOrder spawnOrder;
         [ReadOnly] public float3 spawnPosition;
         [ReadOnly] public PeepoConfig peepoConfig;
-        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref PeepoComponent peepoComponent, ref PhysicsVelocity velocity, ref LocalTransform localTransform, ref HashIDComponent hash)
         {
             if (peepoComponent.currentState != PeepoState.Born) return;
-            peepoComponent.hashID = spawnOrder.hash;
+            hash.ID = spawnOrder.hash;
             velocity.Linear = spawnOrder.initForce;
             localTransform.Scale = 0;
             localTransform.Position = spawnPosition;
@@ -122,10 +122,10 @@ public partial class PeepoEventSystem : SystemBase
         [ReadOnly] public int hashID;
         [ReadOnly] public float addValue;
         [ReadOnly] public PeepoConfig peepoConfig;
-        public void Execute(ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent)
+        public void Execute(ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, in HashIDComponent hash)
         {
             //Debug.Log("채팅");
-            if (peepoComponent.hashID == hashID)
+            if (hash.ID == hashID)
                 timeLimitedLifeComponent.lifeTime = math.clamp(timeLimitedLifeComponent.lifeTime + addValue, 0, peepoConfig.MaxLifeTime);
         }
     }
@@ -135,10 +135,10 @@ public partial class PeepoEventSystem : SystemBase
     {
         [ReadOnly] public int hashID;
         [ReadOnly] public uint payAmount;
-        public void Execute(ref PeepoComponent peepoComponent)
+        public void Execute(ref PeepoComponent peepoComponent, in HashIDComponent hash)
         {
             Debug.Log("후원");
-            if (peepoComponent.hashID == hashID)
+            if (hash.ID == hashID)
                 peepoComponent.totalDonation += payAmount;
         }
     }
@@ -148,9 +148,9 @@ public partial class PeepoEventSystem : SystemBase
         [ReadOnly] public int hashID;
         [ReadOnly] public EntityStoreComponent store;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
-        public void Execute([ChunkIndexInQuery] int chunkIndex, in PeepoComponent peepoComponent, in LocalTransform peepoLocalTransform, ref RandomDataComponent randomDataComponent)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, in PeepoComponent peepoComponent, in LocalTransform peepoLocalTransform, ref RandomDataComponent randomDataComponent, in HashIDComponent hash)
         {
-            if (peepoComponent.hashID == hashID)
+            if (hash.ID == hashID)
             {
                 Entity spawnedCheeze = parallelWriter.Instantiate(chunkIndex, store.cheeze);
                 randomDataComponent.Random = new Unity.Mathematics.Random(randomDataComponent.Random.NextUInt(uint.MinValue, uint.MaxValue));
@@ -172,9 +172,9 @@ public partial class PeepoEventSystem : SystemBase
         [ReadOnly] public int hashID;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
 
-        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, in HashIDComponent hash)
         {
-            if (peepoComponent.hashID == hashID)
+            if (hash.ID == hashID)
             {
                 timeLimitedLifeComponent.lifeTime = 0;
             }

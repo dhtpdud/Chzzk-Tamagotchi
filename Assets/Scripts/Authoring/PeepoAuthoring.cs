@@ -17,6 +17,7 @@ public class PeepoAuthoring : MonoBehaviour
                 Random = new Unity.Mathematics.Random((uint)Random.Range(int.MinValue, int.MaxValue))
             });
             AddComponent(entity, new DragableTag());
+            AddComponent(entity, new HashIDComponent());
         }
     }
 }

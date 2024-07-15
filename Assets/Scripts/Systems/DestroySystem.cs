@@ -49,7 +49,7 @@ public partial struct DestroySystem : ISystem
         [ReadOnly] public TimeData time;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
         [ReadOnly] public GameManagerSingletonComponent gameManager;
-        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, ref LocalTransform localTransform)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref TimeLimitedLifeComponent timeLimitedLifeComponent, in PeepoComponent peepoComponent, ref LocalTransform localTransform, in HashIDComponent hash)
         {
             PeepoConfig peepoConfig = gameManager.peepoConfig.Value;
             localTransform.Scale = math.clamp(math.lerp(localTransform.Scale, timeLimitedLifeComponent.lifeTime / peepoConfig.DefalutLifeTime * peepoConfig.DefaultSize, time.DeltaTime), peepoConfig.MinSize, peepoConfig.MaxSize);
@@ -57,7 +57,7 @@ public partial struct DestroySystem : ISystem
             if (timeLimitedLifeComponent.lifeTime <= 0 && (gameManager.dragingEntityInfo.entity != entity))
             {
                 //Debug.Log($"»èÁ¦: {peepoComponent.hashID}");
-                GameManager.instance.viewerInfos[peepoComponent.hashID].OnDestroy();
+                GameManager.instance.viewerInfos[hash.ID].OnDestroy();
                 parallelWriter.AddComponent(chunkIndex, entity, new DestroyMark());
             }
         }

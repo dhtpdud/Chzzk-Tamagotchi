@@ -176,7 +176,7 @@ namespace DigitalLegacy.UI.Sizing
         /// <summary>
         /// Event called when a resize ends
         /// </summary>
-        [HideInInspector]
+        //[HideInInspector]
         public UnityEvent OnResizeEnd = new UnityEvent();
 
         private Dictionary<eResizeListenerType, uResize_ResizeListener> ResizeListeners = new Dictionary<eResizeListenerType, uResize_ResizeListener>();

@@ -9,7 +9,9 @@ using TMPro;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
 using WebSocketSharp;
 using MessageEventArgs = WebSocketSharp.MessageEventArgs;
 using WebSocket = WebSocketSharp.WebSocket;
@@ -58,6 +60,7 @@ public class ChzzkUnity : MonoBehaviour
                 {
                     GameManager.instance.settingUI.SetActive(!isOnSettingUI);
                     GameManager.instance.peepoSpawnRect.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
+                    GameManager.instance.restrictedAreaRoot.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
                 }
                 else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
                 {

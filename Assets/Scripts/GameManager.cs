@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Scenes;
 using UnityEngine;
 using UnityEngine.Profiling;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public SubScene defaultWolrdSubScene;
     public GameManagerInfoSystem gameManagerSystem;
     public Camera mainCam;
     public int targetFPS = 0;
@@ -122,10 +125,12 @@ public class GameManager : MonoBehaviour
     public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
     [Header("UI")]
+    public Canvas rootCanvas;
     public Transform nameTagUICanvasTransform;
     public Transform chatBubbleUICanvasTransform;
     public GameObject settingUI;
     public GameObject channelInfoUI;
+    public GameObject restrictedAreaRoot;
     public TMP_Text channelViewerCount;
     public TMP_Text peepoCountText;
     public GameObject ErrorPOPUP;
@@ -134,10 +139,12 @@ public class GameManager : MonoBehaviour
 
     [Header("GameObject Caches")]
     public GameObject peepo;
-    public Transform subscene;
     public GameObject chatBubbles;
     public GameObject chatBubble;
     public GameObject nameTag;
+    public GameObject restrictedAreaObject;
+
+    public Dictionary<int, BlobAssetReference<Unity.Physics.Collider>> blobAssetcolliders = new Dictionary<int, BlobAssetReference<Unity.Physics.Collider>>();
 
     public class ChatInfo
     {
@@ -250,5 +257,9 @@ public class GameManager : MonoBehaviour
             if (Input.GetMouseButton(0))
                 onMouseDragPosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
         }
+    }
+    public void InstantiateRestrictedArea()
+    {
+        Instantiate(restrictedAreaObject, restrictedAreaRoot.transform);
     }
 }

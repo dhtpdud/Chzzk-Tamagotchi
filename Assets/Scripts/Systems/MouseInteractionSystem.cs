@@ -13,9 +13,9 @@ using RaycastHit = Unity.Physics.RaycastHit;
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
 {
+    private CollisionFilter clickableFilter;
     private PhysicsWorldSingleton _physicsWorldSingleton;
     private EntityManager entityManager;
-    RaycastHit raycastHit;
     Entity mouseRockEntity;
     TimeData time;
     float2 entityPositionOnDown;
@@ -29,6 +29,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        clickableFilter = new CollisionFilter { BelongsTo = 1u << 0, CollidesWith = ~(1u << 3), GroupIndex = 0 };
         state.RequireForUpdate<GameManagerSingletonComponent>();
         state.RequireForUpdate<EntityStoreComponent>();
         entityManager = state.EntityManager;
@@ -160,7 +161,7 @@ public partial struct MouseInteractionSystem : ISystem, ISystemStartStop
         {
             Start = rayStart,
             End = rayEnd,
-            Filter = CollisionFilter.Default
+            Filter = clickableFilter
         };
         return _physicsWorldSingleton.CastRay(raycastInput, out raycastHit);
     }

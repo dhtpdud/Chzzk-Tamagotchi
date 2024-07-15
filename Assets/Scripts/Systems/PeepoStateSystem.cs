@@ -29,7 +29,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
-        var onIdleFilter = new CollisionFilter { BelongsTo = 2u, CollidesWith = ~2u, GroupIndex = 0 };
+        var onIdleFilter = new CollisionFilter { BelongsTo = 1u << 2, CollidesWith = ~(1u << 2), GroupIndex = 0 };
         onRagdollCollider = SystemAPI.GetComponent<PhysicsCollider>(SystemAPI.GetSingleton<EntityStoreComponent>().peepo).Value.Value.Clone();
         onIdleCollider = onRagdollCollider.Value.Clone();
         onDragingCollider = onRagdollCollider.Value.Clone();
