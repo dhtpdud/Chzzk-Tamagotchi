@@ -1,6 +1,4 @@
-using Unity.Entities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class DragableObject : MonoBehaviour
 {
