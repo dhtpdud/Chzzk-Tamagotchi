@@ -1,42 +1,59 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using UnityEngine;
 
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [BurstCompile]
-partial struct OutEntityComeBackSystem : ISystem
+partial struct OutEntityComeBackSystem : ISystem, ISystemStartStop
 {
+    float2 topRightScreenPoint;
+    public void OnStartRunning(ref SystemState state)
+    {
+        float scaleFactor = GameManager.instance.rootCanvas.transform.localScale.x;
+        //Vector3 bottomLeftScreenPoint   = - new Vector3(Screen.width, Screen.height, 0f) / 2 * scaleFactor;
+        topRightScreenPoint = new float2(Screen.width, Screen.height) / 2 * scaleFactor;
+    }
+
+    [BurstCompile]
+    public void OnStopRunning(ref SystemState state)
+    {
+    }
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new OutEnityComeBackJob().ScheduleParallel();
+        new OutEnityComeBackJob { topRightScreenPoint = this.topRightScreenPoint }.ScheduleParallel();
     }
 
     [BurstCompile]
     partial struct OutEnityComeBackJob : IJobEntity
     {
+        [ReadOnly] public float2 topRightScreenPoint;
         public void Execute(in DragableTag dragable, ref LocalTransform localTransform, ref PhysicsVelocity velocity)
         {
-            if (localTransform.Position.x > 8.5f * 2)
+            if (localTransform.Position.x > topRightScreenPoint.x)
             {
-                localTransform.Position.x = 7.5f * 2;
+                localTransform.Position.x = topRightScreenPoint.x;
                 velocity.Linear.x /= 2;
             }
-            else if (localTransform.Position.x < -8.5f * 2)
+            else if (localTransform.Position.x < -topRightScreenPoint.x)
             {
-                localTransform.Position.x = -7.5f * 2;
+                localTransform.Position.x = -topRightScreenPoint.x;
                 velocity.Linear.x /= 2;
             }
-            if (localTransform.Position.y > 5f * 2)
+            if (localTransform.Position.y > topRightScreenPoint.y)
             {
-                localTransform.Position.y = 4f * 2;
+                localTransform.Position.y = topRightScreenPoint.y;
                 velocity.Linear.y /= 2;
             }
-            else if (localTransform.Position.y < -5f * 2)
+            else if (localTransform.Position.y < -topRightScreenPoint.y + .5f)
             {
-                localTransform.Position.y = -4f * 2;
+                localTransform.Position.y = -topRightScreenPoint.y + .5f;
                 velocity.Linear.y /= 2;
             }
         }

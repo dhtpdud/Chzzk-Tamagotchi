@@ -19,7 +19,7 @@ public class RestrictedColliderUI : MonoBehaviour
     {
         float size = GameManager.instance.rootCanvas.transform.localScale.x;
         Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta * size;
-        World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>().UpdateColliderEntity(ref colliderEntity, new float3(transform.position.x, transform.position.y, 0), new float3(sizeDelta.x, sizeDelta.y, 1));
+        World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>().UpdateColliderEntity(ref colliderEntity, new float3(transform.position.x, transform.position.y, 0), new float3(sizeDelta.x, sizeDelta.y, 10));
     }
     public void DestroySelf()
     {
