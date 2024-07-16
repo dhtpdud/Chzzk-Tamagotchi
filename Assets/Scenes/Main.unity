@@ -10322,7 +10322,7 @@ MonoBehaviour:
   rootCanvas: {fileID: 1893371138}
   nameTagUICanvasTransform: {fileID: 1308870874}
   chatBubbleUICanvasTransform: {fileID: 645066253}
-  settingUI: {fileID: 1271894671}
+  settingUI: {fileID: 1731550267}
   channelInfoUI: {fileID: 1922877818}
   restrictedAreaRoot: {fileID: 1659124495}
   channelViewerCount: {fileID: 1575984616}
@@ -10646,7 +10646,7 @@ GameObject:
   - component: {fileID: 1271894674}
   - component: {fileID: 1271894673}
   m_Layer: 5
-  m_Name: Setting UI
+  m_Name: Contents
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14598,7 +14598,7 @@ GameObject:
   - component: {fileID: 1731550269}
   - component: {fileID: 1731550272}
   m_Layer: 5
-  m_Name: Scroll View
+  m_Name: Setting UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
