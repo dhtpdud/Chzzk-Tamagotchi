@@ -262,4 +262,8 @@ public class GameManager : MonoBehaviour
     {
         Instantiate(restrictedAreaObject, restrictedAreaRoot.transform);
     }
+    private void OnDestroy()
+    {
+        ES3AutoSaveMgr.managers.Clear();
+    }
 }
