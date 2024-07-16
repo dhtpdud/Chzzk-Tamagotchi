@@ -2,14 +2,20 @@ using UnityEngine;
 
 public class DragableObject : MonoBehaviour
 {
+    public Transform target;
     [SerializeField]
     private bool isSelected;
     private Vector2 onMouseDownPosition;
     public bool isLockX;
     public bool isLockY;
+    public void Awake()
+    {
+        if (target == null)
+            target = transform;
+    }
     public void OnMouseDown()
     {
-        onMouseDownPosition = transform.position;
+        onMouseDownPosition = target.position;
         isSelected = true;
         GameManager.instance.dragingObject = gameObject;
     }
@@ -18,7 +24,7 @@ public class DragableObject : MonoBehaviour
         if (isSelected)
         {
             var targetPosition = onMouseDownPosition + (GameManager.instance.onMouseDragPosition - GameManager.instance.onMouseDownPosition);
-            transform.position = new Vector3(isLockX ? transform.position.x : targetPosition.x, isLockY ? transform.position.y : targetPosition.y, transform.position.z);
+            target.position = new Vector3(isLockX ? target.position.x : targetPosition.x, isLockY ? target.position.y : targetPosition.y, target.position.z);
         }
     }
     public void OnMouseUp()
