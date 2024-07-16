@@ -30,14 +30,17 @@ public partial class PeepoEventSystem : SystemBase
 
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         donationConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().donationConfig;
+        string Bonobono = "보노 보노";
         OnSpawn = async () =>
         {
-            new OnSpawnPeepoJob
+            var spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
+            new OnSpawnCharacterJob
             {
+                spawnEntity = spawnOrder.hash.Equals(Animator.StringToHash(Bonobono)) ? SystemAPI.GetSingleton<EntityStoreComponent>().bonobono : SystemAPI.GetSingleton<EntityStoreComponent>().peepo,
                 parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
             await Utils.YieldCaches.UniTaskYield;
-            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()*GameManager.instance.rootCanvas.transform.localScale.x }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = spawnOrder, spawnPosition = Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()*GameManager.instance.rootCanvas.transform.localScale.x }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
         OnChat = (hashID, addValueLife) =>
         {
@@ -85,14 +88,15 @@ public partial class PeepoEventSystem : SystemBase
     }
 
     [BurstCompile]
-    public partial struct OnSpawnPeepoJob : IJobEntity
+    public partial struct OnSpawnCharacterJob : IJobEntity
     {
+        [ReadOnly] public Entity spawnEntity;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, in EntityStoreComponent store)
         {
             //Debug.Log("스폰");
-            parallelWriter.Instantiate(chunkIndex, store.peepo);
+            parallelWriter.Instantiate(chunkIndex, spawnEntity);
         }
     }
     partial struct PeepoInitJob : IJobEntity

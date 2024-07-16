@@ -87,13 +87,15 @@ public struct PeepoConfig
 }
 public struct EntityStoreComponent : IComponentData
 {
+    public readonly Entity bonobono;
     public readonly Entity peepo;
     public readonly Entity cheeze;
     public readonly Entity mouseRock;
     public readonly Entity boxCollider;
 
-    public EntityStoreComponent(Entity peepo, Entity cheeze, Entity mouseRock, Entity boxCollider)
+    public EntityStoreComponent(Entity bonobono, Entity peepo, Entity cheeze, Entity mouseRock, Entity boxCollider)
     {
+        this.bonobono = bonobono;
         this.peepo = peepo;
         this.cheeze = cheeze;
         this.mouseRock = mouseRock;

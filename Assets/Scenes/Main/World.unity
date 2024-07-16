@@ -248,6 +248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 980d5d3ef1744824aad94171ae6206ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bonobono: {fileID: 1765040178466298933, guid: 29114d5c8f54ff9448e21a76c13d1cf4, type: 3}
   peepo: {fileID: 1765040178466298933, guid: e46d68c82253a174fb13a321a501fba9, type: 3}
   cheeze: {fileID: 1765040178466298933, guid: 5632baacfa094424db68ab4ecda1eb10, type: 3}
   mouseRock: {fileID: 1765040178466298933, guid: fa99e895bb7d1c04295c81586d51ad4b, type: 3}
@@ -449,7 +450,7 @@ PrefabInstance:
     - target: {fileID: 2179396316960238096, guid: 3e57b6458f9504d4188e89de390d5f6c, type: 3}
       propertyPath: spawnPrefab
       value: 
-      objectReference: {fileID: 1765040178466298933, guid: 5632baacfa094424db68ab4ecda1eb10, type: 3}
+      objectReference: {fileID: 1765040178466298933, guid: 29114d5c8f54ff9448e21a76c13d1cf4, type: 3}
     - target: {fileID: 2179396316960238096, guid: 3e57b6458f9504d4188e89de390d5f6c, type: 3}
       propertyPath: isRandomSize
       value: 0
