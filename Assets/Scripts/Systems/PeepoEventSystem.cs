@@ -37,7 +37,7 @@ public partial class PeepoEventSystem : SystemBase
                 parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter()
             }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
             await Utils.YieldCaches.UniTaskYield;
-            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = GameManager.instance.mainCam.ScreenToWorldPoint(Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()) }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+            new PeepoInitJob { peepoConfig = peepoConfig.Value, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter(), spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue(), spawnPosition = Utils.GetRandomPosition_Float2(GameManager.instance.peepoSpawnRect).ToFloat3()*GameManager.instance.rootCanvas.transform.localScale.x }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
         };
         OnChat = (hashID, addValueLife) =>
         {

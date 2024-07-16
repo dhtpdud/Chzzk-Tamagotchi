@@ -69,7 +69,7 @@ public partial struct ConstrainPhysicsTo2D : ISystem
 [BurstCompile]
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
-[UpdateBefore(typeof(ExportPhysicsWorld))]
+//[UpdateBefore(typeof(ExportPhysicsWorld))]
 [RequireMatchingQueriesForUpdate]
 public partial struct Physic2DSystem : ISystem
 {

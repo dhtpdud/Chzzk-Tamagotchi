@@ -200,7 +200,7 @@ namespace OSY
         }
         public static float2 GetRandomPosition_Float2(RectTransform rectTransform)
         {
-            return (float2)rectTransform.anchoredPosition + new float2(GetRandom(0, rectTransform.rect.width), GetRandom(0, rectTransform.rect.height));
+            return (float2)rectTransform.anchoredPosition + new float2(GetRandom(-rectTransform.rect.width / 2, rectTransform.rect.width / 2), GetRandom(-rectTransform.rect.height / 2, rectTransform.rect.height / 2));
         }
         public static int GetRandom(int minimum, int maximum)
         {
