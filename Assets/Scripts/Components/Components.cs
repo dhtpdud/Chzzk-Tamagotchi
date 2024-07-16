@@ -57,6 +57,14 @@ public struct CheezeComponent : IComponentData
 {
     public int hashID;
 }
+public struct DonationConfig
+{
+    public float objectCountFactor;
+    public float objectLifeTime;
+
+    public float MinSize;
+    public float MaxSize;
+}
 public struct PeepoConfig
 {
     public float DefalutLifeTime;
@@ -136,6 +144,7 @@ public struct GameManagerSingletonComponent : IComponentData
 
     public float physicMaxVelocity;
     public BlobAssetReference<PeepoConfig> peepoConfig;
+    public BlobAssetReference<DonationConfig> donationConfig;
 }
 public struct RandomDataComponent : IComponentData
 {

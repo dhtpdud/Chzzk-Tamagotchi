@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ES3Types
 {
 	[UnityEngine.Scripting.Preserve]
-	[ES3PropertiesAttribute("gravity", "SpawnMinSpeed", "SpawnMaxSpeed", "dragPower", "stabilityPower", "physicMaxVelocity", "peepoConfig", "chatBubbleSize", "thumbnailsCacheDic")]
+	[ES3PropertiesAttribute("gravity", "SpawnMinSpeed", "SpawnMaxSpeed", "dragPower", "stabilityPower", "physicMaxVelocity", "peepoConfig", "donationConfig", "chatBubbleSize", "thumbnailsCacheDic")]
 	public class ES3UserType_GameManager : ES3ComponentType
 	{
 		public static ES3Type Instance = null;
@@ -23,6 +23,7 @@ namespace ES3Types
 			writer.WriteProperty("stabilityPower", instance.stabilityPower, ES3Type_float.Instance);
 			writer.WriteProperty("physicMaxVelocity", instance.physicMaxVelocity, ES3Type_float.Instance);
 			writer.WriteProperty("peepoConfig", instance.peepoConfig, ES3Internal.ES3TypeMgr.GetOrCreateES3Type(typeof(GameManager.PeepoConfig)));
+			writer.WriteProperty("donationConfig", instance.donationConfig, ES3Internal.ES3TypeMgr.GetOrCreateES3Type(typeof(GameManager.DonationConfig)));
 			writer.WriteProperty("chatBubbleSize", instance.chatBubbleSize, ES3Type_float.Instance);
 			writer.WriteProperty("thumbnailsCacheDic", instance.thumbnailsCacheDic, ES3Internal.ES3TypeMgr.GetOrCreateES3Type(typeof(System.Collections.Generic.Dictionary<System.Int32, UnityEngine.Texture2D>)));
 		}
@@ -55,6 +56,9 @@ namespace ES3Types
 						break;
 					case "peepoConfig":
 						instance.peepoConfig = reader.Read<GameManager.PeepoConfig>();
+						break;
+					case "donationConfig":
+						instance.donationConfig = reader.Read<GameManager.DonationConfig>();
 						break;
 					case "chatBubbleSize":
 						instance.chatBubbleSize = reader.Read<System.Single>(ES3Type_float.Instance);

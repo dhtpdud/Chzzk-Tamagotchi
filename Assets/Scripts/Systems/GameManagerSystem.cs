@@ -10,6 +10,7 @@ public sealed partial class GameManagerInfoSystem : SystemBase
     public Camera mainCam;
     public UniWindowController uniWindowController;
     public BlobAssetReference<PeepoConfig> peepoConfigRef;
+    public BlobAssetReference<DonationConfig> donationConfigRef;
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
@@ -21,13 +22,16 @@ public sealed partial class GameManagerInfoSystem : SystemBase
 
 
         var builder = new BlobBuilder(Allocator.TempJob);
-
         ref PeepoConfig peepoConfig = ref builder.ConstructRoot<PeepoConfig>();
+        ref DonationConfig donationConfig = ref builder.ConstructRoot<DonationConfig>();
+
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
 
         peepoConfigRef = builder.CreateBlobAssetReference<PeepoConfig>(Allocator.Persistent);
+        donationConfigRef = builder.CreateBlobAssetReference<DonationConfig>(Allocator.Persistent);
 
         gameManagerRW.peepoConfig = peepoConfigRef;
+        gameManagerRW.donationConfig = donationConfigRef;
         UpdateSetting();
 
         builder.Dispose();
@@ -42,26 +46,28 @@ public sealed partial class GameManagerInfoSystem : SystemBase
     {
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
         ref var peepoConfigRW = ref peepoConfigRef.Value;
+        ref var donationConfigRW = ref donationConfigRef.Value;
+
         gameManagerRW.stabilityPower = GameManager.instance.stabilityPower;
         gameManagerRW.dragPower = GameManager.instance.dragPower;
         gameManagerRW.physicMaxVelocity = GameManager.instance.physicMaxVelocity;
         gameManagerRW.gravity = GameManager.instance.gravity;
         gameManagerRW.SpawnMinSpeed = GameManager.instance.SpawnMinSpeed;
         gameManagerRW.SpawnMaxSpeed = GameManager.instance.SpawnMaxSpeed;
-        peepoConfigRW.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
-        peepoConfigRW.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
-        peepoConfigRW.AddLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+        peepoConfigRW.DefalutLifeTime = GameManager.instance.peepoConfig.defalutLifeTime;
+        peepoConfigRW.MaxLifeTime = GameManager.instance.peepoConfig.maxLifeTime;
+        peepoConfigRW.AddLifeTime = GameManager.instance.peepoConfig.addLifeTime;
         
-        peepoConfigRW.DefaultSize = GameManager.instance.peepoConfig.DefaultSize;
-        peepoConfigRW.MaxSize = GameManager.instance.peepoConfig.MaxSize;
-        peepoConfigRW.MinSize = GameManager.instance.peepoConfig.MinSize;
-        peepoConfigRW.DefalutLifeTime = GameManager.instance.peepoConfig.DefalutLifeTime;
-        peepoConfigRW.MaxLifeTime = GameManager.instance.peepoConfig.MaxLifeTime;
-        peepoConfigRW.AddLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+        peepoConfigRW.DefaultSize = GameManager.instance.peepoConfig.defaultSize;
+        peepoConfigRW.MaxSize = GameManager.instance.peepoConfig.maxSize;
+        peepoConfigRW.MinSize = GameManager.instance.peepoConfig.minSize;
+        peepoConfigRW.DefalutLifeTime = GameManager.instance.peepoConfig.defalutLifeTime;
+        peepoConfigRW.MaxLifeTime = GameManager.instance.peepoConfig.maxLifeTime;
+        peepoConfigRW.AddLifeTime = GameManager.instance.peepoConfig.addLifeTime;
 
-        peepoConfigRW.DefaultSize = GameManager.instance.peepoConfig.DefaultSize;
-        peepoConfigRW.MaxSize = GameManager.instance.peepoConfig.MaxSize;
-        peepoConfigRW.MinSize = GameManager.instance.peepoConfig.MinSize;
+        peepoConfigRW.DefaultSize = GameManager.instance.peepoConfig.defaultSize;
+        peepoConfigRW.MaxSize = GameManager.instance.peepoConfig.maxSize;
+        peepoConfigRW.MinSize = GameManager.instance.peepoConfig.minSize;
 
         peepoConfigRW.switchIdleAnimationTime = GameManager.instance.peepoConfig.switchIdleAnimationTime;
         peepoConfigRW.switchTimeImpact = GameManager.instance.peepoConfig.switchTimeImpact;
@@ -71,6 +77,11 @@ public sealed partial class GameManagerInfoSystem : SystemBase
         peepoConfigRW.movingTimeMax = GameManager.instance.peepoConfig.movingTimeMax;
         peepoConfigRW.IdlingTimeMin = GameManager.instance.peepoConfig.IdlingTimeMin;
         peepoConfigRW.IdlingTimeMax = GameManager.instance.peepoConfig.IdlingTimeMax;
+
+        donationConfigRW.objectCountFactor = GameManager.instance.donationConfig.objectCountFactor;
+        donationConfigRW.objectLifeTime = GameManager.instance.donationConfig.objectLifeTime;
+        donationConfigRW.MinSize = GameManager.instance.donationConfig.minSize;
+        donationConfigRW.MaxSize = GameManager.instance.donationConfig.maxSize;
     }
     protected override void OnDestroy()
     {

@@ -18,6 +18,7 @@ public partial class PeepoEventSystem : SystemBase
 
     public Action OnCalm;
     BlobAssetReference<PeepoConfig> peepoConfig;
+    BlobAssetReference<DonationConfig> donationConfig;
     protected override void OnCreate()
     {
         base.OnCreate();
@@ -28,6 +29,7 @@ public partial class PeepoEventSystem : SystemBase
         base.OnStartRunning();
 
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
+        donationConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().donationConfig;
         OnSpawn = async () =>
         {
             new OnSpawnPeepoJob
@@ -59,10 +61,10 @@ public partial class PeepoEventSystem : SystemBase
         OnDonation = async (hashID, payAmount) =>
         {
             new OnDonationPeepoJob { hashID = hashID, payAmount = (uint)payAmount }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
-            int cheezeCount = (int)payAmount / 10;
+            int cheezeCount = (int)(payAmount * donationConfig.Value.objectCountFactor);
             for (int i = 0; i < cheezeCount; i++)
             {
-                new SpawnCheezeJob { hashID = hashID, store = SystemAPI.GetSingleton<EntityStoreComponent>(), parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                new SpawnDonationObjectJob {donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
                 await Utils.YieldCaches.UniTaskYield;
             }
         };
@@ -143,24 +145,25 @@ public partial class PeepoEventSystem : SystemBase
         }
     }
     [BurstCompile]
-    partial struct SpawnCheezeJob : IJobEntity
+    partial struct SpawnDonationObjectJob : IJobEntity
     {
         [ReadOnly] public int hashID;
-        [ReadOnly] public EntityStoreComponent store;
+        [ReadOnly] public Entity spawnObject;
+        [ReadOnly] public DonationConfig donationConfig;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
         public void Execute([ChunkIndexInQuery] int chunkIndex, in PeepoComponent peepoComponent, in LocalTransform peepoLocalTransform, ref RandomDataComponent randomDataComponent, in HashIDComponent hash)
         {
             if (hash.ID == hashID)
             {
-                Entity spawnedCheeze = parallelWriter.Instantiate(chunkIndex, store.cheeze);
+                Entity spawnedCheeze = parallelWriter.Instantiate(chunkIndex, spawnObject);
                 randomDataComponent.Random = new Unity.Mathematics.Random(randomDataComponent.Random.NextUInt(uint.MinValue, uint.MaxValue));
-                var initTransform = new LocalTransform { Position = peepoLocalTransform.Position, Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(0.3f, 1.2f) };
+                var initTransform = new LocalTransform { Position = peepoLocalTransform.Position, Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(donationConfig.MinSize, donationConfig.MaxSize) };
                 var initVelocity = new PhysicsVelocity { Linear = new float3(randomDataComponent.Random.NextFloat(-5f, 5f), 0, 0) };
                 parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initTransform);
                 parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initVelocity);
                 parallelWriter.AddComponent(chunkIndex, spawnedCheeze, new TimeLimitedLifeComponent
                 {
-                    lifeTime = 10
+                    lifeTime = donationConfig.objectLifeTime
                 });
             }
         }

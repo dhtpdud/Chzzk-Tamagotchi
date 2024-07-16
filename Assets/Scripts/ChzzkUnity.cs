@@ -103,11 +103,11 @@ public class ChzzkUnity : MonoBehaviour
                 await Utils.YieldCaches.UniTaskYield;
             }
             else
-                addLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+                addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
 
             peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, 5f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
         OnDonation = async (profile, chatID, chatText, extra) =>
         {
@@ -127,12 +127,12 @@ public class ChzzkUnity : MonoBehaviour
                 await Utils.YieldCaches.UniTaskYield;
             }
             else
-                addLifeTime = GameManager.instance.peepoConfig.AddLifeTime;
+                addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
 
             peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
             peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
             GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
     }
     public void StartLive()

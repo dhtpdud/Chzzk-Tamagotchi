@@ -65,14 +65,23 @@ public class GameManager : MonoBehaviour
     public float physicMaxVelocity;
 
     [Serializable]
+    public class DonationConfig
+    {
+        public float objectCountFactor;
+        public float objectLifeTime;
+        public float minSize;
+        public float maxSize;
+    }
+
+    [Serializable]
     public class PeepoConfig
     {
-        public float DefalutLifeTime;
-        public float AddLifeTime;
-        public float MaxLifeTime;
-        public float DefaultSize;
-        public float MinSize;
-        public float MaxSize;
+        public float defalutLifeTime;
+        public float addLifeTime;
+        public float maxLifeTime;
+        public float defaultSize;
+        public float minSize;
+        public float maxSize;
 
         public float switchTimeImpact;
         public float switchIdleAnimationTime;
@@ -85,34 +94,55 @@ public class GameManager : MonoBehaviour
         public float IdlingTimeMax;
     }
     public PeepoConfig peepoConfig;
+    public DonationConfig donationConfig;
     public void SetDefalutLifeTime(string val)
     {
-        peepoConfig.DefalutLifeTime = float.Parse(val);
+        peepoConfig.defalutLifeTime = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetAddLifeTime(string val)
     {
-        peepoConfig.AddLifeTime = float.Parse(val);
+        peepoConfig.addLifeTime = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetMaxLifeTime(string val)
     {
-        peepoConfig.MaxLifeTime = float.Parse(val);
+        peepoConfig.maxLifeTime = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetDefaultSize(string val)
     {
-        peepoConfig.DefaultSize = float.Parse(val);
+        peepoConfig.defaultSize = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetMinSize(string val)
     {
-        peepoConfig.MinSize = float.Parse(val);
+        peepoConfig.minSize = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetMaxSize(string val)
     {
-        peepoConfig.MaxSize = float.Parse(val);
+        peepoConfig.maxSize = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetDonationObjectCountFactor(string val)
+    {
+        donationConfig.objectCountFactor = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetDonationObjectLifeTime(string val)
+    {
+        donationConfig.objectLifeTime = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetDonationObjectMinSize(string val)
+    {
+        donationConfig.minSize = float.Parse(val);
+        gameManagerSystem.UpdateSetting();
+    }
+    public void SetDonationObjectMaxSize(string val)
+    {
+        donationConfig.maxSize = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
     public void SetChatBubbleSize(string val)
@@ -152,7 +182,7 @@ public class GameManager : MonoBehaviour
         public GameObject bubbleObject;
         public DateTime dateTime;
         public string text;
-        public ChatInfo(string id, string text, Transform bubbleObjectParent)
+        public ChatInfo(string id, string text, float lifeTImeSec, Transform bubbleObjectParent)
         {
             this.id = id;
             dateTime = DateTime.Now;
@@ -168,7 +198,7 @@ public class GameManager : MonoBehaviour
                 var parentOBJ = bubbleObjectParent.gameObject;
                 parentOBJ.SetActive(false);
                 parentOBJ.SetActive(true);
-                await UniTask.Delay(TimeSpan.FromSeconds(3));
+                await UniTask.Delay(TimeSpan.FromSeconds(lifeTImeSec));
                 var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
                 invisible.a = 0;
                 await tmp.DoColorAsync(invisible, 1, Utils.YieldCaches.UniTaskYield);
