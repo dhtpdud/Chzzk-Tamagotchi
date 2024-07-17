@@ -31,9 +31,9 @@ public partial class PeepoEventSystem : SystemBase
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         donationConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().donationConfig;
         string Bonobono = "보노 보노";
-        EntityStoreComponent store = SystemAPI.GetSingleton<EntityStoreComponent>();
         OnSpawn = async () =>
         {
+            EntityStoreComponent store = SystemAPI.GetSingleton<EntityStoreComponent>();
             var spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
             EntityManager.Instantiate(spawnOrder.hash.Equals(Animator.StringToHash(Bonobono)) ? store.bonobono : store.peepo);
             await Utils.YieldCaches.UniTaskYield;

@@ -255,7 +255,6 @@ public class GameManager : MonoBehaviour
 
     protected void Awake()
     {
-        ES3AutoSaveMgr.managers.Clear();
         instance = this;
         var tokenInit = destroyCancellationToken;
         mainCam ??= Camera.main;
@@ -290,5 +289,9 @@ public class GameManager : MonoBehaviour
     public void InstantiateRestrictedArea()
     {
         Instantiate(restrictedAreaObject, restrictedAreaRoot.transform);
+    }
+    public void OnDestroy()
+    {
+        ES3AutoSaveMgr.managers.Clear();
     }
 }

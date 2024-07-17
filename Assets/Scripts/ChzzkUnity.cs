@@ -112,6 +112,7 @@ public class ChzzkUnity : MonoBehaviour
         OnDonation = async (profile, chatID, chatText, extra) =>
         {
             await UniTask.SwitchToMainThread();
+            if (profile == null) return;
             int hash = Animator.StringToHash(profile.nickname);
             bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
             float addLifeTime = 0;
