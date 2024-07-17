@@ -7,6 +7,7 @@ using UnityEngine;
 [UpdateBefore(typeof(InitializationSystemGroup))]
 public sealed partial class GameManagerInfoSystem : SystemBase
 {
+    public bool isReady;
     public Camera mainCam;
     public UniWindowController uniWindowController;
     public BlobAssetReference<PeepoConfig> peepoConfigRef;
@@ -32,7 +33,7 @@ public sealed partial class GameManagerInfoSystem : SystemBase
 
         gameManagerRW.peepoConfig = peepoConfigRef;
         gameManagerRW.donationConfig = donationConfigRef;
-        UpdateSetting();
+        isReady = true;
 
         builder.Dispose();
     }
@@ -64,10 +65,6 @@ public sealed partial class GameManagerInfoSystem : SystemBase
         peepoConfigRW.DefalutLifeTime = GameManager.instance.peepoConfig.defalutLifeTime;
         peepoConfigRW.MaxLifeTime = GameManager.instance.peepoConfig.maxLifeTime;
         peepoConfigRW.AddLifeTime = GameManager.instance.peepoConfig.addLifeTime;
-
-        peepoConfigRW.DefaultSize = GameManager.instance.peepoConfig.defaultSize;
-        peepoConfigRW.MaxSize = GameManager.instance.peepoConfig.maxSize;
-        peepoConfigRW.MinSize = GameManager.instance.peepoConfig.minSize;
 
         peepoConfigRW.switchIdleAnimationTime = GameManager.instance.peepoConfig.switchIdleAnimationTime;
         peepoConfigRW.switchTimeImpact = GameManager.instance.peepoConfig.switchTimeImpact;

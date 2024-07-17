@@ -262,13 +262,16 @@ public class GameManager : MonoBehaviour
         origincaptureFramerate = Time.captureFramerate;
         originVSyncCount = QualitySettings.vSyncCount;
     }
-    private void Start()
+    private async void Start()
     {
         gameManagerSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<GameManagerInfoSystem>();
+        await Utils.WaitUntil(() => gameManagerSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
         QualitySettings.maxQueuedFrames = 4;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFPS;
         Profiler.maxUsedMemory = 2000000000;//2GB
+        ES3AutoSaveMgr.Current.Load();
+        gameManagerSystem.UpdateSetting();
     }
     private void Update()
     {
