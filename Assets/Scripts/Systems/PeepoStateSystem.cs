@@ -89,7 +89,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         peepoComponent.switchTimerImpact = 0;
                         peepoComponent.switchTimerMove = 0;
                         collider.Value = onIdleCollider;
-                        peepoComponent.lastState = PeepoState.Idle;
                     }
                     //update
                     localTransform.Rotation = math.nlerp(localTransform.Rotation, quaternion.identity, 10 * time.DeltaTime);
@@ -121,6 +120,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         }
                         peepoComponent.switchTimerMove += time.DeltaTime;
                     }
+                    peepoComponent.lastState = PeepoState.Idle;
                     break;
                 case PeepoState.Ragdoll:
                     //init
@@ -128,7 +128,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     {
                         peepoComponent.switchTimerImpact = 0;
                         collider.Value = onRagdollCollider;
-                        peepoComponent.lastState = PeepoState.Ragdoll;
                     }
                     //update
                     if (peepoComponent.currentImpact <= 1f)
@@ -143,6 +142,7 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     {
                         peepoComponent.switchTimerImpact = 0;
                     }
+                    peepoComponent.lastState = PeepoState.Ragdoll;
                     break;
                 case PeepoState.Move:
                     //init
@@ -153,7 +153,6 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                         peepoComponent.switchTimeMove = randomDataComponent.Random.NextFloat(peepoConfig.Value.movingTimeMin, peepoConfig.Value.movingTimeMax);
                         peepoComponent.moveVelocity = randomDataComponent.Random.NextFloat(peepoConfig.Value.moveSpeedMin, peepoConfig.Value.moveSpeedMax);
                         flip.Value.x = peepoComponent.moveVelocity > 0 ? 0 : -1;
-                        peepoComponent.lastState = PeepoState.Move;
                     }
                     //update
                     if (peepoComponent.switchTimerMove > peepoComponent.switchTimeMove)
@@ -164,14 +163,15 @@ partial struct PeepoStateSystem : ISystem, ISystemStartStop
                     peepoComponent.switchTimerMove += time.DeltaTime;
                     if (currentAngularVelocity < 120)
                         localTransform.Position.x += peepoComponent.moveVelocity * time.DeltaTime;
+                    peepoComponent.lastState = PeepoState.Move;
                     break;
                 case PeepoState.Draged:
                     //Init
                     if (peepoComponent.lastState != PeepoState.Draged)
                     {
-                        peepoComponent.lastState = PeepoState.Draged;
                         collider.Value = onDragingCollider;
                     }
+                    peepoComponent.lastState = PeepoState.Draged;
                     break;
             }
 

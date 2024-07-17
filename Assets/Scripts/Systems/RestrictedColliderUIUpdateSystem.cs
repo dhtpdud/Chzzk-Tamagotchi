@@ -31,10 +31,10 @@ public partial class RestrictedColliderUIUpdateSystem : SystemBase
         float2 topRightScreenPoint = new float2(Screen.width, Screen.height) / 2 * scaleFactor;
         float thickness = 10f;
 
-        UpdateColliderEntity(ref top, new float3(0f, topRightScreenPoint.y + 0.5f, 0f), new float3(Screen.width * scaleFactor + 1, 1f, thickness));
-        UpdateColliderEntity(ref bottom, new float3(0f, -topRightScreenPoint.y, 0f), new float3(Screen.width * scaleFactor + 1, 1f, thickness));
-        UpdateColliderEntity(ref left, new float3(-topRightScreenPoint.x - 0.5f, 0, 0f), new float3(1f, Screen.height * scaleFactor + 1, thickness));
-        UpdateColliderEntity(ref right, new float3(topRightScreenPoint.x + 0.5f, 0, 0f), new float3(1f, Screen.height * scaleFactor + 1, thickness));
+        UpdateColliderEntity(ref top,       new float3(0f, topRightScreenPoint.y + 0.5f, 0f),   new float3(Screen.width * scaleFactor + 1, 1f, thickness));
+        UpdateColliderEntity(ref bottom,    new float3(0f, -topRightScreenPoint.y, 0f),         new float3(Screen.width * scaleFactor + 1, 1f, thickness));
+        UpdateColliderEntity(ref left,      new float3(-topRightScreenPoint.x - 0.5f, 0, 0f),   new float3(1f, Screen.height * scaleFactor + 1, thickness));
+        UpdateColliderEntity(ref right,     new float3(topRightScreenPoint.x + 0.5f, 0, 0f),    new float3(1f, Screen.height * scaleFactor + 1, thickness));
     }
 
     public unsafe void UpdateColliderEntity(ref Entity colliderEntity, float3 position, float3 size)

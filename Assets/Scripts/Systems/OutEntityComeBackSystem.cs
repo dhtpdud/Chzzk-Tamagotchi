@@ -15,7 +15,6 @@ partial struct OutEntityComeBackSystem : ISystem, ISystemStartStop
     public void OnStartRunning(ref SystemState state)
     {
         float scaleFactor = GameManager.instance.rootCanvas.transform.localScale.x;
-        //Vector3 bottomLeftScreenPoint   = - new Vector3(Screen.width, Screen.height, 0f) / 2 * scaleFactor;
         topRightScreenPoint = new float2(Screen.width, Screen.height) / 2 * scaleFactor;
     }
 

@@ -57,8 +57,8 @@ public class ChzzkUnity : MonoBehaviour
             {
                 if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift))
                 {
-                    GameManager.instance.channelInfoUI.GetComponent<Image>().color = isOnSettingUI ? new Color(0, 0, 0, 0.3f) : new Color(0, 0, 0, 0.7f);
                     GameManager.instance.settingUI.SetActive(!isOnSettingUI);
+                    GameManager.instance.channelInfoUI.GetComponent<Image>().color = GameManager.instance.settingUI.activeInHierarchy ? new Color(0, 0, 0, 0.7f) : new Color(0, 0, 0, 0.3f);
                     GameManager.instance.peepoSpawnRect.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
                     GameManager.instance.restrictedAreaRoot.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
                 }

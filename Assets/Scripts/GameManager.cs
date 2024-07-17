@@ -150,7 +150,6 @@ public class GameManager : MonoBehaviour
         chatBubbleSize = float.Parse(val);
     }
     public float chatBubbleSize = 1;
-    //말풍선 겹치는 문제
 
     public Dictionary<int, Texture2D> thumbnailsCacheDic = new Dictionary<int, Texture2D>();
 
@@ -199,9 +198,8 @@ public class GameManager : MonoBehaviour
                 parentOBJ.SetActive(false);
                 parentOBJ.SetActive(true);
                 await UniTask.Delay(TimeSpan.FromSeconds(lifeTImeSec));
-                var invisible = new Color(tmp.color.r, tmp.color.g, tmp.color.b, tmp.color.a);
-                invisible.a = 0;
-                await tmp.DoColorAsync(invisible, 1, Utils.YieldCaches.UniTaskYield);
+
+                await tmp.DoColorAsync(new Color(tmp.color.r, tmp.color.g, tmp.color.b, 0), 1, Utils.YieldCaches.UniTaskYield);
                 DestroyImmediate(bubbleObject);
             }, true, bubbleCTD).Forget();
         }

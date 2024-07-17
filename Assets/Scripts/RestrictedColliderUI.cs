@@ -13,10 +13,11 @@ public class RestrictedColliderUI : MonoBehaviour
     }
     public async void UpdateColliderEntity()
     {
-        float size = GameManager.instance.rootCanvas.transform.localScale.x;
-        Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta * size;
         RestrictedColliderUIUpdateSystem ColliderUpdateSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>();
         await Utils.WaitUntil(() => ColliderUpdateSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
+
+        float size = GameManager.instance.rootCanvas.transform.localScale.x;
+        Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta * size;
         if (!destroyCancellationToken.IsCancellationRequested)
             ColliderUpdateSystem.UpdateColliderEntity(ref colliderEntity, new float3(transform.position.x, transform.position.y, 0), new float3(sizeDelta.x, sizeDelta.y, 10));
     }

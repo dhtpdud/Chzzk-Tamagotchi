@@ -7,7 +7,8 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-/*
+
+#if false
 [BurstCompile]
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
 [UpdateAfter(typeof(PhysicsSimulationGroup))]
@@ -63,13 +64,17 @@ public partial struct ConstrainPhysicsTo2D : ISystem
             // * Shift pointer to access WorldFromMotion (RigidTransform) and then the Z variable of its position.
             UnsafeUtility.MemCpyStride(&dat->WorldFromMotion.pos.z, sizeof(MotionData),
                 &zC, 0, sizeof(int), Data.Length);
+
+            UnsafeUtility.MemCpyStride(&dat->WorldFromMotion.rot.value, sizeof(MotionData),
+                &xyC, 0, sizeof(int), Data.Length);
         }
     }
-}*/
+}
+# else
 [BurstCompile]
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
-[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
-//[UpdateBefore(typeof(ExportPhysicsWorld))]
+//[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
+[UpdateBefore(typeof(ExportPhysicsWorld))]
 [RequireMatchingQueriesForUpdate]
 public partial struct Physic2DSystem : ISystem
 {
@@ -81,7 +86,8 @@ public partial struct Physic2DSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().physicMaxVelocity, gravity = SystemAPI.GetSingleton<GameManagerSingletonComponent>().gravity }.ScheduleParallel();
+        GameManagerSingletonComponent gmComponent = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
+        new Physic2DJob { maxVelocity = gmComponent.physicMaxVelocity, gravity = gmComponent.gravity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity
@@ -111,3 +117,4 @@ public partial struct Physic2DSystem : ISystem
         }
     }
 }
+#endif
