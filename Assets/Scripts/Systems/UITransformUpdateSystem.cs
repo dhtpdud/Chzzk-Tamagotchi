@@ -47,9 +47,9 @@ public partial struct UITransformUpdateSystem : ISystem, ISystemStartStop
                     {
                         Vector2 targetPosition = GameManager.instance.mainCam.WorldToScreenPoint(localTransform.Position, Camera.MonoOrStereoscopicEye.Mono);
                         targetPosition.y += 80;
-                        float MinX = -maxVal.x + bubbleTransform.rect.width / 2;
+                        float MinX = bubbleTransform.rect.width / 2;
                         float MaxX = maxVal.x - bubbleTransform.rect.width / 2;
-                        float MinY = -maxVal.y;
+                        float MinY = 0;
                         float MaxY = maxVal.y - bubbleTransform.rect.height;
                         bubbleTransform.localPosition = (Vector2)math.clamp(targetPosition, new float2(MinX, MinY), new float2(MaxX, MaxY));
                         //bubbleTransform.localPosition = targetPosition;
