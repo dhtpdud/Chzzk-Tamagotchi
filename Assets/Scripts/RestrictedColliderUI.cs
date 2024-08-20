@@ -14,7 +14,7 @@ public class RestrictedColliderUI : MonoBehaviour
     public async void UpdateColliderEntity()
     {
         RestrictedColliderUIUpdateSystem ColliderUpdateSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<RestrictedColliderUIUpdateSystem>();
-        await Utils.WaitUntil(() => ColliderUpdateSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
+        await Utils.WaitUntil(() => GameManager.instance?.rootCanvas != null &&ColliderUpdateSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
 
         float size = GameManager.instance.rootCanvas.transform.localScale.x;
         Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta * size;

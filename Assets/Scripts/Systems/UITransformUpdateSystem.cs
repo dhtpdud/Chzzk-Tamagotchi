@@ -17,6 +17,7 @@ public partial struct UITransformUpdateSystem : ISystem, ISystemStartStop
 
     public void OnUpdate(ref SystemState state)
     {
+        if (GameManager.instance?.chatBubbleUICanvasTransform == null) return;
         if (GameManager.instance.chatBubbleUICanvasTransform.gameObject.activeInHierarchy)
             new UpdateChatBubbleHUDJob { topRightScreenPoint = this.topRightScreenPoint }.ScheduleParallel();
         if (GameManager.instance.nameTagUICanvasTransform.gameObject.activeInHierarchy)

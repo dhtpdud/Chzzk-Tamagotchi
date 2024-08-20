@@ -8,10 +8,16 @@ using UnityEngine;
 
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
+[CreateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
 partial struct OutEntityComeBackSystem : ISystem, ISystemStartStop
 {
     float2 topRightScreenPoint;
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<GameManagerSingletonComponent>();
+    }
     public void OnStartRunning(ref SystemState state)
     {
         float scaleFactor = GameManager.instance.rootCanvas.transform.localScale.x;

@@ -47,10 +47,6 @@ public struct PeepoComponent : IComponentData
     public float switchTimeMove;
     public float moveVelocity;
     public float switchTimerMove;
-
-    public bool triggerDonation;
-
-    public uint totalDonation;
     //public bool isMute;
 }
 public struct CheezeComponent : IComponentData
@@ -138,6 +134,7 @@ public struct GameManagerSingletonComponent : IComponentData
     public float2 ScreenToWorldPointMainCam;
 
     public float gravity;
+
     public float2 SpawnMinSpeed;
     public float2 SpawnMaxSpeed;
 

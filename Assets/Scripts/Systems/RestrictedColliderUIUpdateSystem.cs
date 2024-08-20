@@ -21,7 +21,7 @@ public partial class RestrictedColliderUIUpdateSystem : SystemBase
     {
         base.OnStartRunning();
         EntityStoreComponent entityStore;
-        await Utils.WaitUntil(() => SystemAPI.TryGetSingleton<EntityStoreComponent>(out entityStore) && EntityManager != null && EntityManager.Exists(entityStore.boxCollider), Utils.YieldCaches.UniTaskYield, GameManager.instance.destroyCancellationToken);
+        await Utils.WaitUntil(() => GameManager.instance?.rootCanvas != null && SystemAPI.TryGetSingleton<EntityStoreComponent>(out entityStore) && EntityManager != null && EntityManager.Exists(entityStore.boxCollider), Utils.YieldCaches.UniTaskYield, GameManager.instance.destroyCancellationToken);
         isReady = true;
         UpdateResolution();
     }

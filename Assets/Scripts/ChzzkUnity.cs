@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using WebSocketSharp;
+using static UnityEngine.EventSystems.EventTrigger;
 using MessageEventArgs = WebSocketSharp.MessageEventArgs;
 using WebSocket = WebSocketSharp.WebSocket;
 
@@ -43,14 +44,16 @@ public class ChzzkUnity : MonoBehaviour
 
     public Action<Profile, string, string> OnChat = (profile, chatID, str) => { };
     public Action<Profile, string, string, DonationExtras> OnDonation = (profile, chatID, str, extra) => { };
+    public Action<Profile, string, string, SubscriptionExtras> onSubscription = (profile, chatID, str, extra) => { };
 
     // Start is called before the first frame update
     void Start()
     {
-        var peepoEventSystemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PeepoEventSystem>();
+        PeepoEventSystem peepoEventSystemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PeepoEventSystem>();
         UniTask.RunOnThreadPool(async () =>
         {
             await UniTask.SwitchToMainThread();
+            await Utils.WaitUntil(() => GameManager.instance?.settingUI != null, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
             bool isOnSettingUI = GameManager.instance.settingUI.activeInHierarchy;
             bool isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
             while (!destroyCancellationToken.IsCancellationRequested)
@@ -89,52 +92,50 @@ public class ChzzkUnity : MonoBehaviour
         {
             await UniTask.SwitchToMainThread();
             int hash = Animator.StringToHash(profile.nickname);
-            bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
-            float addLifeTime = 0;
-
-            if (isInit)
-            {
-                var nickNameColor = Color.white;
-                //Debug.Log(nickNameColor.ToHexString());
-                GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
-                GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                    initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
-                peepoEventSystemHandle.OnSpawn.Invoke();
-                await Utils.YieldCaches.UniTaskYield;
-            }
-            else
-                addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
-
-            peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
-            GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
+            await OnInit(peepoEventSystemHandle, hash, profile, profile.streamingProperty?.subscription?.accumulativeMonth ?? 0);
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, 5f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
         OnDonation = async (profile, chatID, chatText, extra) =>
         {
             await UniTask.SwitchToMainThread();
-            if (profile == null) return;
-            int hash = Animator.StringToHash(profile.nickname);
-            bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
-            float addLifeTime = 0;
-
-            if (isInit)
+            if (profile == null) //익명 후원
             {
-                var nickNameColor = Color.white;
-                //Debug.Log(nickNameColor.ToHexString());
-                GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, nickNameColor));
-                GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                    initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
-                peepoEventSystemHandle.OnSpawn.Invoke();
-                await Utils.YieldCaches.UniTaskYield;
+                peepoEventSystemHandle.OnDonation.Invoke(-1, extra.payAmount);
+                return;
             }
-            else
-                addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
-
-            peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
+            int hash = Animator.StringToHash(profile.nickname);
+            await OnInit(peepoEventSystemHandle, hash, profile, profile.streamingProperty?.subscription?.accumulativeMonth ?? 0);
             peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
-            GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
+        onSubscription = async (profile, chatID, chatText, extra) =>
+        {
+            await UniTask.SwitchToMainThread();
+            if (profile == null) return;
+            int hash = Animator.StringToHash(profile.nickname);
+            await OnInit(peepoEventSystemHandle, hash, profile, extra.month);
+            peepoEventSystemHandle.onSubscription.Invoke(hash, extra.month);
+            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=red>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+        };
+    }
+    public async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, Profile profile, int subMonth)
+    {
+        bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+        float addLifeTime = 0;
+
+        if (isInit)
+        {
+            GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, subMonth));
+            GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
+                initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
+            peepoEventSystemHandle.OnSpawn.Invoke();
+            await Utils.YieldCaches.UniTaskYield;
+        }
+        else
+            addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
+
+        peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
+        GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
     }
     public void StartLive()
     {
@@ -296,7 +297,6 @@ public class ChzzkUnity : MonoBehaviour
         {
             IDictionary<string, object> data = JsonConvert.DeserializeObject<IDictionary<string, object>>(e.Data);
 
-            Debug.Log(e.Data);
             JArray bdy;
             //Cmd에 따라서
             switch ((long)data["cmd"])
@@ -308,6 +308,7 @@ public class ChzzkUnity : MonoBehaviour
                     timer = 0;
                     break;
                 case 93101://Chat
+                    //Debug.Log($"{(long)data["cmd"]}: \n{e.Data}");
                     bdy = (JArray)data["bdy"];
                     UniTask.RunOnThreadPool(async () =>
                     {
@@ -322,7 +323,8 @@ public class ChzzkUnity : MonoBehaviour
                             string chatTxt = chatInfo["msg"].ToString().Trim();
                             string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"];
                             //Debug.Log(profile.nickname + ": " + chatTxt);
-                            OnChat(profile, chatID, chatTxt);
+                            if (GameManager.instance.SpawnMinDonationAmount <= 0 && GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                                OnChat(profile, chatID, chatTxt);
                             await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                         }
                     }, true, destroyCancellationToken).Forget();
@@ -339,18 +341,49 @@ public class ChzzkUnity : MonoBehaviour
                             Profile profile = JsonUtility.FromJson<Profile>(profileText);
 
                             Debug.Log(chatInfo);
-                            //도네이션과 관련된 데이터는 extras
-                            string extraText = chatInfo["extras"].ToString();
+                            var msgTypeCode = int.Parse(chatInfo["msgTypeCode"].ToString());
+                            //도네이션과 관련된 데이터는 extra
+                            string extraText = null;
+                            if (chatInfo.ContainsKey("extra"))
+                            {
+                                extraText = chatInfo["extra"].ToString();
+                            }
+                            else if (chatInfo.ContainsKey("extras"))
+                            {
+                                extraText = chatInfo["extras"].ToString();
+                            }
                             string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"]; // 도네이션 json요소도 똑같을까?
                             extraText = extraText.Replace("\\", "");
-                            DonationExtras extras = JsonUtility.FromJson<DonationExtras>(extraText);
-                            OnDonation(profile, chatID, chatInfo["msg"].ToString(), extras);
+                            switch (msgTypeCode)
+                            {
+                                case 10: // Donation
+                                    DonationExtras donation = JsonUtility.FromJson<DonationExtras>(extraText);
+                                    if (GameManager.instance.SpawnMinDonationAmount <= donation.payAmount && GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                                        OnDonation(profile, chatID, chatInfo["msg"].ToString(), donation);
+                                    break;
+                                case 11: // Subscription
+                                    SubscriptionExtras subscription = JsonUtility.FromJson<SubscriptionExtras>(extraText);
+                                    if (GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                                        onSubscription(profile, chatID, chatInfo["msg"].ToString(), subscription);
+                                    break;
+                                default:
+                                    /*Debug.LogError($"MessageTypeCode-{msgTypeCode} is not supported");
+                                    Debug.LogError(bdyObject.ToString());*/
+                                    break;
+                            }
                             await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                         }
                     }, true, destroyCancellationToken).Forget();
                     break;
+                case 93006://Temporary Restrict 블라인드 처리된 메세지.
+                    Debug.Log($"{(long)data["cmd"]}: \n{e.Data}");
+                    break;
                 case 94008://Blocked Message(CleanBot) 차단된 메세지.
+                    Debug.Log($"{(long)data["cmd"]}: \n{e.Data}");
+                    break;
                 case 94201://Member Sync 멤버 목록 동기화.
+                    Debug.Log($"{(long)data["cmd"]}: \n{e.Data}");
+                    break;
                 case 10000://HeartBeat Response 하트비트 응답.
                 case 10100://Token ACC
                     break;//Nothing to do
@@ -481,11 +514,24 @@ public class ChzzkUnity : MonoBehaviour
         public string title;
         public string verifiedMark;
         public List<String> activityBadges;
-        public StreamingProperty streamingProperty;
         [Serializable]
         public class StreamingProperty
         {
+            [Serializable]
+            public class Subscription
+            {
+                public int accumulativeMonth;
+                public int tier;
+                [Serializable]
+                public class Badge
+                {
+                    public string imageUrl;
+                }
+                public Badge badge;
+            }
+            public Subscription subscription;
         }
+        public StreamingProperty streamingProperty;
     }
 
 
@@ -512,6 +558,14 @@ public class ChzzkUnity : MonoBehaviour
             public int ranking;
         }
         public WeeklyRank donationUserWeeklyRank;
+    }
+    [Serializable]
+    public class SubscriptionExtras
+    {
+        public int month;
+        public string tierName;
+        public string nickname;
+        public int tierNo;
     }
 
     [Serializable]

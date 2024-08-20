@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OSY;

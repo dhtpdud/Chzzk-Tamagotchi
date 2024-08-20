@@ -38,8 +38,18 @@ public class GameManager : MonoBehaviour
         gravity = float.Parse(val);
         gameManagerSystem.UpdateSetting();
     }
+    public int SpawnMinDonationAmount;
+    public int SpawnMinSubscriptionMonth;
     public float2 SpawnMinSpeed;
     public float2 SpawnMaxSpeed;
+    public void SetSpawnMinDonationAmount(string val)
+    {
+        SpawnMinDonationAmount = int.Parse(val);
+    }
+    public void SetSpawnMinSubscriptionMonth(string val)
+    {
+        SpawnMinSubscriptionMonth = int.Parse(val);
+    }
     public void SetSpawnMinXSpeed(string val)
     {
         SpawnMinSpeed.x = float.Parse(val);
@@ -187,7 +197,7 @@ public class GameManager : MonoBehaviour
             dateTime = DateTime.Now;
             this.text = text;
             bubbleObject = Instantiate(instance.chatBubble, bubbleObjectParent);
-            var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
+            //var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
             UniTask.RunOnThreadPool(async () =>
             {
                 await UniTask.SwitchToMainThread();
@@ -201,25 +211,26 @@ public class GameManager : MonoBehaviour
 
                 await tmp.DoColorAsync(new Color(tmp.color.r, tmp.color.g, tmp.color.b, 0), 1, Utils.YieldCaches.UniTaskYield);
                 DestroyImmediate(bubbleObject);
-            }, true, bubbleCTD).Forget();
+            }, true, GameManager.instance.destroyCancellationToken).Forget();
         }
     }
     public class ViewerInfo
     {
         public string nickName;
+        public int subscribeMonth;
         public GameObject chatBubbleObjects;
         public List<ChatInfo> chatInfos;
         public GameObject nameTagObject;
-        public ViewerInfo(string nickName, Color nicknameColor)
+        public ViewerInfo(string nickName, int subscribeMonth = 0)
         {
             this.nickName = nickName;
             chatInfos = new List<ChatInfo>();
             this.nameTagObject = Instantiate(instance.nameTag, instance.nameTagUICanvasTransform);
             this.chatBubbleObjects = Instantiate(instance.chatBubbles, instance.chatBubbleUICanvasTransform);
             var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
-            tmp.text = nickName;
+            tmp.text = subscribeMonth > 0 ? $"[{subscribeMonth}개월]\n{nickName}" : nickName;
             //Debug.Log(nicknameColor.ToHexString());
-            tmp.color = nicknameColor;
+            tmp.color = subscribeMonth > 0 ? new Color(1, 0.5f, 0) : Color.white;
         }
         public void OnDestroy()
         {
@@ -261,6 +272,7 @@ public class GameManager : MonoBehaviour
         originTargetFramerate = Application.targetFrameRate;
         origincaptureFramerate = Time.captureFramerate;
         originVSyncCount = QualitySettings.vSyncCount;
+        ES3AutoSaveMgr.Current.Load();
     }
     private async void Start()
     {
@@ -270,7 +282,6 @@ public class GameManager : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFPS;
         Profiler.maxUsedMemory = 2000000000;//2GB
-        ES3AutoSaveMgr.Current.Load();
         gameManagerSystem.UpdateSetting();
     }
     private void Update()
