@@ -9,6 +9,7 @@ using Unity.Physics;
 using Unity.Scenes;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -167,6 +168,8 @@ public class GameManager : MonoBehaviour
     public Canvas rootCanvas;
     public Transform nameTagUICanvasTransform;
     public Transform chatBubbleUICanvasTransform;
+    public Transform unknownDonationParentsTransform;
+
     public GameObject settingUI;
     public GameObject channelInfoUI;
     public GameObject restrictedAreaRoot;
@@ -191,12 +194,14 @@ public class GameManager : MonoBehaviour
         public GameObject bubbleObject;
         public DateTime dateTime;
         public string text;
-        public ChatInfo(string id, string text, float lifeTImeSec, Transform bubbleObjectParent)
+        public ChatInfo(string id, string text, float lifeTImeSec, Transform bubbleObjectParent, bool isTop = false)
         {
             this.id = id;
             dateTime = DateTime.Now;
             this.text = text;
             bubbleObject = Instantiate(instance.chatBubble, bubbleObjectParent);
+            if(isTop)
+                bubbleObject.transform.SetAsFirstSibling();
             //var bubbleCTD = bubbleObject.GetCancellationTokenOnDestroy();
             UniTask.RunOnThreadPool(async () =>
             {
@@ -228,7 +233,7 @@ public class GameManager : MonoBehaviour
             this.nameTagObject = Instantiate(instance.nameTag, instance.nameTagUICanvasTransform);
             this.chatBubbleObjects = Instantiate(instance.chatBubbles, instance.chatBubbleUICanvasTransform);
             var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
-            tmp.text = subscribeMonth > 0 ? $"[{subscribeMonth}개월]\n{nickName}" : nickName;
+            tmp.text = subscribeMonth > 0 ? $"{nickName}\n[{subscribeMonth}개월]" : nickName;
             //Debug.Log(nicknameColor.ToHexString());
             tmp.color = subscribeMonth > 0 ? new Color(1, 0.5f, 0) : Color.white;
         }

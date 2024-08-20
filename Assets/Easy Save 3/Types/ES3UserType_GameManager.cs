@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ES3Types
 {
 	[UnityEngine.Scripting.Preserve]
-	[ES3PropertiesAttribute("gravity", "SpawnMinSpeed", "SpawnMaxSpeed", "dragPower", "stabilityPower", "physicMaxVelocity", "peepoConfig", "donationConfig", "chatBubbleSize", "thumbnailsCacheDic")]
+	[ES3PropertiesAttribute("gravity", "SpawnMinDonationAmount", "SpawnMinSubscriptionMonth", "SpawnMinSpeed", "SpawnMaxSpeed", "dragPower", "stabilityPower", "physicMaxVelocity", "peepoConfig", "donationConfig", "chatBubbleSize", "thumbnailsCacheDic")]
 	public class ES3UserType_GameManager : ES3ComponentType
 	{
 		public static ES3Type Instance = null;
@@ -17,6 +17,8 @@ namespace ES3Types
 			var instance = (GameManager)obj;
 			
 			writer.WriteProperty("gravity", instance.gravity, ES3Type_float.Instance);
+			writer.WriteProperty("SpawnMinDonationAmount", instance.SpawnMinDonationAmount, ES3Type_int.Instance);
+			writer.WriteProperty("SpawnMinSubscriptionMonth", instance.SpawnMinSubscriptionMonth, ES3Type_int.Instance);
 			writer.WriteProperty("SpawnMinSpeed", instance.SpawnMinSpeed, ES3Internal.ES3TypeMgr.GetOrCreateES3Type(typeof(Unity.Mathematics.float2)));
 			writer.WriteProperty("SpawnMaxSpeed", instance.SpawnMaxSpeed, ES3Internal.ES3TypeMgr.GetOrCreateES3Type(typeof(Unity.Mathematics.float2)));
 			writer.WriteProperty("dragPower", instance.dragPower, ES3Type_float.Instance);
@@ -38,6 +40,12 @@ namespace ES3Types
 					
 					case "gravity":
 						instance.gravity = reader.Read<System.Single>(ES3Type_float.Instance);
+						break;
+					case "SpawnMinDonationAmount":
+						instance.SpawnMinDonationAmount = reader.Read<System.Int32>(ES3Type_int.Instance);
+						break;
+					case "SpawnMinSubscriptionMonth":
+						instance.SpawnMinSubscriptionMonth = reader.Read<System.Int32>(ES3Type_int.Instance);
 						break;
 					case "SpawnMinSpeed":
 						instance.SpawnMinSpeed = reader.Read<Unity.Mathematics.float2>();

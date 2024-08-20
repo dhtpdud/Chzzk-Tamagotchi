@@ -7,7 +7,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public partial class PeepoEventSystem : SystemBase
 {
@@ -82,8 +81,7 @@ public partial class PeepoEventSystem : SystemBase
             {
                 for (int i = 0; i < cheezeCount; i++)
                 {
-                    //익명 후원 초기값 설정 필요!!
-                    new SpawnDonationObjectUnkownJob { donationConfig = donationConfig.Value, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                    new SpawnDonationObjectUnknownJob {topRightScreenPoint = GameManager.instance.mainCam.ScreenToWorldPoint(new float3(Screen.width, Screen.height,0), Camera.MonoOrStereoscopicEye.Mono).ToFloat2(), donationConfig = donationConfig.Value, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
                     await Utils.YieldCaches.UniTaskYield;
                 }
             }
@@ -180,18 +178,17 @@ public partial class PeepoEventSystem : SystemBase
         }
     }
     [BurstCompile]
-    partial struct SpawnDonationObjectUnkownJob : IJobEntity
+    partial struct SpawnDonationObjectUnknownJob : IJobEntity
     {
         [ReadOnly] public Entity spawnObject;
         [ReadOnly] public DonationConfig donationConfig;
-        [ReadOnly] public float2 spawnPosition;
+        [ReadOnly] public float2 topRightScreenPoint;
         public EntityCommandBuffer.ParallelWriter parallelWriter;
-        public RandomDataComponent randomDataComponent;
-        public void Execute([ChunkIndexInQuery] int chunkIndex)
+        public void Execute([ChunkIndexInQuery] int chunkIndex, ref RandomDataComponent randomDataComponent, SpawnerComponent spawner)
         {
             Entity spawnedCheeze = parallelWriter.Instantiate(chunkIndex, spawnObject);
             randomDataComponent.Random = new Unity.Mathematics.Random(randomDataComponent.Random.NextUInt(uint.MinValue, uint.MaxValue));
-            var initTransform = new LocalTransform { Position = spawnPosition.ToFloat3(), Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(donationConfig.MinSize, donationConfig.MaxSize) };
+            var initTransform = new LocalTransform { Position = new float3(randomDataComponent.Random.NextFloat(-topRightScreenPoint.x, topRightScreenPoint.x), topRightScreenPoint.y, 0), Rotation = quaternion.identity, Scale = randomDataComponent.Random.NextFloat(donationConfig.MinSize, donationConfig.MaxSize) };
             var initVelocity = new PhysicsVelocity { Linear = new float3(randomDataComponent.Random.NextFloat(-5f, 5f), 0, 0) };
             parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initTransform);
             parallelWriter.SetComponent(chunkIndex, spawnedCheeze, initVelocity);

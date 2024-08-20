@@ -64,6 +64,8 @@ public class ChzzkUnity : MonoBehaviour
                     GameManager.instance.channelInfoUI.GetComponent<Image>().color = GameManager.instance.settingUI.activeInHierarchy ? new Color(0, 0, 0, 0.7f) : new Color(0, 0, 0, 0.3f);
                     GameManager.instance.peepoSpawnRect.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
                     GameManager.instance.restrictedAreaRoot.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
+                    GameManager.instance.unknownDonationParentsTransform.parent.GetComponent<Image>().enabled = GameManager.instance.settingUI.activeInHierarchy;
+                    GameManager.instance.unknownDonationParentsTransform.parent.GetComponentInChildren<TMP_Text>().enabled = GameManager.instance.settingUI.activeInHierarchy;
                 }
                 else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
                 {
@@ -101,11 +103,14 @@ public class ChzzkUnity : MonoBehaviour
             if (profile == null) //익명 후원
             {
                 peepoEventSystemHandle.OnDonation.Invoke(-1, extra.payAmount);
+                new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
                 return;
             }
             int hash = Animator.StringToHash(profile.nickname);
             await OnInit(peepoEventSystemHandle, hash, profile, profile.streamingProperty?.subscription?.accumulativeMonth ?? 0);
             peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
+
+            //new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
             GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
         };
         onSubscription = async (profile, chatID, chatText, extra) =>
@@ -323,7 +328,7 @@ public class ChzzkUnity : MonoBehaviour
                             string chatTxt = chatInfo["msg"].ToString().Trim();
                             string chatID = (string)chatInfo["uid"] + (string)chatInfo["msgTime"];
                             //Debug.Log(profile.nickname + ": " + chatTxt);
-                            if (GameManager.instance.SpawnMinDonationAmount <= 0 && GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                            if (GameManager.instance.SpawnMinDonationAmount <= 0 && (profile?.streamingProperty?.subscription == null || GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth))
                                 OnChat(profile, chatID, chatTxt);
                             await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
                         }
@@ -358,12 +363,12 @@ public class ChzzkUnity : MonoBehaviour
                             {
                                 case 10: // Donation
                                     DonationExtras donation = JsonUtility.FromJson<DonationExtras>(extraText);
-                                    if (GameManager.instance.SpawnMinDonationAmount <= donation.payAmount && GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                                    if (GameManager.instance.SpawnMinDonationAmount <= donation.payAmount && (profile?.streamingProperty?.subscription == null || GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth))
                                         OnDonation(profile, chatID, chatInfo["msg"].ToString(), donation);
                                     break;
                                 case 11: // Subscription
                                     SubscriptionExtras subscription = JsonUtility.FromJson<SubscriptionExtras>(extraText);
-                                    if (GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
+                                    if (profile?.streamingProperty?.subscription == null || GameManager.instance.SpawnMinSubscriptionMonth <= profile.streamingProperty.subscription.accumulativeMonth)
                                         onSubscription(profile, chatID, chatInfo["msg"].ToString(), subscription);
                                     break;
                                 default:
