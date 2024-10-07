@@ -1,25 +1,21 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OSY;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
-using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 using WebSocketSharp;
-using static UnityEngine.EventSystems.EventTrigger;
 using MessageEventArgs = WebSocketSharp.MessageEventArgs;
 using WebSocket = WebSocketSharp.WebSocket;
 
 public class ChzzkUnity : MonoBehaviour
 {
-    public CancellationTokenSource LiveCTS;
-    LiveStatus liveStatus;
+    public static ChzzkUnity instance;
+    public TMP_InputField inputChannelID;
+    public LiveStatus liveStatus;
     //WSS(WS 말고 WSS) 쓰려면 필요함.
     private enum SslProtocolsHack
     {
@@ -30,10 +26,9 @@ public class ChzzkUnity : MonoBehaviour
 
     string cid;
     string token;
-    //public string channelID;
-    public TMP_InputField inputChannelID;
 
-    WebSocket socket = null;
+
+    public WebSocket socket = null;
     string wsURL = "wss://kr-ss3.chat.naver.com/chat";
 
     float timer = 0f;
@@ -42,132 +37,16 @@ public class ChzzkUnity : MonoBehaviour
     string heartbeatRequest = "{\"ver\":\"2\",\"cmd\":0}";
     string heartbeatResponse = "{\"ver\":\"2\",\"cmd\":10000}";
 
+    public Action<UnityWebRequestException> OnConnectError = (ex) => { };
     public Action<Profile, string, string> OnChat = (profile, chatID, str) => { };
     public Action<Profile, string, string, DonationExtras> OnDonation = (profile, chatID, str, extra) => { };
     public Action<Profile, string, string, SubscriptionExtras> onSubscription = (profile, chatID, str, extra) => { };
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        PeepoEventSystem peepoEventSystemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PeepoEventSystem>();
-        UniTask.RunOnThreadPool(async () =>
-        {
-            await UniTask.SwitchToMainThread();
-            await Utils.WaitUntil(() => GameManager.instance?.settingUI != null, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
-            bool isOnSettingUI = GameManager.instance.settingUI.activeInHierarchy;
-            bool isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
-            while (!destroyCancellationToken.IsCancellationRequested)
-            {
-                if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift))
-                {
-                    GameManager.instance.settingUI.SetActive(!isOnSettingUI);
-                    GameManager.instance.channelInfoUI.GetComponent<Image>().color = GameManager.instance.settingUI.activeInHierarchy ? new Color(0, 0, 0, 0.7f) : new Color(0, 0, 0, 0.3f);
-                    GameManager.instance.peepoSpawnRect.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
-                    GameManager.instance.restrictedAreaRoot.gameObject.SetActive(GameManager.instance.settingUI.activeInHierarchy);
-                    GameManager.instance.unknownDonationParentsTransform.parent.GetComponent<Image>().enabled = GameManager.instance.settingUI.activeInHierarchy;
-                    GameManager.instance.unknownDonationParentsTransform.parent.GetComponentInChildren<TMP_Text>().enabled = GameManager.instance.settingUI.activeInHierarchy;
-                }
-                else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
-                {
-                    isOnSettingUI = GameManager.instance.settingUI.activeInHierarchy;
-                }
-
-                if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.RightShift))
-                {
-                    GameManager.instance.channelInfoUI.SetActive(!isOnChannelInfoUI);
-                }
-                else if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightShift))
-                {
-                    isOnChannelInfoUI = GameManager.instance.channelInfoUI.activeInHierarchy;
-                }
-
-                if(Input.GetKeyDown(KeyCode.RightControl))
-                {
-                    peepoEventSystemHandle.OnCalm.Invoke();
-                }
-                await Utils.YieldCaches.UniTaskYield;
-            }
-        }, true, destroyCancellationToken).Forget();
-
-
-        OnChat = async (profile, chatID, chatText) =>
-        {
-            await UniTask.SwitchToMainThread();
-            int hash = Animator.StringToHash(profile.nickname);
-            await OnInit(peepoEventSystemHandle, hash, profile, profile.streamingProperty?.subscription?.accumulativeMonth ?? 0);
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, chatText, 5f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
-        };
-        OnDonation = async (profile, chatID, chatText, extra) =>
-        {
-            await UniTask.SwitchToMainThread();
-            if (profile == null) //익명 후원
-            {
-                peepoEventSystemHandle.OnDonation.Invoke(-1, extra.payAmount);
-                new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
-                return;
-            }
-            int hash = Animator.StringToHash(profile.nickname);
-            await OnInit(peepoEventSystemHandle, hash, profile, profile.streamingProperty?.subscription?.accumulativeMonth ?? 0);
-            peepoEventSystemHandle.OnDonation.Invoke(hash, extra.payAmount);
-
-            //new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
-        };
-        onSubscription = async (profile, chatID, chatText, extra) =>
-        {
-            await UniTask.SwitchToMainThread();
-            if (profile == null) return;
-            int hash = Animator.StringToHash(profile.nickname);
-            await OnInit(peepoEventSystemHandle, hash, profile, extra.month);
-            peepoEventSystemHandle.onSubscription.Invoke(hash, extra.month);
-            GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatID, "<b><color=red>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
-        };
+        instance = this;
     }
-    public async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, Profile profile, int subMonth)
-    {
-        bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
-        float addLifeTime = 0;
 
-        if (isInit)
-        {
-            GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(profile.nickname, subMonth));
-            GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
-                initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
-            peepoEventSystemHandle.OnSpawn.Invoke();
-            await Utils.YieldCaches.UniTaskYield;
-        }
-        else
-            addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
-
-        peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
-        GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
-    }
-    public void StartLive()
-    {
-        UniTask.RunOnThreadPool(async ()=> 
-        {
-            await Connect();
-            UniTask.RunOnThreadPool(async () =>
-            {
-                await UniTask.SwitchToMainThread();
-                while (!LiveCTS.IsCancellationRequested)
-                {
-                    liveStatus = await GetLiveStatus(inputChannelID.text);
-                    GameManager.instance.channelViewerCount.text = $"시청자 수: {liveStatus.content.concurrentUserCount}";
-                    GameManager.instance.peepoCountText.text = $"채팅 참여자 수: {GameManager.instance.viewerInfos.Count}";
-                    await UniTask.Delay(TimeSpan.FromSeconds(2), false, PlayerLoopTiming.FixedUpdate, LiveCTS.Token, true);
-                }
-            }, true, LiveCTS.Token).Forget();
-        }, true, destroyCancellationToken).Forget();
-    }
-    public void StopLive()
-    {
-        if (socket != null && socket.IsAlive)
-        {
-            socket.Close();
-            socket = null;
-        }
-    }
     public void removeAllOnMessageListener()
     {
         OnChat = (profile, chatID, str) => { };
@@ -220,8 +99,7 @@ public class ChzzkUnity : MonoBehaviour
         }
         catch (UnityWebRequestException ex)
         {
-            GameManager.instance.ErrorPOPUP.SetActive(true);
-            GameManager.instance.ErrorPOPUPText.text = $"따흐흑ㅠㅠ 에러!!\n\n{ex.Message}";
+            OnConnectError(ex);
             return null;
         }
         LiveStatus liveStatus = null;
@@ -260,14 +138,6 @@ public class ChzzkUnity : MonoBehaviour
 
     public async UniTask Connect()
     {
-        if (socket != null && socket.IsAlive)
-        {
-            LiveCTS?.Cancel();
-            socket.Close();
-            socket = null;
-        }
-        LiveCTS = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
-
         liveStatus = await GetLiveStatus(inputChannelID.text);
         cid = liveStatus.content.chatChannelId;
         AccessTokenResult accessTokenResult = await GetAccessToken(cid);
@@ -438,7 +308,6 @@ public class ChzzkUnity : MonoBehaviour
     {
         removeAllOnDonationListener();
         removeAllOnMessageListener();
-        LiveCTS?.Cancel();
         if (socket != null && socket.IsAlive)
         {
             socket.Close();
