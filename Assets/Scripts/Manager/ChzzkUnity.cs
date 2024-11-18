@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -42,7 +41,7 @@ public class ChzzkUnity : MonoBehaviour
     public Action<Profile, string, string, DonationExtras> OnDonation = (profile, chatID, str, extra) => { };
     public Action<Profile, string, string, SubscriptionExtras> onSubscription = (profile, chatID, str, extra) => { };
 
-    private void Awake()
+    public void Awake()
     {
         instance = this;
     }
@@ -60,7 +59,7 @@ public class ChzzkUnity : MonoBehaviour
     //20초에 한번 HeartBeat 전송해야 함.
     //서버에서 먼저 요청하면 안 해도 됨.
     //TimeScale에 영향 안 받기 위해서 Fixed
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         if (running)
         {

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -80,7 +81,7 @@ namespace OSY
     {
         public static async UniTask CachingTextureTask(string url)
         {
-            if (url == null || url == GameManager.instance.EmptyString || url == "\r\n")
+            if (url == null || url == string.Empty || url == "\r\n")
                 return;
             int urlHash = Animator.StringToHash(url);
             if (GameManager.instance.thumbnailsCacheDic.ContainsKey(urlHash))
@@ -254,7 +255,7 @@ namespace OSY
 
         public static async UniTask<AudioClip> GetAudioFile(string url, AudioType audioType)
         {
-            if (url.Equals(null) || url.Equals(GameManager.instance.EmptyString)) return null;
+            if (url.Equals(null) || url.Equals(string.Empty)) return null;
             if (!url.Substring(0, 4).Equals("http"))
                 url = $"file://{url}";
             using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
@@ -463,6 +464,59 @@ namespace OSY
             if (digits % 2 == 0)
                 return result;
             return result + random.Next(16).ToString("X");
+        }
+
+        public static async UniTask<JObject> GetJObject(string url, CancellationToken token, bool isKeepTry = true)
+        {
+            if (!url.Substring(0, 4).Equals("http"))
+                url = $"file://{url}";
+
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            for(float timer = 0; timer < 10; timer ++)
+            {
+                try
+                {
+                    await request.SendWebRequest();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    if (!isKeepTry)
+                        return null;
+                    await UniTask.Delay(TimeSpan.FromSeconds(1f), false, PlayerLoopTiming.Update, token);
+                    request = UnityWebRequest.Get(url);
+                }
+            }
+            var result = request.downloadHandler.text;
+            //Debug.Log(result);
+            return new JObject(JObject.Parse(result));
+        }
+        public static async UniTask<string> GetJsonString(string url, CancellationToken token, bool isKeepTry = true)
+        {
+            if (!url.Substring(0, 4).Equals("http"))
+                url = $"file://{url}";
+
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            for (float timer = 0; timer < 10; timer ++)
+            {
+                try
+                {
+                    await request.SendWebRequest();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    if (!isKeepTry)
+                        return null;
+                    await UniTask.Delay(TimeSpan.FromSeconds(1f), false, PlayerLoopTiming.Update, token);
+                    request = UnityWebRequest.Get(url);
+                }
+            }
+            var result = request.downloadHandler.text;
+            //Debug.Log(result);
+            return result;
         }
     }
 }

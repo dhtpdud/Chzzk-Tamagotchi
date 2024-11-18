@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using OSY;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using TMPro;
 using Unity.Entities;
@@ -10,9 +11,9 @@ using UnityEngine.UI;
 
 public class StreamingEventManager : MonoBehaviour
 {
-    public CancellationTokenSource LiveCTS;
+    public CancellationTokenSource ChzzkCTS;
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         PeepoEventSystem peepoEventSystemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PeepoEventSystem>();
         UniTask.RunOnThreadPool(async () =>
@@ -51,9 +52,18 @@ public class StreamingEventManager : MonoBehaviour
                     peepoEventSystemHandle.OnCalm.Invoke();
                 }
                 await Utils.YieldCaches.UniTaskYield;
+                try
+                {
+                    if (destroyCancellationToken.IsCancellationRequested) return;
+                }
+                catch (MissingReferenceException ex)
+                {
+                    return;
+                }
             }
         }, true, destroyCancellationToken).Forget();
 
+        #region ※치지직 이벤트
         if (ChzzkUnity.instance != null)
         {
             ChzzkUnity.instance.OnConnectError = (ex) =>
@@ -114,8 +124,78 @@ public class StreamingEventManager : MonoBehaviour
                 GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
             }
         }
+        #endregion
+
+        #region ※유튜브 이벤트
+        if (YoutubeUnity.instance != null)
+        {
+            YoutubeUnity.instance.OnChatEvent = async (chatInfo) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash($"{chatInfo.authorDetails.channelId}{GameManager.instance.nameSpliter}{chatInfo.authorDetails.displayName}");
+                await OnInit(peepoEventSystemHandle, hash, chatInfo.authorDetails);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatInfo.id, chatInfo.snippet.displayMessage, 5f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            YoutubeUnity.instance.OnSuperChatEvent = async (chatInfo) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash($"{chatInfo.authorDetails.channelId}{GameManager.instance.nameSpliter}{chatInfo.authorDetails.displayName}");
+                await OnInit(peepoEventSystemHandle, hash, chatInfo.authorDetails);
+                peepoEventSystemHandle.OnDonation.Invoke(hash, int.Parse(Regex.Replace(chatInfo.snippet.superChatDetails.amountDisplayString, @"\D", "")));
+
+                //new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatInfo.id, "<b><color=orange>" + chatInfo.snippet.displayMessage + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            YoutubeUnity.instance.OnSuperStickerEvent = async (chatInfo) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash($"{chatInfo.authorDetails.channelId}{GameManager.instance.nameSpliter}{chatInfo.authorDetails.displayName}");
+                await OnInit(peepoEventSystemHandle, hash, chatInfo.authorDetails);
+                peepoEventSystemHandle.OnDonation.Invoke(hash, int.Parse(Regex.Replace(chatInfo.snippet.superStickerDetails.amountDisplayString, @"\D", "")));
+
+                //new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatInfo.id, "<b><color=orange>" + chatInfo.snippet.displayMessage + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            YoutubeUnity.instance.OnNewSponsorEvent = async (chatInfo) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash($"{chatInfo.authorDetails.channelId}{GameManager.instance.nameSpliter}{chatInfo.authorDetails.displayName}");
+                await OnInit(peepoEventSystemHandle, hash, chatInfo.authorDetails);
+                peepoEventSystemHandle.onSubscription.Invoke(hash, chatInfo.snippet.memberMilestoneChatDetails.memeberMonth);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatInfo.id, "<b><color=red>" + chatInfo.snippet.displayMessage + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            YoutubeUnity.instance.OnMemberMilestoneChatEvent = async (chatInfo) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash($"{chatInfo.authorDetails.channelId}{GameManager.instance.nameSpliter}{chatInfo.authorDetails.displayName}");
+                await OnInit(peepoEventSystemHandle, hash, chatInfo.authorDetails, chatInfo.snippet.memberMilestoneChatDetails.memeberMonth);
+                peepoEventSystemHandle.onSubscription.Invoke(hash, chatInfo.snippet.memberMilestoneChatDetails.memeberMonth);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(chatInfo.id, "<b><color=red>" + chatInfo.snippet.displayMessage + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+
+            async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, YoutubeUnity.LiveChatInfo.Chat.AuthorDetails authorDetails, int subMonth = 0)
+            {
+                bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+                float addLifeTime = 0;
+
+                if (isInit)
+                {
+                    GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo($"{authorDetails.channelId}{GameManager.instance.nameSpliter}{authorDetails.displayName}", subMonth));
+                    GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
+                        initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
+                    peepoEventSystemHandle.OnSpawn.Invoke();
+                    await Utils.YieldCaches.UniTaskYield;
+                }
+                else
+                    addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
+
+                peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
+                GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
+            }
+        }
+        #endregion
     }
-    public void StartLive()
+    public void StartChzzk()
     {
         UniTask.RunOnThreadPool(async () =>
         {
@@ -123,27 +203,27 @@ public class StreamingEventManager : MonoBehaviour
             {
                 if (ChzzkUnity.instance.socket != null && ChzzkUnity.instance.socket.IsAlive)
                 {
-                    LiveCTS?.Cancel();
+                    ChzzkCTS?.Cancel();
                     ChzzkUnity.instance.socket.Close();
                     ChzzkUnity.instance.socket = null;
                 }
-                LiveCTS = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+                ChzzkCTS = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
                 await ChzzkUnity.instance.Connect();
                 UniTask.RunOnThreadPool(async () =>
                 {
                     await UniTask.SwitchToMainThread();
-                    while (!LiveCTS.IsCancellationRequested)
+                    while (!ChzzkCTS.IsCancellationRequested)
                     {
                         ChzzkUnity.instance.liveStatus = await ChzzkUnity.instance.GetLiveStatus(ChzzkUnity.instance.inputChannelID.text);
                         GameManager.instance.channelViewerCount.text = $"시청자 수: {ChzzkUnity.instance.liveStatus.content.concurrentUserCount}";
                         GameManager.instance.peepoCountText.text = $"채팅 참여자 수: {GameManager.instance.viewerInfos.Count}";
-                        await UniTask.Delay(TimeSpan.FromSeconds(2), false, PlayerLoopTiming.FixedUpdate, LiveCTS.Token, true);
+                        await UniTask.Delay(TimeSpan.FromSeconds(2), false, PlayerLoopTiming.FixedUpdate, ChzzkCTS.Token, true);
                     }
-                }, true, LiveCTS.Token).Forget();
+                }, true, ChzzkCTS.Token).Forget();
             }
         }, true, destroyCancellationToken).Forget();
     }
-    public void StopLive()
+    public void StopChzzk()
     {
         if (ChzzkUnity.instance != null)
         {
@@ -153,9 +233,33 @@ public class StreamingEventManager : MonoBehaviour
                 ChzzkUnity.instance.socket = null;
             }
         }
+        ChzzkCTS?.Cancel();
+        ChzzkCTS?.Dispose();
     }
-    private void OnDestroy()
+
+    public CancellationTokenSource youtubeCTS;
+    public void StartYoutube()
     {
-        LiveCTS?.Cancel();
+        youtubeCTS?.Cancel();
+        youtubeCTS?.Dispose();
+        if (YoutubeUnity.instance != null)
+        {
+            youtubeCTS = CancellationTokenSource.CreateLinkedTokenSource(GameManager.instance.destroyCancellationToken);
+            UniTask.RunOnThreadPool(() => YoutubeUnity.instance.Connect(youtubeCTS.Token), true).Forget();
+        }
+    }
+    public void StopYoutube()
+    {
+        youtubeCTS?.Cancel();
+        youtubeCTS?.Dispose();
+    }
+
+    public async void OnDestroy()
+    {
+        ChzzkCTS?.Cancel();
+        youtubeCTS?.Cancel();
+        await UniTask.Yield();
+        ChzzkCTS?.Dispose();
+        youtubeCTS?.Dispose();
     }
 }

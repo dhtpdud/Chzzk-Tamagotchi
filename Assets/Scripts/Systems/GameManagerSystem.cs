@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-[UpdateBefore(typeof(InitializationSystemGroup))]
+[UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))]
 public sealed partial class GameManagerInfoSystem : SystemBase
 {
     public bool isReady;

@@ -18,8 +18,7 @@ public class GameManager : MonoBehaviour
     public GameManagerInfoSystem gameManagerSystem;
     public Camera mainCam;
     public int targetFPS = 0;
-    [HideInInspector]
-    public string EmptyString = "";
+    public string nameSpliter= "!:";
 
     //캐싱용 변수
     public float deltaTime { get; private set; }
@@ -233,6 +232,10 @@ public class GameManager : MonoBehaviour
             this.nameTagObject = Instantiate(instance.nameTag, instance.nameTagUICanvasTransform);
             this.chatBubbleObjects = Instantiate(instance.chatBubbles, instance.chatBubbleUICanvasTransform);
             var tmp = nameTagObject.GetComponentInChildren<TMP_Text>();
+
+            if (nickName.Contains(GameManager.instance.nameSpliter))
+                nickName = nickName.Split(GameManager.instance.nameSpliter)[1];
+
             tmp.text = subscribeMonth > 0 ? $"{nickName}\n[{subscribeMonth}개월]" : nickName;
             //Debug.Log(nicknameColor.ToHexString());
             tmp.color = subscribeMonth > 0 ? new Color(1, 0.5f, 0) : Color.white;
@@ -279,7 +282,7 @@ public class GameManager : MonoBehaviour
         originVSyncCount = QualitySettings.vSyncCount;
         ES3AutoSaveMgr.Current.Load();
     }
-    private async void Start()
+    public async void Start()
     {
         gameManagerSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<GameManagerInfoSystem>();
         await Utils.WaitUntil(() => gameManagerSystem.isReady, Utils.YieldCaches.UniTaskYield, destroyCancellationToken);
@@ -289,7 +292,7 @@ public class GameManager : MonoBehaviour
         Profiler.maxUsedMemory = 2000000000;//2GB
         gameManagerSystem.UpdateSetting();
     }
-    private void Update()
+    public void Update()
     {
         deltaTime = Time.deltaTime;
         targetFrameRate = Application.targetFrameRate;
