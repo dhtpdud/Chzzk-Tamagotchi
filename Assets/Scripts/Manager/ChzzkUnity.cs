@@ -44,6 +44,7 @@ public class ChzzkUnity : MonoBehaviour
     public void Awake()
     {
         instance = this;
+        var init = destroyCancellationToken.IsCancellationRequested;
     }
 
     public void removeAllOnMessageListener()

@@ -30,12 +30,30 @@ public partial class PeepoEventSystem : SystemBase
 
         peepoConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().peepoConfig;
         donationConfig = SystemAPI.GetSingleton<GameManagerSingletonComponent>().donationConfig;
-        string Bonobono = "보노 보노";
+        string StringBonobono = "보노 보노";
+        string StringTropicanan = "트로피카난";
+        string StringSeokev = "서깨비";
         OnSpawn = () =>
         {
             EntityStoreComponent store = SystemAPI.GetSingleton<EntityStoreComponent>();
             GameManager.SpawnOrder spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
-            Entity spawnedPeepo = EntityManager.Instantiate(spawnOrder.hash.Equals(Animator.StringToHash(Bonobono)) ? store.bonobono : store.peepo);
+            Entity spawnedPeepo = default;
+            if(spawnOrder.hash == Animator.StringToHash(StringBonobono))
+            {
+                spawnedPeepo = EntityManager.Instantiate(store.bonobono);
+            }
+            else if (spawnOrder.hash == Animator.StringToHash(StringTropicanan))
+            {
+                spawnedPeepo = EntityManager.Instantiate(store.tropicanan);
+            }
+            else if (spawnOrder.hash == Animator.StringToHash(StringSeokev))
+            {
+                spawnedPeepo = EntityManager.Instantiate(store.seokev);
+            }
+            else
+            {
+                spawnedPeepo = EntityManager.Instantiate(store.peepo);
+            }
             var peepoComponent = EntityManager.GetComponentData<PeepoComponent>(spawnedPeepo);
             var hash = EntityManager.GetComponentData<HashIDComponent>(spawnedPeepo);
             var velocity = EntityManager.GetComponentData<PhysicsVelocity>(spawnedPeepo);
