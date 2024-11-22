@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using Unity.Entities.UniversalDelegates;
 using UnityEngine;
+using static UnityEditor.Progress;
 using Debug = UnityEngine.Debug;
 
 
@@ -142,7 +143,10 @@ public class AHSeleniumUnity : MonoBehaviour
             if (isHeadless)
             {
                 _options.AddArgument("--headless");
+                _options.AddArgument("--disable-gpu");
                 _options.AddArgument("--window-size=1920,1080");
+                _options.AddArgument("--disable-images");
+                _options.AddArgument("--blink-settings=imagesEnabled=false");
             }
             //_options.AddArgument("--blink-settings=imagesEnabled=false");
             _driver = new ChromeDriver(_driverService, _options);
@@ -211,18 +215,19 @@ public class AHSeleniumUnity : MonoBehaviour
             string[] chatContent;
             string name;
 
-            string preChatClassName = string.Empty;
+            //string preChatClassName = string.Empty;
+            int startIndex = 0;
             while (!destroyCancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var chatElementList = chatListElement.FindElements(By.TagName(stringLI)).ToList();
+                    var chatElementList = chatListElement.FindElements(By.TagName(stringLI));
                     int chatElementListCount = chatElementList.Count;
 
                     if (chatElementListCount <= 0)
                         continue;
 
-                    int startIndex = 0;
+                    /*int startIndex = 0;
                     if (preChatClassName != string.Empty)
                     {
                         for (startIndex = 0; startIndex < chatElementListCount; startIndex++)
@@ -234,14 +239,15 @@ public class AHSeleniumUnity : MonoBehaviour
                                 break;
                             }
                         }
-                    }
+                    }*/
                     for (int i = startIndex; i < chatElementListCount; i++)
                     {
-                        if (i == (chatElementListCount - 1))
+                        startIndex++;
+                        /*if (i == (chatElementListCount - 1))
                         {
                             preChatClassName = chatElementList[i].GetAttribute("className");
-                            Debug.Log($"{i} /{preChatClassName}");
-                        }
+                            //Debug.Log($"{i} /{preChatClassName}");
+                        }*/
 
                         userID = chatElementList[i].GetAttribute(stringDataId);
 
@@ -329,6 +335,13 @@ public class AHSeleniumUnity : MonoBehaviour
                 }
                 catch(WebDriverTimeoutException)
                 {
+                    continue;
+                }
+                catch(StaleElementReferenceException)
+                {
+
+                    chatListElement = _driver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
+                    startIndex = 0;
                     continue;
                 }
                 finally
