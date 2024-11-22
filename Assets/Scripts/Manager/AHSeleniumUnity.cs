@@ -1,20 +1,12 @@
 using Cysharp.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 using OSY;
-using SeleniumExtras.WaitHelpers;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using Unity.Entities.UniversalDelegates;
 using UnityEngine;
-using static UnityEditor.Progress;
-using Debug = UnityEngine.Debug;
 
 
 // 아프리카 도우미 사용시 구독자 기간은 어떻게 조회 할것인지?
@@ -331,11 +323,11 @@ public class AHSeleniumUnity : MonoBehaviour
                         await Utils.YieldCaches.UniTaskYield;
                     }
                 }
-                catch(WebDriverTimeoutException)
+                catch (WebDriverTimeoutException)
                 {
                     continue;
                 }
-                catch(StaleElementReferenceException)
+                catch (StaleElementReferenceException)
                 {
                     chatListElement = _driver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
                     startIndex = 0;
