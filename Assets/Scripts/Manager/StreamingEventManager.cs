@@ -194,6 +194,59 @@ public class StreamingEventManager : MonoBehaviour
             }
         }
         #endregion
+
+        #region 아프리카 도우미 이벤트
+
+        if (AHSeleniumUnity.instance != null)
+        {
+            AHSeleniumUnity.instance.OnChat = async (authorName, chatText) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash(authorName);
+                await OnInit(peepoEventSystemHandle, hash, authorName, 0);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(string.Empty, chatText, 5f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            AHSeleniumUnity.instance.OnDonation = async (authorName, chatText, amount) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash(authorName);
+                await OnInit(peepoEventSystemHandle, hash, authorName, 0);
+                peepoEventSystemHandle.OnDonation.Invoke(hash, amount);
+
+                //new GameManager.ChatInfo(chatID, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.unknownDonationParentsTransform, true);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(string.Empty, "<b><color=orange>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+            AHSeleniumUnity.instance.onSubscription = async (authorName, chatText, month) =>
+            {
+                await UniTask.SwitchToMainThread();
+                int hash = Animator.StringToHash(authorName);
+                await OnInit(peepoEventSystemHandle, hash, authorName, month);
+                peepoEventSystemHandle.onSubscription.Invoke(hash, month);
+                GameManager.instance.viewerInfos[hash].chatInfos.Add(new GameManager.ChatInfo(string.Empty, "<b><color=red>" + chatText + "</color></b>", 10f, GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform));
+            };
+
+            async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, string authorName, int subMonth = 0)
+            {
+                Utils.hashMemory.TryAdd(hash, authorName);
+                bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
+                float addLifeTime = 0;
+
+                if (isInit)
+                {
+                    GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(authorName, subMonth));
+                    GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
+                        initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
+                    peepoEventSystemHandle.OnSpawn.Invoke();
+                    await Utils.YieldCaches.UniTaskYield;
+                }
+                else
+                    addLifeTime = GameManager.instance.peepoConfig.addLifeTime;
+
+                peepoEventSystemHandle.OnChat.Invoke(hash, addLifeTime);
+                GameManager.instance.viewerInfos[hash].chatBubbleObjects.transform.localScale = Vector3.one * GameManager.instance.chatBubbleSize;
+            }
+        }
+        #endregion
     }
     public void StartChzzk()
     {

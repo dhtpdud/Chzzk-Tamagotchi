@@ -79,6 +79,8 @@ namespace OSY
     }*/
     public static class Utils
     {
+        public static Dictionary<int, string> hashMemory = new Dictionary<int, string>();
+        public static string stringSpace = " ";
         public static async UniTask CachingTextureTask(string url)
         {
             if (url == null || url == string.Empty || url == "\r\n")

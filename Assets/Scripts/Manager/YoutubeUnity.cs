@@ -35,6 +35,7 @@ public class YoutubeUnity : MonoBehaviour
     }
     private async UniTask UpdateChatListTask(CancellationToken token)
     {
+        float updateTime = 5f;
         string pageToken = null;
         const string StringTextMessageEvent = "textMessageEvent";
         const string StringSuperChatEvent = "superChatEvent";
@@ -74,11 +75,11 @@ public class YoutubeUnity : MonoBehaviour
                                 OnMemberMilestoneChatEvent(chat);
                                 break;
                         }
-                        await UniTask.Delay(TimeSpan.FromSeconds(3.5f / liveChatInfo.chats.Count), true, PlayerLoopTiming.FixedUpdate, token, true);
+                        await UniTask.Delay(TimeSpan.FromSeconds(updateTime / liveChatInfo.chats.Count), true, PlayerLoopTiming.FixedUpdate, token, true);
                     }
                 }
                 else
-                    await UniTask.Delay(TimeSpan.FromSeconds(3.5f), true, PlayerLoopTiming.FixedUpdate, token, true);
+                    await UniTask.Delay(TimeSpan.FromSeconds(updateTime), true, PlayerLoopTiming.FixedUpdate, token, true);
             }
             finally
             {

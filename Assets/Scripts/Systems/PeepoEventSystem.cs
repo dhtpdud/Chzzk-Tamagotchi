@@ -38,15 +38,15 @@ public partial class PeepoEventSystem : SystemBase
             EntityStoreComponent store = SystemAPI.GetSingleton<EntityStoreComponent>();
             GameManager.SpawnOrder spawnOrder = GameManager.instance.spawnOrderQueue.Dequeue();
             Entity spawnedPeepo = default;
-            if(spawnOrder.hash == Animator.StringToHash(StringBonobono))
+            if (Utils.hashMemory[spawnOrder.hash].Contains(StringBonobono))
             {
                 spawnedPeepo = EntityManager.Instantiate(store.bonobono);
             }
-            else if (spawnOrder.hash == Animator.StringToHash(StringTropicanan))
+            else if (Utils.hashMemory[spawnOrder.hash].Contains(StringTropicanan))
             {
                 spawnedPeepo = EntityManager.Instantiate(store.tropicanan);
             }
-            else if (spawnOrder.hash == Animator.StringToHash(StringSeokev))
+            else if (Utils.hashMemory[spawnOrder.hash].Contains(StringSeokev))
             {
                 spawnedPeepo = EntityManager.Instantiate(store.seokev);
             }
@@ -112,11 +112,16 @@ public partial class PeepoEventSystem : SystemBase
                 }
             }
         };
-        onSubscription = (hashID, subMonth) =>
+        onSubscription = async (hashID, subMonth) =>
         {
-            for (int i = 0; i < subMonth * 10; i++)
+            for (int i = 0; i < subMonth; i++)
             {
                 new SpawnDonationObjectJob { donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                new SpawnDonationObjectJob { donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                new SpawnDonationObjectJob { donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                new SpawnDonationObjectJob { donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                new SpawnDonationObjectJob { donationConfig = donationConfig.Value, hashID = hashID, spawnObject = SystemAPI.GetSingleton<EntityStoreComponent>().cheeze, parallelWriter = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(CheckedStateRef.WorldUnmanaged).AsParallelWriter() }.ScheduleParallel(CheckedStateRef.Dependency).Complete();
+                await Utils.YieldCaches.UniTaskYield;
             }
         };
     }
