@@ -143,14 +143,12 @@ public class AHSeleniumUnity : MonoBehaviour
             if (isHeadless)
             {
                 _options.AddArgument("--headless");
-                _options.AddArgument("--disable-gpu");
+                //_options.AddArgument("--disable-gpu");
                 _options.AddArgument("--window-size=1920,1080");
                 _options.AddArgument("--disable-images");
-                _options.AddArgument("--blink-settings=imagesEnabled=false");
+                //_options.AddArgument("--blink-settings=imagesEnabled=false");
             }
-            //_options.AddArgument("--blink-settings=imagesEnabled=false");
             _driver = new ChromeDriver(_driverService, _options);
-            //_driver.Navigate().GoToUrl(InputChatUrl.text);
 
             IWebElement chatListElement = null;
             while (chatListElement == null)
@@ -339,7 +337,6 @@ public class AHSeleniumUnity : MonoBehaviour
                 }
                 catch(StaleElementReferenceException)
                 {
-
                     chatListElement = _driver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
                     startIndex = 0;
                     continue;
