@@ -1,43 +1,108 @@
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Systems;
 using Unity.Transforms;
 
-[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
-[UpdateInGroup(typeof(SimulationSystemGroup))]
+#if false
 [BurstCompile]
-public partial struct Physic2DSystem : ISystem, ISystemStartStop
+[UpdateInGroup(typeof(PhysicsSystemGroup))]
+[UpdateAfter(typeof(PhysicsSimulationGroup))]
+[UpdateBefore(typeof(ExportPhysicsWorld))]
+[RequireMatchingQueriesForUpdate]
+public partial struct ConstrainPhysicsTo2D : ISystem
 {
-    GameManagerComponent gameManager;
     [BurstCompile]
-    public void OnStartRunning(ref SystemState state)
+    public void OnCreate(ref SystemState state)
     {
-        gameManager = SystemAPI.GetSingleton<GameManagerComponent>();
-    }
-
-    [BurstCompile]
-    public void OnStopRunning(ref SystemState state)
-    {
+        state.RequireForUpdate<PhysicsWorldSingleton>();
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        new Physic2DJob { maxVelocity = gameManager.physicMaxVelocity }.ScheduleParallel();
+        ref PhysicsWorldSingleton physics = ref SystemAPI.GetSingletonRW<PhysicsWorldSingleton>().ValueRW;
+
+        state.Dependency = new ConstrainJob
+        {
+            Velocity = physics.MotionVelocities,
+            Data = physics.MotionDatas
+        }.Schedule(state.Dependency);
+    }
+
+    [BurstCompile]
+    private unsafe struct ConstrainJob : IJob
+    {
+        public NativeArray<MotionVelocity> Velocity;
+        public NativeArray<MotionData> Data;
+
+        public void Execute()
+        {
+            // * Fixed zero value.
+            var zC = 0;
+
+            // * Fixed float2 zero value.
+            float2 xyC = float2.zero;
+
+            var vel = (MotionVelocity*)Velocity.GetUnsafePtr();
+
+            // * Shift pointer to access Z variable of linear velocity and zero it out.
+            UnsafeUtility.MemCpyStride(&vel->LinearVelocity.z, sizeof(MotionVelocity),
+                &zC, 0, sizeof(int), Velocity.Length);
+
+            // * Shift pointer to access XY fields of angular velocity and zero them out.
+            UnsafeUtility.MemCpyStride(&vel->AngularVelocity, sizeof(MotionVelocity),
+                &xyC, 0, sizeof(float2), Velocity.Length);
+
+            var dat = (MotionData*)Data.GetUnsafePtr();
+            //float4 xyQ = new float4(0, 0, dat->BodyFromMotion.rot.value.z, dat->BodyFromMotion.rot.value.w);
+
+            // * Shift pointer to access WorldFromMotion (RigidTransform) and then the Z variable of its position.
+            UnsafeUtility.MemCpyStride(&dat->WorldFromMotion.pos.z, sizeof(MotionData),
+                &zC, 0, sizeof(int), Data.Length);
+
+            UnsafeUtility.MemCpyStride(&dat->WorldFromMotion.rot.value, sizeof(MotionData),
+                &xyC, 0, sizeof(int), Data.Length);
+        }
+    }
+}
+#elif true
+[BurstCompile]
+[UpdateInGroup(typeof(PhysicsSystemGroup), OrderFirst = true)]
+//[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
+[UpdateBefore(typeof(ExportPhysicsWorld))]
+[RequireMatchingQueriesForUpdate]
+public partial struct Physic2DSystem : ISystem
+{
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<GameManagerSingletonComponent>();
+    }
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
+    {
+        new StandJob().ScheduleParallel(state.Dependency).Complete();
+        GameManagerSingletonComponent gmComponent = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
+        new Physic2DJob { maxVelocity = gmComponent.physicMaxVelocity, gravity = gmComponent.gravity }.ScheduleParallel();
     }
     [BurstCompile]
     partial struct Physic2DJob : IJobEntity
     {
-        public float maxVelocity;
-        public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform)
+        [ReadOnly] public float maxVelocity;
+        [ReadOnly] public float gravity;
+        public void Execute(ref PhysicsVelocity velocity, ref LocalTransform localTransform, ref PhysicsGravityFactor gravityFactor)
         {
+            gravityFactor.Value = gravity;
             localTransform.Position.z = 0;
 
             localTransform.Rotation = new Unity.Mathematics.quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
 
             velocity.Linear.z = 0;
-            velocity.Angular.x = 0;
-            velocity.Angular.y = 0;
 
             if (velocity.Linear.x > maxVelocity)
                 velocity.Linear.x = maxVelocity;
@@ -50,4 +115,40 @@ public partial struct Physic2DSystem : ISystem, ISystemStartStop
                 velocity.Linear.y = -maxVelocity;
         }
     }
+
+    [BurstCompile]
+    partial struct StandJob : IJobEntity
+    {
+        public void Execute(ref LocalTransform localTransform, ref PhysicsMass physicsMass, ref PhysicsVelocity physicsVelocity)
+        {
+            if (physicsMass.InverseInertia.x == 0 && physicsMass.InverseInertia.y == 0) return;
+            physicsMass.InverseInertia = new float3(0, 0, physicsMass.InverseInertia.z);
+            physicsVelocity.Angular = new float3(0, 0, physicsVelocity.Angular.z);
+            localTransform.Rotation = new quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
+        }
+    }
 }
+#else
+[BurstCompile]
+partial struct StandSystem : ISystem
+{
+
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
+    {
+        new StandJob().ScheduleParallel(state.Dependency).Complete();
+    }
+
+    [BurstCompile]
+    partial struct StandJob : IJobEntity
+    {
+        public void Execute(ref LocalTransform localTransform, ref PhysicsMass physicsMass, ref PhysicsVelocity physicsVelocity)
+        {
+            if (physicsMass.InverseInertia.x == 0 && physicsMass.InverseInertia.y == 0) return;
+            physicsMass.InverseInertia = new float3(0, 0, physicsMass.InverseInertia.z);
+            physicsVelocity.Angular = new float3(0, 0, physicsVelocity.Angular.z);
+            localTransform.Rotation = new quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
+        }
+    }
+}
+#endif

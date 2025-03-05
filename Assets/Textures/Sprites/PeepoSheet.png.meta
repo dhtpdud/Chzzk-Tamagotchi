@@ -1,0 +1,1116 @@
+fileFormatVersion: 2
+guid: bd3a2a73587b35e428ffd0e8e6f6e9f5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6713194508893911192
+    second: PeepoSheet_0
+  - first:
+      213: -5533230609447988688
+    second: PeepoSheet_1
+  - first:
+      213: 585064349656743576
+    second: PeepoSheet_2
+  - first:
+      213: 6282504529811451966
+    second: PeepoSheet_3
+  - first:
+      213: 3181563770724905047
+    second: PeepoSheet_4
+  - first:
+      213: 7407258898138631712
+    second: PeepoSheet_5
+  - first:
+      213: -8729492844096306499
+    second: PeepoSheet_6
+  - first:
+      213: -6054479312258246928
+    second: PeepoSheet_7
+  - first:
+      213: 3954671155436770803
+    second: PeepoSheet_8
+  - first:
+      213: 1299746822138773781
+    second: PeepoSheet_9
+  - first:
+      213: -8229984417699036632
+    second: PeepoSheet_10
+  - first:
+      213: -8807023400959262397
+    second: PeepoSheet_11
+  - first:
+      213: 7925841385622448949
+    second: PeepoSheet_12
+  - first:
+      213: 3108638775695633781
+    second: PeepoSheet_13
+  - first:
+      213: 8767892703556273403
+    second: PeepoSheet_14
+  - first:
+      213: 5596034092863311743
+    second: PeepoSheet_15
+  - first:
+      213: 562610914607589044
+    second: PeepoSheet_16
+  - first:
+      213: -6734230578664829050
+    second: PeepoSheet_17
+  - first:
+      213: -5392142757107954274
+    second: PeepoSheet_18
+  - first:
+      213: 412912820528362874
+    second: PeepoSheet_19
+  - first:
+      213: -1670490265825249662
+    second: PeepoSheet_20
+  - first:
+      213: 2409570472335956710
+    second: PeepoSheet_21
+  - first:
+      213: 9006927320675846350
+    second: PeepoSheet_22
+  - first:
+      213: -7733274122621824893
+    second: PeepoSheet_23
+  - first:
+      213: -3178207509498006954
+    second: PeepoSheet_24
+  - first:
+      213: 1699367149332068321
+    second: PeepoSheet_25
+  - first:
+      213: -3175691310421276563
+    second: PeepoSheet_26
+  - first:
+      213: -4535601602868781915
+    second: PeepoSheet_27
+  - first:
+      213: 8887408779539028311
+    second: PeepoSheet_28
+  - first:
+      213: -99335910433419293
+    second: PeepoSheet_29
+  - first:
+      213: -779785089514875309
+    second: PeepoSheet_30
+  - first:
+      213: -1586023531815575617
+    second: PeepoSheet_31
+  - first:
+      213: 8999223607968221006
+    second: PeepoSheet_32
+  - first:
+      213: 5380136026522478477
+    second: PeepoSheet_33
+  - first:
+      213: 6151746252031263113
+    second: PeepoSheet_34
+  - first:
+      213: -2510247166453286464
+    second: PeepoSheet_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Win64
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: VisionOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PeepoSheet_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 224
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89879ba76de0a2d50800000000000000
+      internalID: 6713194508893911192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_1
+      rect:
+        serializedVersion: 2
+        x: 222
+        y: 0
+        width: 115
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 032d887b3140633b0800000000000000
+      internalID: -5533230609447988688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_2
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 0
+        width: 113
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89ef80c1de09e1800800000000000000
+      internalID: 585064349656743576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_3
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 0
+        width: 109
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e30b13f6590ff2750800000000000000
+      internalID: 6282504529811451966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_4
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 0
+        width: 109
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7507f40946f272c20800000000000000
+      internalID: 3181563770724905047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_5
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 0
+        width: 108
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02e87e6f8bedbc660800000000000000
+      internalID: 7407258898138631712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_6
+      rect:
+        serializedVersion: 2
+        x: 788
+        y: 0
+        width: 109
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db24356528c9ad680800000000000000
+      internalID: -8729492844096306499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_7
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 0
+        width: 199
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f655ecb42b2afba0800000000000000
+      internalID: -6054479312258246928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_8
+      rect:
+        serializedVersion: 2
+        x: 1092
+        y: 0
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f5da4f8670d1e630800000000000000
+      internalID: 3954671155436770803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_9
+      rect:
+        serializedVersion: 2
+        x: 1119
+        y: 0
+        width: 92
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 511468f29d0a90210800000000000000
+      internalID: 1299746822138773781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_10
+      rect:
+        serializedVersion: 2
+        x: 1204
+        y: 0
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8228c04c6c839cd80800000000000000
+      internalID: -8229984417699036632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_11
+      rect:
+        serializedVersion: 2
+        x: 1231
+        y: 0
+        width: 91
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3414541e0ea27c580800000000000000
+      internalID: -8807023400959262397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_12
+      rect:
+        serializedVersion: 2
+        x: 1315
+        y: 0
+        width: 22
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53bad105fbe3efd60800000000000000
+      internalID: 7925841385622448949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_13
+      rect:
+        serializedVersion: 2
+        x: 1343
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57de7580f7a142b20800000000000000
+      internalID: 3108638775695633781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_14
+      rect:
+        serializedVersion: 2
+        x: 1455
+        y: 0
+        width: 106
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf40638a5ffcda970800000000000000
+      internalID: 8767892703556273403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_15
+      rect:
+        serializedVersion: 2
+        x: 1567
+        y: 0
+        width: 106
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7fc710cb5b19ad40800000000000000
+      internalID: 5596034092863311743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_16
+      rect:
+        serializedVersion: 2
+        x: 1679
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b661ff55abcec700800000000000000
+      internalID: 562610914607589044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_17
+      rect:
+        serializedVersion: 2
+        x: 1791
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68f0c1bd7f43b82a0800000000000000
+      internalID: -6734230578664829050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_18
+      rect:
+        serializedVersion: 2
+        x: 1903
+        y: 0
+        width: 91
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9d82603bb24b25b0800000000000000
+      internalID: -5392142757107954274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_19
+      rect:
+        serializedVersion: 2
+        x: 1988
+        y: 0
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a753cc6c506fab500800000000000000
+      internalID: 412912820528362874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_20
+      rect:
+        serializedVersion: 2
+        x: 2015
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 286fcb034f931d8e0800000000000000
+      internalID: -1670490265825249662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_21
+      rect:
+        serializedVersion: 2
+        x: 2127
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6eadad00493807120800000000000000
+      internalID: 2409570472335956710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_22
+      rect:
+        serializedVersion: 2
+        x: 2239
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec805aa6da80ffc70800000000000000
+      internalID: 9006927320675846350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_23
+      rect:
+        serializedVersion: 2
+        x: 2351
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 380d76a7824eda490800000000000000
+      internalID: -7733274122621824893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_24
+      rect:
+        serializedVersion: 2
+        x: 2463
+        y: 0
+        width: 106
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65274e5eb1db4e3d0800000000000000
+      internalID: -3178207509498006954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_25
+      rect:
+        serializedVersion: 2
+        x: 2575
+        y: 0
+        width: 91
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e7f7ee2b6d559710800000000000000
+      internalID: 1699367149332068321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_26
+      rect:
+        serializedVersion: 2
+        x: 2659
+        y: 0
+        width: 22
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d688b06249dade3d0800000000000000
+      internalID: -3175691310421276563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_27
+      rect:
+        serializedVersion: 2
+        x: 2690
+        y: 6
+        width: 91
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ac50527f5e4e01c0800000000000000
+      internalID: -4535601602868781915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_28
+      rect:
+        serializedVersion: 2
+        x: 2774
+        y: 6
+        width: 22
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7599c1e823b665b70800000000000000
+      internalID: 8887408779539028311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_29
+      rect:
+        serializedVersion: 2
+        x: 2807
+        y: 0
+        width: 91
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ef0d2904861f9ef0800000000000000
+      internalID: -99335910433419293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_30
+      rect:
+        serializedVersion: 2
+        x: 2891
+        y: 0
+        width: 22
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 356d152b795ad25f0800000000000000
+      internalID: -779785089514875309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_31
+      rect:
+        serializedVersion: 2
+        x: 2914
+        y: 6
+        width: 91
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbfd8bc30005df9e0800000000000000
+      internalID: -1586023531815575617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_32
+      rect:
+        serializedVersion: 2
+        x: 2998
+        y: 6
+        width: 22
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e474147013aa3ec70800000000000000
+      internalID: 8999223607968221006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_33
+      rect:
+        serializedVersion: 2
+        x: 3023
+        y: 0
+        width: 91
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d87672006351aaa40800000000000000
+      internalID: 5380136026522478477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_34
+      rect:
+        serializedVersion: 2
+        x: 3107
+        y: 0
+        width: 22
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9810aa47f946f5550800000000000000
+      internalID: 6151746252031263113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PeepoSheet_35
+      rect:
+        serializedVersion: 2
+        x: 3135
+        y: 0
+        width: 225
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c9fe11808fc92dd0800000000000000
+      internalID: -2510247166453286464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      PeepoSheet_0: 6713194508893911192
+      PeepoSheet_1: -5533230609447988688
+      PeepoSheet_10: -8229984417699036632
+      PeepoSheet_11: -8807023400959262397
+      PeepoSheet_12: 7925841385622448949
+      PeepoSheet_13: 3108638775695633781
+      PeepoSheet_14: 8767892703556273403
+      PeepoSheet_15: 5596034092863311743
+      PeepoSheet_16: 562610914607589044
+      PeepoSheet_17: -6734230578664829050
+      PeepoSheet_18: -5392142757107954274
+      PeepoSheet_19: 412912820528362874
+      PeepoSheet_2: 585064349656743576
+      PeepoSheet_20: -1670490265825249662
+      PeepoSheet_21: 2409570472335956710
+      PeepoSheet_22: 9006927320675846350
+      PeepoSheet_23: -7733274122621824893
+      PeepoSheet_24: -3178207509498006954
+      PeepoSheet_25: 1699367149332068321
+      PeepoSheet_26: -3175691310421276563
+      PeepoSheet_27: -4535601602868781915
+      PeepoSheet_28: 8887408779539028311
+      PeepoSheet_29: -99335910433419293
+      PeepoSheet_3: 6282504529811451966
+      PeepoSheet_30: -779785089514875309
+      PeepoSheet_31: -1586023531815575617
+      PeepoSheet_32: 8999223607968221006
+      PeepoSheet_33: 5380136026522478477
+      PeepoSheet_34: 6151746252031263113
+      PeepoSheet_35: -2510247166453286464
+      PeepoSheet_4: 3181563770724905047
+      PeepoSheet_5: 7407258898138631712
+      PeepoSheet_6: -8729492844096306499
+      PeepoSheet_7: -6054479312258246928
+      PeepoSheet_8: 3954671155436770803
+      PeepoSheet_9: 1299746822138773781
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

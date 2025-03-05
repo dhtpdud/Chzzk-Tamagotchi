@@ -3,18 +3,28 @@ using UnityEngine;
 
 public class EntityStoreAuthoring : MonoBehaviour
 {
+    public GameObject bonobono;
+    public GameObject tropicanan;
+    public GameObject seokev;
+    public GameObject mangongja;
     public GameObject peepo;
+    public GameObject cheeze;
     public GameObject mouseRock;
-    public class SpawnerAuthoringBaker : Baker<EntityStoreAuthoring>
+    public GameObject boxCollider;
+    public class EntityStoreAuthoringBaker : Baker<EntityStoreAuthoring>
     {
         public override void Bake(EntityStoreAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-            AddComponent(entity, new EntityStoreComponent
-            {
-                peepo = GetEntity(authoring.peepo, TransformUsageFlags.Dynamic),
-                mouseRock = GetEntity(authoring.mouseRock, TransformUsageFlags.Dynamic)
-            });
+            AddComponent(entity, new EntityStoreComponent(
+                GetEntity(authoring.bonobono, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.tropicanan, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.seokev, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.mangongja, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.peepo, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.cheeze, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.mouseRock, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.boxCollider, TransformUsageFlags.Dynamic)));
         }
     }
 }

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59540757d4006d444aaf5d4f510bc912, type: 3}
+  m_Name: PeepoAnimationSet
+  m_EditorClassIdentifier: 
+  _animations:
+  - name: Idle
+    data: {fileID: 11400000, guid: ad6259728fc0ecc4c89d56bf3f5fbad7, type: 2}
+  - name: IdleSub1
+    data: {fileID: 11400000, guid: 757387ac6a0504c408664b15a59f0992, type: 2}
+  - name: IdleSub2
+    data: {fileID: 11400000, guid: 537727faa853ae246a9301763b4f6834, type: 2}
+  - name: Move
+    data: {fileID: 11400000, guid: 530033e432371ce45963bfa3b1163a7a, type: 2}
+  - name: Ragdoll
+    data: {fileID: 11400000, guid: ee4d181ead553c34e8aa3f92876fd46c, type: 2}
+  - name: Donation
+    data: {fileID: 11400000, guid: b3b4bd0b3f145be4bbfc8f3cb0ba82aa, type: 2}
