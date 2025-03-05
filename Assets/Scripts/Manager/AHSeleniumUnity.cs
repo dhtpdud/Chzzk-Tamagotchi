@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 
 // 아프리카 도우미 사용시 구독자 기간은 어떻게 조회 할것인지?
@@ -26,6 +27,9 @@ public class AHSeleniumUnity : MonoBehaviour
     public Action<string, string> OnChat = (authorName, str) => { };
     public Action<string, string, int> OnDonation = (authorName, str, donationAmount) => { };
     public Action<string, string, int> onSubscription = (authorName, str, month) => { };
+
+    //int count;
+
     public void Awake()
     {
         instance = this;
@@ -129,8 +133,10 @@ public class AHSeleniumUnity : MonoBehaviour
             _options.AddArgument("--disable-infobars");
             _options.AddArgument("--disable-extensions");
             _options.AddArgument($"--app={InputChatUrl.text}");
-            _options.AddArgument("disable-blink-features=AutomationControlled");
-            _options.AddArgument($"user-data-dir={Environment.CurrentDirectory}\\Selenium\\UserData");
+            _options.AddArgument("--disable-blink-features=AutomationControlled");
+            _options.AddArgument("--no-sandbox");
+            _options.AddArgument("--disable-dev-shm-usage");
+            //_options.AddArgument($"user-data-dir={Environment.CurrentDirectory}\\Selenium\\UserData");
             //_options.PageLoadStrategy = PageLoadStrategy.Eager;
             if (isHeadless)
             {
@@ -138,21 +144,7 @@ public class AHSeleniumUnity : MonoBehaviour
                 //_options.AddArgument("--disable-gpu");
                 _options.AddArgument("--window-size=1920,1080");
                 _options.AddArgument("--disable-images");
-                //_options.AddArgument("--blink-settings=imagesEnabled=false");
-            }
-            _driver = new ChromeDriver(_driverService, _options);
-
-            IWebElement chatListElement = null;
-            while (chatListElement == null)
-            {
-                try
-                {
-                    chatListElement = _driver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
-                }
-                catch (NoSuchElementException)
-                {
-                    _driver.Navigate().Refresh();
-                }
+                _options.AddArgument("--blink-settings=imagesEnabled=false");
             }
 
             string stringNaver = "naver";
@@ -207,10 +199,42 @@ public class AHSeleniumUnity : MonoBehaviour
 
             //string preChatClassName = string.Empty;
             int startIndex = 0;
+
+            float timer = 0;
+
+            IWebElement chatListElement = null;
             while (!destroyCancellationToken.IsCancellationRequested)
             {
                 try
                 {
+                    if(_driver == null /*|| timer >= 7*/)
+                    {
+                        chatListElement = null;
+                        ChromeDriver tempDriver = new ChromeDriver(_driverService, _options);
+
+                        while (chatListElement == null)
+                        {
+                            try
+                            {
+                                await UniTask.Delay(TimeSpan.FromSeconds(.1f), true, PlayerLoopTiming.FixedUpdate, destroyCancellationToken, true);
+                                chatListElement = tempDriver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
+                            }
+                            catch (NoSuchElementException)
+                            {
+                                tempDriver.Navigate().Refresh();
+                            }
+                        }
+                        _driver?.Close();
+                        _driver = tempDriver;
+                        /*timer = 0;
+                        startIndex = 0;*/
+                    }
+                    /*if(timer >= 7)
+                    {
+                        _driver.Navigate().Refresh();
+                        timer = 0;
+                        startIndex = 0;
+                    }*/
                     var chatElementList = chatListElement.FindElements(By.TagName(stringLI));
                     int chatElementListCount = chatElementList.Count;
 
@@ -323,24 +347,29 @@ public class AHSeleniumUnity : MonoBehaviour
                         await Utils.YieldCaches.UniTaskYield;
                     }
                 }
-                catch (WebDriverTimeoutException)
+                catch (WebDriverTimeoutException e)
                 {
+                    Debug.LogWarning(e.Message);
                     continue;
                 }
-                catch (StaleElementReferenceException)
+                catch (StaleElementReferenceException e)
                 {
+                    Debug.LogWarning(e.Message);
+                    await UniTask.Delay(TimeSpan.FromSeconds(1f), true, PlayerLoopTiming.FixedUpdate, destroyCancellationToken, true);
                     chatListElement = _driver.FindElement(By.XPath("//*[@id=\"page\"]/div/div[2]/div[6]/div[10]/div[1]/ul"));
                     startIndex = 0;
                     continue;
                 }
                 finally
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(0.1f));
+                    //body.SendKeys(Keys.Null);
+                    timer += 0.1f;
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.1f), true, PlayerLoopTiming.FixedUpdate, destroyCancellationToken, true);
                 }
             }
         }, true, destroyCancellationToken).Forget();
     }
-    public void OnDestroy()
+    public void OnApplicationQuit()
     {
         _driver?.Close();
         _driver?.Quit();

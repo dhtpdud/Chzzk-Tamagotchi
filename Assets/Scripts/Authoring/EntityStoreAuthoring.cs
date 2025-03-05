@@ -6,6 +6,7 @@ public class EntityStoreAuthoring : MonoBehaviour
     public GameObject bonobono;
     public GameObject tropicanan;
     public GameObject seokev;
+    public GameObject mangongja;
     public GameObject peepo;
     public GameObject cheeze;
     public GameObject mouseRock;
@@ -19,6 +20,7 @@ public class EntityStoreAuthoring : MonoBehaviour
                 GetEntity(authoring.bonobono, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.tropicanan, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.seokev, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.mangongja, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.peepo, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.cheeze, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.mouseRock, TransformUsageFlags.Dynamic),

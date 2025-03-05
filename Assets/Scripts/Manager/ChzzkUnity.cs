@@ -304,7 +304,7 @@ public class ChzzkUnity : MonoBehaviour
         socket.Send(message);
     }
 
-    private void OnDestroy()
+    public void OnApplicationQuit()
     {
         removeAllOnDonationListener();
         removeAllOnMessageListener();

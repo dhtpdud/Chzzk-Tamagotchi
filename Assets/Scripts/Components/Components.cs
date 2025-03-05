@@ -86,16 +86,18 @@ public struct EntityStoreComponent : IComponentData
     public readonly Entity bonobono;
     public readonly Entity tropicanan;
     public readonly Entity seokev;
+    public readonly Entity mangongja;
     public readonly Entity peepo;
     public readonly Entity cheeze;
     public readonly Entity mouseRock;
     public readonly Entity boxCollider;
 
-    public EntityStoreComponent(Entity bonobono, Entity tropicanan, Entity seokev, Entity peepo, Entity cheeze, Entity mouseRock, Entity boxCollider)
+    public EntityStoreComponent(Entity bonobono, Entity tropicanan, Entity seokev, Entity mangongja, Entity peepo, Entity cheeze, Entity mouseRock, Entity boxCollider)
     {
         this.bonobono = bonobono;
         this.tropicanan = tropicanan;
         this.seokev = seokev;
+        this.mangongja = mangongja;
         this.peepo = peepo;
         this.cheeze = cheeze;
         this.mouseRock = mouseRock;
@@ -104,12 +106,16 @@ public struct EntityStoreComponent : IComponentData
 }
 public struct SpawnerComponent : IComponentData
 {
-    public Entity spawnPrefab;
+    public Entity targetEntity;
     public int maxCount;
     public int spawnedCount;
 
     public float spawnIntervalSec;
     public float currentSec;
+    public int batchCount;
+
+    public float3 minPos;
+    public float3 maxPos;
 
     public bool isRandomSize;
     public float minSize;

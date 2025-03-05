@@ -106,6 +106,7 @@ public class StreamingEventManager : MonoBehaviour
 
             async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, ChzzkUnity.Profile profile, int subMonth)
             {
+                Utils.hashMemory.TryAdd(hash, profile.nickname);
                 bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
                 float addLifeTime = 0;
 
@@ -175,12 +176,14 @@ public class StreamingEventManager : MonoBehaviour
 
             async UniTask OnInit(PeepoEventSystem peepoEventSystemHandle, int hash, YoutubeUnity.LiveChatInfo.Chat.AuthorDetails authorDetails, int subMonth = 0)
             {
+                string authVal = $"{authorDetails.channelId}{GameManager.instance.nameSpliter}{authorDetails.displayName}";
+                Utils.hashMemory.TryAdd(hash, authVal);
                 bool isInit = !GameManager.instance.viewerInfos.ContainsKey(hash);
                 float addLifeTime = 0;
 
                 if (isInit)
                 {
-                    GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo($"{authorDetails.channelId}{GameManager.instance.nameSpliter}{authorDetails.displayName}", subMonth));
+                    GameManager.instance.viewerInfos.Add(hash, new GameManager.ViewerInfo(authVal, subMonth));
                     GameManager.instance.spawnOrderQueue.Enqueue(new GameManager.SpawnOrder(hash,
                         initForce: new float3(Utils.GetRandom(GameManager.instance.SpawnMinSpeed.x, GameManager.instance.SpawnMaxSpeed.x), Utils.GetRandom(GameManager.instance.SpawnMinSpeed.y, GameManager.instance.SpawnMaxSpeed.y), 0)));
                     peepoEventSystemHandle.OnSpawn.Invoke();
@@ -307,7 +310,7 @@ public class StreamingEventManager : MonoBehaviour
         youtubeCTS?.Dispose();
     }
 
-    public async void OnDestroy()
+    public async void OnApplicationQuit()
     {
         ChzzkCTS?.Cancel();
         youtubeCTS?.Cancel();

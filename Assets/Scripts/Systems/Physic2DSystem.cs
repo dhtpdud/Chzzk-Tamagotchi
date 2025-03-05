@@ -70,9 +70,9 @@ public partial struct ConstrainPhysicsTo2D : ISystem
         }
     }
 }
-# else
+#elif true
 [BurstCompile]
-[UpdateInGroup(typeof(PhysicsSystemGroup))]
+[UpdateInGroup(typeof(PhysicsSystemGroup), OrderFirst = true)]
 //[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [UpdateBefore(typeof(ExportPhysicsWorld))]
 [RequireMatchingQueriesForUpdate]
@@ -86,6 +86,7 @@ public partial struct Physic2DSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        new StandJob().ScheduleParallel(state.Dependency).Complete();
         GameManagerSingletonComponent gmComponent = SystemAPI.GetSingleton<GameManagerSingletonComponent>();
         new Physic2DJob { maxVelocity = gmComponent.physicMaxVelocity, gravity = gmComponent.gravity }.ScheduleParallel();
     }
@@ -102,8 +103,6 @@ public partial struct Physic2DSystem : ISystem
             localTransform.Rotation = new Unity.Mathematics.quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
 
             velocity.Linear.z = 0;
-            velocity.Angular.x = 0;
-            velocity.Angular.y = 0;
 
             if (velocity.Linear.x > maxVelocity)
                 velocity.Linear.x = maxVelocity;
@@ -114,6 +113,41 @@ public partial struct Physic2DSystem : ISystem
                 velocity.Linear.y = maxVelocity;
             else if (velocity.Linear.y < -maxVelocity)
                 velocity.Linear.y = -maxVelocity;
+        }
+    }
+
+    [BurstCompile]
+    partial struct StandJob : IJobEntity
+    {
+        public void Execute(ref LocalTransform localTransform, ref PhysicsMass physicsMass, ref PhysicsVelocity physicsVelocity)
+        {
+            if (physicsMass.InverseInertia.x == 0 && physicsMass.InverseInertia.y == 0) return;
+            physicsMass.InverseInertia = new float3(0, 0, physicsMass.InverseInertia.z);
+            physicsVelocity.Angular = new float3(0, 0, physicsVelocity.Angular.z);
+            localTransform.Rotation = new quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
+        }
+    }
+}
+#else
+[BurstCompile]
+partial struct StandSystem : ISystem
+{
+
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
+    {
+        new StandJob().ScheduleParallel(state.Dependency).Complete();
+    }
+
+    [BurstCompile]
+    partial struct StandJob : IJobEntity
+    {
+        public void Execute(ref LocalTransform localTransform, ref PhysicsMass physicsMass, ref PhysicsVelocity physicsVelocity)
+        {
+            if (physicsMass.InverseInertia.x == 0 && physicsMass.InverseInertia.y == 0) return;
+            physicsMass.InverseInertia = new float3(0, 0, physicsMass.InverseInertia.z);
+            physicsVelocity.Angular = new float3(0, 0, physicsVelocity.Angular.z);
+            localTransform.Rotation = new quaternion(0, 0, localTransform.Rotation.value.z, localTransform.Rotation.value.w);
         }
     }
 }

@@ -1,9 +1,11 @@
 using Kirurobo;
 using OSY;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
+[BurstCompile]
 [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))]
 public sealed partial class GameManagerInfoSystem : SystemBase
 {
@@ -12,6 +14,8 @@ public sealed partial class GameManagerInfoSystem : SystemBase
     public UniWindowController uniWindowController;
     public BlobAssetReference<PeepoConfig> peepoConfigRef;
     public BlobAssetReference<DonationConfig> donationConfigRef;
+
+    [BurstCompile]
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
@@ -37,6 +41,8 @@ public sealed partial class GameManagerInfoSystem : SystemBase
 
         builder.Dispose();
     }
+
+    [BurstCompile]
     protected override void OnUpdate()
     {
         ref var gameManagerRW = ref SystemAPI.GetSingletonRW<GameManagerSingletonComponent>().ValueRW;
@@ -80,9 +86,12 @@ public sealed partial class GameManagerInfoSystem : SystemBase
         donationConfigRW.MinSize = GameManager.instance.donationConfig.minSize;
         donationConfigRW.MaxSize = GameManager.instance.donationConfig.maxSize;
     }
+
+    [BurstCompile]
     protected override void OnDestroy()
     {
         base.OnDestroy();
         peepoConfigRef.Dispose();
+        donationConfigRef.Dispose();
     }
 }
