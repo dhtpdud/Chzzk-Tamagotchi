@@ -22,7 +22,7 @@ https://youtu.be/YGVlcJjfj70?si=ombY6yvEDdHcPJav
 - 설정 자동 저장 & 불러오기 기능 지원
 - 유동적 해상도 대응
   - 16:9, 16:10, 9:16 등등 모두 지원
-- Unity DOTS
+- **Unity DOTS**
   - i7 - 13700KF 기준) 동접 채팅자 수 200명 이상 + 수백개의 치즈 오브젝트가 혼재하는 상황에서도 별다른 프레임 저하없이 동작 확인했습니다. (악어의 놀이터2 당시 테스트)
 - 윈도우 64비트 운영체제 이상만 실행 가능
 ## 단축키
@@ -39,7 +39,7 @@ https://youtu.be/YGVlcJjfj70?si=ombY6yvEDdHcPJav
 (!!!현재 연령 제한 방송은 불가능!!!)
 ## 종속성
 Unity 2022.3.54f1  
-Entities 1.0.16  
-Unity Physics 1.0.16  
+**Entities 1.0.16**  
+**Unity Physics 1.0.16**  
 [NSprites 4.0.1](https://github.com/Antoshidza/NSprites)  
 [NSprites Foundation 8.0.4](https://github.com/Antoshidza/NSprites-Foundation)
