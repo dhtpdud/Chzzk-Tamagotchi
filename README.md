@@ -37,3 +37,9 @@ https://youtu.be/YGVlcJjfj70?si=ombY6yvEDdHcPJav
 ## 사용 방법
 채널ID 입력 후, "시작" 버튼을 클릭  
 (!!!현재 연령 제한 방송은 불가능!!!)
+## 종속성
+Unity 2022.3.54f1
+Entities 1.0.16
+Unity Physics 1.0.16
+NSprites 4.0.1
+NSprites Foundation 8.0.4
